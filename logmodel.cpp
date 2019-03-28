@@ -2,6 +2,7 @@
 
 #include "config.h"
 
+#include <QColor>
 #include <QDebug>
 
 LogModel::LogModel(const Config& config, const QStringList& lines)
@@ -16,6 +17,13 @@ int LogModel::rowCount(const QModelIndex& parent) const {
         return 0;
     }
     return mLines.count();
+}
+
+int LogModel::columnCount(const QModelIndex& parent) const {
+    if (parent.isValid()) {
+        return 0;
+    }
+    return mColumns.count();
 }
 
 QVariant LogModel::data(const QModelIndex& index, int role) const {
@@ -38,25 +46,26 @@ QVariant LogModel::data(const QModelIndex& index, int role) const {
         return role == 0 ? QVariant(line) : QVariant();
     }
     switch (role) {
-    case BackgroundColorRole:
-        return logLine.bgColor;
-    default:
-        Q_ASSERT(role < mColumns.count());
-        return logLine.cells[role];
+    case Qt::BackgroundColorRole:
+        return logLine.bgColor.isValid() ? QVariant(logLine.bgColor) : QVariant();
+    case Qt::DisplayRole:
+        return logLine.cells.at(index.column());
     };
+    return {};
+}
+
+QVariant LogModel::headerData(int section, Qt::Orientation orientation, int role) const {
+    if (orientation == Qt::Vertical) {
+        return {};
+    }
+    if (role == Qt::DisplayRole) {
+        return mColumns.at(section);
+    }
+    return {};
 }
 
 QStringList LogModel::columns() const {
     return mColumns;
-}
-
-QHash<int, QByteArray> LogModel::roleNames() const {
-    QHash<int, QByteArray> hash;
-    int idx = 0;
-    for (const auto& column : mColumns) {
-        hash[idx++] = column.toUtf8();
-    }
-    return hash;
 }
 
 LogLine LogModel::processLine(const QString& line) const {

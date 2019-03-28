@@ -3,6 +3,7 @@
 
 #include "condition.h"
 
+#include <QColor>
 #include <QString>
 
 #include <memory>
@@ -10,7 +11,7 @@
 class Highlight {
 public:
     std::unique_ptr<Condition> condition;
-    QString bgColor;
+    QColor bgColor;
 };
 
 #endif // HIGHLIGHT_H

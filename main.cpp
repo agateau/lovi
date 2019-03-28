@@ -1,8 +1,9 @@
 #include "config.h"
 #include "logmodel.h"
+#include "mainwindow.h"
 
 #include <QAbstractListModel>
-#include <QCoreApplication>
+#include <QApplication>
 #include <QDebug>
 #include <QFile>
 #include <QJsonDocument>
@@ -18,16 +19,17 @@ void dumpModel(LogModel* model) {
     cout << "<html><body>\n";
     cout << "<table>\n";
     for (int row = 0; row < rowCount; ++row) {
-        auto idx = model->index(row);
-        QString bgColor = idx.data(LogModel::BackgroundColorRole).toString();
+        auto idx = model->index(row, 0);
+        QVariant bgColorVariant = idx.data(Qt::BackgroundColorRole);
         cout << "<tr";
-        if (!bgColor.isEmpty()) {
-            cout << " style='background-color:" << bgColor.toStdString() << "'";
+        if (bgColorVariant.isValid()) {
+            QColor color = bgColorVariant.value<QColor>();
+            cout << " style='background-color:" << color.name().toStdString() << "'";
         }
         cout << ">";
 
         for (int column = 0; column < columnCount; ++column) {
-            QString value = idx.data(column).toString();
+            QString value = model->index(row, column).data().toString();
             cout << "<td>" << value.toStdString() << "</td>";
         }
         cout << "</tr>\n";
@@ -45,9 +47,8 @@ optional<QByteArray> readFile(const QString& fileName) {
     return file.readAll();
 }
 
-int main(int argc, char *argv[])
-{
-    QCoreApplication a(argc, argv);
+int main(int argc, char* argv[]) {
+    QApplication app(argc, argv);
 
     QString configFileName = argv[1];
     QString logFileName = argv[2];
@@ -81,7 +82,8 @@ int main(int argc, char *argv[])
 
     LogModel model(config.value(), lines);
 
-    dumpModel(&model);
-
-    return 0;
+    //dumpModel(&model);
+    MainWindow window(&model);
+    window.show();
+    return app.exec();
 }
