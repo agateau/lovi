@@ -103,8 +103,24 @@ public:
     }
 };
 
+
+class LogLine {
+public:
+    QString bgColor;
+    QString fgColor;
+    QStringList cells;
+
+    bool isValid() const {
+        return !cells.empty();
+    }
+};
+
 class LogModel : public QAbstractListModel {
 public:
+    enum {
+        BackgroundColorRole = Qt::UserRole
+    };
+
     LogModel(const Config& config, const QStringList& lines)
         : mConfig(config)
         , mLines(lines) {
@@ -124,21 +140,27 @@ public:
         if (row < 0 || row >= mLines.count()) {
             return {};
         }
-        auto it = mKnownMatches.find(row);
-        QRegularExpressionMatch match;
-        if (it == mKnownMatches.end()) {
+        auto it = mLogLineCache.find(row);
+        LogLine logLine;
+        if (it == mLogLineCache.end()) {
             QString line = mLines.at(row);
-            match = mConfig.parser.match(line);
-            mKnownMatches[row] = match;
+            logLine = processLine(line);
+            mLogLineCache[row] = logLine;
         } else {
-            match = it.value();
+            logLine = it.value();
         }
-        if (!match.hasMatch()) {
+        if (!logLine.isValid()) {
             QString line = mLines.at(row);
             qDebug() << "Line" << row + 1 << "does not match:" << line;
             return role == 0 ? QVariant(line) : QVariant();
         }
-        return match.captured(role + 1);
+        switch (role) {
+        case BackgroundColorRole:
+            return logLine.bgColor;
+        default:
+            Q_ASSERT(role < mColumns.count());
+            return logLine.cells[role];
+        };
     }
 
     QStringList columns() const {
@@ -158,29 +180,45 @@ private:
     const Config& mConfig;
     const QStringList mLines;
     QStringList mColumns;
-    mutable QHash<int, QRegularExpressionMatch> mKnownMatches;
+    mutable QHash<int, LogLine> mLogLineCache;
+
+    LogLine processLine(const QString& line) const {
+        auto match = mConfig.parser.match(line);
+        if (!match.hasMatch()) {
+            return {};
+        }
+        LogLine logLine;
+        int count = mColumns.count();
+
+        logLine.cells.reserve(count);
+        for (int role = 0; role < count; ++role) {
+            QString value = match.captured(role + 1);
+            applyHighlights(&logLine, role, value);
+            logLine.cells << value;
+        }
+        return logLine;
+    }
+
+    void applyHighlights(LogLine* logLine, int role, const QString& value) const {
+        for (const Highlight& highlight : mConfig.highlights) {
+            if (highlight.condition->role() == role) {
+                if (highlight.condition->eval(value)) {
+                    logLine->bgColor = highlight.bgColor;
+                    return;
+                }
+            }
+        }
+    }
 };
 
 void dumpModel(LogModel* model, const Config& config) {
-    int count = model->rowCount();
+    int rowCount = model->rowCount();
     int columnCount = model->columns().count();
     cout << "<html><body>\n";
     cout << "<table>\n";
-    for (int row = 0; row < count; ++row) {
+    for (int row = 0; row < rowCount; ++row) {
         auto idx = model->index(row);
-        QString bgColor;
-        for (int role = 0; role < columnCount; ++role) {
-            QString value = idx.data(role).toString();
-            for (const Highlight& highlight : config.highlights) {
-                 if (highlight.condition->role() == role) {
-                     if (highlight.condition->eval(value)) {
-                         bgColor = highlight.bgColor;
-                         break;
-                     }
-                 }
-            }
-        }
-
+        QString bgColor = idx.data(LogModel::BackgroundColorRole).toString();
         cout << "<tr";
         if (!bgColor.isEmpty()) {
             cout << " style='background-color:" << bgColor.toStdString() << "'";
