@@ -8,6 +8,12 @@ set(CMAKE_CXX_STANDARD 17)
 
 find_package(Qt5Core)
 
-add_executable(${PROJECT_NAME} "main.cpp")
+add_executable(${PROJECT_NAME}
+    "main.cpp"
+    "condition.cpp"
+    "config.cpp"
+    "equalcondition.cpp"
+    "logmodel.cpp"
+    )
 
 target_link_libraries(${PROJECT_NAME} Qt5::Core)
