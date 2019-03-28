@@ -36,13 +36,14 @@ QVariant LogModel::data(const QModelIndex& index, int role) const {
         QString line = mLines[row];
         logLine = processLine(line);
         mLogLineCache[row] = logLine;
+        if (!logLine.isValid()) {
+            qWarning() << "Line" << row + 1 << "does not match:" << line;
+        }
     } else {
         logLine = it.value();
     }
     if (!logLine.isValid()) {
-        QString line = mLines[row];
-        qDebug() << "Line" << row + 1 << "does not match:" << line;
-        return role == 0 ? QVariant(line) : QVariant();
+        return role == 0 ? QVariant(mLines[row]) : QVariant();
     }
     const auto& cell = logLine.cells.at(index.column());
     switch (role) {
