@@ -5,12 +5,10 @@
 #include <QColor>
 #include <QDebug>
 
-LogModel::LogModel(const Config& config, const QStringList& lines, QObject* parent)
+LogModel::LogModel(const Config* config, const QStringList& lines, QObject* parent)
     : QAbstractTableModel(parent)
-    , mConfig(config)
     , mLines(lines) {
-    mColumns = mConfig.parser.namedCaptureGroups();
-    mColumns.removeFirst();
+    setConfig(config);
 }
 
 int LogModel::rowCount(const QModelIndex& parent) const {
@@ -72,8 +70,18 @@ QStringList LogModel::columns() const {
     return mColumns;
 }
 
+void LogModel::setConfig(const Config* config) {
+    Q_ASSERT(config);
+    beginResetModel();
+    mConfig = config;
+    mColumns = mConfig->parser.namedCaptureGroups();
+    mColumns.removeFirst();
+    mLogLineCache.clear();
+    endResetModel();
+}
+
 LogLine LogModel::processLine(const QString& line) const {
-    auto match = mConfig.parser.match(line);
+    auto match = mConfig->parser.match(line);
     if (!match.hasMatch()) {
         return {};
     }
@@ -90,7 +98,7 @@ LogLine LogModel::processLine(const QString& line) const {
 }
 
 void LogModel::applyHighlights(LogCell* cell, int column) const {
-    for (const Highlight& highlight : mConfig.highlights) {
+    for (const Highlight& highlight : mConfig->highlights) {
         if (highlight.condition->column() == column) {
             if (highlight.condition->eval(cell->text)) {
                 cell->bgColor = highlight.bgColor;

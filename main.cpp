@@ -6,12 +6,15 @@
 #include <QApplication>
 #include <QDebug>
 #include <QFile>
+#include <QFileSystemWatcher>
 #include <QJsonDocument>
 
 #include <iostream>
+#include <memory>
 
 using std::optional;
 using std::cout;
+using std::unique_ptr;
 
 void dumpModel(LogModel* model) {
     int rowCount = model->rowCount();
@@ -47,27 +50,30 @@ optional<QByteArray> readFile(const QString& fileName) {
     return file.readAll();
 }
 
+unique_ptr<Config> loadConfig(const QString& fileName) {
+    optional<QByteArray> json = readFile(fileName);
+    if (!json.has_value()) {
+        return {};
+    }
+
+    QJsonParseError error;
+    auto doc = QJsonDocument::fromJson(json.value(), &error);
+    if (error.error != QJsonParseError::NoError) {
+        qCritical() << "Invalid Json in" << fileName << ":" << error.errorString();
+        return {};
+    }
+
+    return Config::fromJsonDocument(doc);
+}
+
 int main(int argc, char* argv[]) {
     QApplication app(argc, argv);
 
     QString configFileName = argv[1];
     QString logFileName = argv[2];
 
-    auto json = readFile(configFileName);
-    if (!json.has_value()) {
-        return 1;
-    }
-
-    QJsonParseError error;
-    auto doc = QJsonDocument::fromJson(json.value(), &error);
-    if (error.error != QJsonParseError::NoError) {
-        qCritical() << "Invalid Json in" << configFileName << ":" << error.errorString();
-        return 1;
-    }
-
-    auto config = Config::fromJsonDocument(doc);
+    unique_ptr<Config> config = loadConfig(configFileName);
     if (!config) {
-        qWarning() << "Failed to parse" << configFileName;
         return 1;
     }
 
@@ -80,7 +86,21 @@ int main(int argc, char* argv[]) {
         lines = QString::fromUtf8(logContent.value()).split('\n');
     }
 
-    LogModel model(config.value(), lines);
+    LogModel model(config.get(), lines);
+
+    auto reloadConfig = [&configFileName, &model, &config] {
+        qDebug() << "Reloading config";
+        unique_ptr<Config> newConfig = loadConfig(configFileName);
+        if (newConfig) {
+            model.setConfig(newConfig.get());
+            config = std::move(newConfig);
+        }
+    };
+    QFileSystemWatcher watcher;
+    QObject::connect(&watcher, &QFileSystemWatcher::directoryChanged, reloadConfig);
+    QObject::connect(&watcher, &QFileSystemWatcher::fileChanged, reloadConfig);
+    watcher.addPath(configFileName);
+    watcher.addPath(configFileName.section('/', 0, -2));
 
     //dumpModel(&model);
     MainWindow window(&model);

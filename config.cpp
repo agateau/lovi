@@ -7,27 +7,27 @@
 #include <QJsonDocument>
 #include <QJsonObject>
 
-using std::optional;
+using std::unique_ptr;
 
-optional<Config> Config::fromJsonDocument(const QJsonDocument &doc) {
+unique_ptr<Config> Config::fromJsonDocument(const QJsonDocument &doc) {
     auto regex = doc.object().value("parser").toObject().value("regex").toString();
     if (regex.isEmpty()) {
         qWarning() << "No regex found";
         return {};
     }
 
-    Config config;
-    config.parser.setPattern(regex);
-    if (!config.parser.isValid()) {
+    unique_ptr<Config> config = std::make_unique<Config>();
+    config->parser.setPattern(regex);
+    if (!config->parser.isValid()) {
         qWarning() << "Invalid regex";
         return {};
     }
-    config.parser.optimize();
+    config->parser.optimize();
 
     QHash<QString, int> columnByName;
     {
         int role = 0;
-        for (const auto& name : config.parser.namedCaptureGroups()) {
+        for (const auto& name : config->parser.namedCaptureGroups()) {
             if (!name.isEmpty()) {
                 columnByName[name] = role++;
             }
@@ -51,8 +51,8 @@ optional<Config> Config::fromJsonDocument(const QJsonDocument &doc) {
         highlight.condition = std::make_unique<EqualCondition>(it.value(), value);
         highlight.bgColor = bgColor;
         highlight.fgColor = fgColor;
-        config.highlights.push_back(std::move(highlight));
+        config->highlights.push_back(std::move(highlight));
     }
 
-    return std::move(config);
+    return config;
 }

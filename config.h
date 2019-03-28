@@ -5,6 +5,7 @@
 
 #include <QRegularExpression>
 
+#include <memory>
 #include <vector>
 
 class QJsonDocument;
@@ -14,7 +15,7 @@ public:
     QRegularExpression parser;
     std::vector<Highlight> highlights;
 
-    static std::optional<Config> fromJsonDocument(const QJsonDocument& doc);
+    static std::unique_ptr<Config> fromJsonDocument(const QJsonDocument& doc);
 };
 
 
