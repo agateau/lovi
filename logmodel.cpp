@@ -34,14 +34,14 @@ QVariant LogModel::data(const QModelIndex& index, int role) const {
     auto it = mLogLineCache.find(row);
     LogLine logLine;
     if (it == mLogLineCache.end()) {
-        QString line = mLines.at(row);
+        QString line = mLines[row];
         logLine = processLine(line);
         mLogLineCache[row] = logLine;
     } else {
         logLine = it.value();
     }
     if (!logLine.isValid()) {
-        QString line = mLines.at(row);
+        QString line = mLines[row];
         qDebug() << "Line" << row + 1 << "does not match:" << line;
         return role == 0 ? QVariant(line) : QVariant();
     }
