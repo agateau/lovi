@@ -5,8 +5,9 @@
 #include <QColor>
 #include <QDebug>
 
-LogModel::LogModel(const Config& config, const QStringList& lines)
-    : mConfig(config)
+LogModel::LogModel(const Config& config, const QStringList& lines, QObject* parent)
+    : QAbstractTableModel(parent)
+    , mConfig(config)
     , mLines(lines) {
     mColumns = mConfig.parser.namedCaptureGroups();
     mColumns.removeFirst();

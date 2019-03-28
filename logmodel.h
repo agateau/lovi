@@ -22,7 +22,7 @@ struct LogLine {
 
 class LogModel : public QAbstractTableModel {
 public:
-    LogModel(const Config& config, const QStringList& lines);
+    LogModel(const Config& config, const QStringList& lines, QObject* parent = nullptr);
 
     int rowCount(const QModelIndex& parent = {}) const override;
 
