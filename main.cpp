@@ -6,8 +6,10 @@
 #include <QApplication>
 #include <QDebug>
 #include <QFile>
+#include <QFileInfo>
 #include <QFileSystemWatcher>
 #include <QJsonDocument>
+#include <QTimer>
 
 #include <iostream>
 #include <memory>
@@ -69,7 +71,7 @@ unique_ptr<Config> loadConfig(const QString& fileName) {
 int main(int argc, char* argv[]) {
     QApplication app(argc, argv);
 
-    QString configFileName = argv[1];
+    QString configFileName = QFileInfo(argv[1]).absoluteFilePath();
     QString logFileName = argv[2];
 
     unique_ptr<Config> config = loadConfig(configFileName);
@@ -97,10 +99,21 @@ int main(int argc, char* argv[]) {
         }
     };
     QFileSystemWatcher watcher;
-    QObject::connect(&watcher, &QFileSystemWatcher::directoryChanged, reloadConfig);
-    QObject::connect(&watcher, &QFileSystemWatcher::fileChanged, reloadConfig);
+
+    QTimer reloadTimer;
+    reloadTimer.setInterval(500);
+    reloadTimer.setSingleShot(true);
+    QObject::connect(&reloadTimer, &QTimer::timeout, reloadConfig);
+
+    auto scheduleReload = [&reloadTimer] {
+        qDebug() << "Schedule reload";
+        reloadTimer.start();
+    };
+
+    QObject::connect(&watcher, &QFileSystemWatcher::directoryChanged, scheduleReload);
+    QObject::connect(&watcher, &QFileSystemWatcher::fileChanged, scheduleReload);
     watcher.addPath(configFileName);
-    watcher.addPath(configFileName.section('/', 0, -2));
+    watcher.addPath(QFileInfo(configFileName).absolutePath());
 
     //dumpModel(&model);
     MainWindow window(&model);
