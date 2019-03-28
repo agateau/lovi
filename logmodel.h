@@ -6,10 +6,14 @@
 
 class Config;
 
-class LogLine {
-public:
+struct LogCell {
+    QString text;
     QColor bgColor;
-    QStringList cells;
+    QColor fgColor;
+};
+
+struct LogLine {
+    std::vector<LogCell> cells;
 
     bool isValid() const {
         return !cells.empty();
@@ -38,7 +42,7 @@ private:
 
     LogLine processLine(const QString& line) const;
 
-    void applyHighlights(LogLine* logLine, int column, const QString& value) const;
+    void applyHighlights(LogCell* logCell, int column) const;
 };
 
 

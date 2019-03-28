@@ -12,6 +12,7 @@ class Highlight {
 public:
     std::unique_ptr<Condition> condition;
     QColor bgColor;
+    QColor fgColor;
 };
 
 #endif // HIGHLIGHT_H

@@ -45,11 +45,14 @@ QVariant LogModel::data(const QModelIndex& index, int role) const {
         qDebug() << "Line" << row + 1 << "does not match:" << line;
         return role == 0 ? QVariant(line) : QVariant();
     }
+    const auto& cell = logLine.cells.at(index.column());
     switch (role) {
     case Qt::BackgroundColorRole:
-        return logLine.bgColor.isValid() ? QVariant(logLine.bgColor) : QVariant();
+        return cell.bgColor.isValid() ? QVariant(cell.bgColor) : QVariant();
+    case Qt::TextColorRole:
+        return cell.fgColor.isValid() ? QVariant(cell.fgColor) : QVariant();
     case Qt::DisplayRole:
-        return logLine.cells.at(index.column());
+        return cell.text;
     };
     return {};
 }
@@ -76,20 +79,21 @@ LogLine LogModel::processLine(const QString& line) const {
     LogLine logLine;
     int count = mColumns.count();
 
-    logLine.cells.reserve(count);
-    for (int role = 0; role < count; ++role) {
-        QString value = match.captured(role + 1);
-        applyHighlights(&logLine, role, value);
-        logLine.cells << value;
+    logLine.cells.resize(count);
+    for (int column = 0; column < count; ++column) {
+        LogCell& cell = logLine.cells[column];
+        cell.text = match.captured(column + 1);
+        applyHighlights(&cell, column);
     }
     return logLine;
 }
 
-void LogModel::applyHighlights(LogLine* logLine, int column, const QString& value) const {
+void LogModel::applyHighlights(LogCell* cell, int column) const {
     for (const Highlight& highlight : mConfig.highlights) {
         if (highlight.condition->column() == column) {
-            if (highlight.condition->eval(value)) {
-                logLine->bgColor = highlight.bgColor;
+            if (highlight.condition->eval(cell->text)) {
+                cell->bgColor = highlight.bgColor;
+                cell->fgColor = highlight.fgColor;
                 return;
             }
         }

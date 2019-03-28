@@ -40,6 +40,7 @@ optional<Config> Config::fromJsonDocument(const QJsonDocument &doc) {
         auto columnName = conditionObj.value("column").toString();
         auto value = conditionObj.value("value").toString();
         auto bgColor = highlightObj.value("bgColor").toString();
+        auto fgColor = highlightObj.value("fgColor").toString();
 
         auto it = columnByName.find(columnName);
         if (it == columnByName.end()) {
@@ -49,6 +50,7 @@ optional<Config> Config::fromJsonDocument(const QJsonDocument &doc) {
         Highlight highlight;
         highlight.condition = std::make_unique<EqualCondition>(it.value(), value);
         highlight.bgColor = bgColor;
+        highlight.fgColor = fgColor;
         config.highlights.push_back(std::move(highlight));
     }
 
