@@ -44,7 +44,7 @@ void dumpModel(LogModel* model) {
 optional<QByteArray> readFile(const QString& fileName) {
     QFile file(fileName);
     if (!file.open(QIODevice::ReadOnly)) {
-        qCritical() << "Could not open" << fileName;
+        qCritical() << "Could not open" << fileName << file.errorString();
         return {};
     }
     return file.readAll();
