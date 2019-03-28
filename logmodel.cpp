@@ -92,7 +92,7 @@ LogLine LogModel::processLine(const QString& line) const {
     logLine.cells.resize(count);
     for (int column = 0; column < count; ++column) {
         LogCell& cell = logLine.cells[column];
-        cell.text = match.captured(column + 1);
+        cell.text = match.captured(column + 1).trimmed();
         applyHighlights(&cell, column);
     }
     return logLine;
