@@ -43,7 +43,7 @@ QVariant LogModel::data(const QModelIndex& index, int role) const {
         logLine = it.value();
     }
     if (!logLine.isValid()) {
-        return role == 0 ? QVariant(mLines[row]) : QVariant();
+        return role == Qt::DisplayRole && index.column() == mColumns.count() - 1 ? QVariant(mLines[row]) : QVariant();
     }
     const auto& cell = logLine.cells.at(index.column());
     switch (role) {
