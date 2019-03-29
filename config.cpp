@@ -11,7 +11,7 @@ using std::unique_ptr;
 
 static unique_ptr<Condition> createCondition(int column, const QString& value, const QString& op) {
     if (op == "exact") {
-        return std::make_unique<EqualCondition>(column, value);
+        return std::make_unique<ExactCondition>(column, value);
     } else if (op.isEmpty() || op == "contains") {
         return std::make_unique<ContainsCondition>(column, value);
     } else {

@@ -6,12 +6,12 @@ int Condition::column() const {
     return mColumn;
 }
 
-EqualCondition::EqualCondition(int column, const QString& expected)
+ExactCondition::ExactCondition(int column, const QString& expected)
     : Condition(column)
     , mExpected(expected) {
 }
 
-bool EqualCondition::eval(const QString& value) const {
+bool ExactCondition::eval(const QString& value) const {
     return value == mExpected;
 }
 
