@@ -5,7 +5,7 @@
 
 class Condition {
 public:
-    explicit Condition(int role);
+    explicit Condition(int column);
     virtual ~Condition() = default;
     virtual bool eval(const QString& value) const = 0;
 
@@ -17,7 +17,7 @@ private:
 
 class ExactCondition : public Condition {
 public:
-    explicit ExactCondition(int role, const QString& expected);
+    explicit ExactCondition(int column, const QString& expected);
 
     bool eval(const QString& value) const override;
 
@@ -27,7 +27,7 @@ private:
 
 class ContainsCondition : public Condition {
 public:
-    explicit ContainsCondition(int role, const QString& expected);
+    explicit ContainsCondition(int column, const QString& expected);
 
     bool eval(const QString& value) const override;
 
