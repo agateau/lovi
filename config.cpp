@@ -1,6 +1,6 @@
 #include "config.h"
 
-#include "equalcondition.h"
+#include "conditions.h"
 
 #include <QDebug>
 #include <QJsonArray>

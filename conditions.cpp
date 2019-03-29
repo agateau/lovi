@@ -1,4 +1,10 @@
-#include "equalcondition.h"
+#include "conditions.h"
+
+Condition::Condition(int column) : mColumn(column) {}
+
+int Condition::column() const {
+    return mColumn;
+}
 
 EqualCondition::EqualCondition(int column, const QString& expected)
     : Condition(column)

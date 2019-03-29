@@ -1,7 +1,7 @@
 #ifndef HIGHLIGHT_H
 #define HIGHLIGHT_H
 
-#include "condition.h"
+#include "conditions.h"
 
 #include <QColor>
 #include <QString>

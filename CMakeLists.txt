@@ -10,9 +10,8 @@ find_package(Qt5 REQUIRED Widgets)
 
 add_executable(${PROJECT_NAME}
     "main.cpp"
-    "condition.cpp"
+    "conditions.cpp"
     "config.cpp"
-    "equalcondition.cpp"
     "logmodel.cpp"
     "mainwindow.cpp"
     )
