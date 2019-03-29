@@ -46,6 +46,8 @@ private:
     LogLine processLine(const QString& line) const;
 
     void applyHighlights(LogCell* logCell, int column) const;
+
+    void onLineCountChanged(int newCount, int oldCount);
 };
 
 

@@ -1,6 +1,6 @@
 #include "config.h"
+#include "filelineprovider.h"
 #include "filewatcher.h"
-#include "lineprovider.h"
 #include "logmodel.h"
 #include "mainwindow.h"
 
@@ -68,23 +68,6 @@ unique_ptr<Config> loadConfig(const QString& fileName) {
     return Config::fromJsonDocument(doc);
 }
 
-class MemoryLineProvider : public LineProvider {
-public:
-    MemoryLineProvider(const QStringList& lines)
-        : mLines(lines) {}
-
-    const QString& lineAt(int row) const override {
-        return mLines.at(row);
-    }
-
-    int lineCount() const override {
-        return mLines.length();
-    }
-
-private:
-    QStringList mLines;
-};
-
 int main(int argc, char* argv[]) {
     QApplication app(argc, argv);
 
@@ -96,16 +79,8 @@ int main(int argc, char* argv[]) {
         return 1;
     }
 
-    QStringList lines;
-    {
-        auto logContent = readFile(logFileName);
-        if (!logContent.has_value()) {
-            return 1;
-        }
-        lines = QString::fromUtf8(logContent.value()).split('\n');
-    }
-
-    MemoryLineProvider lineProvider(lines);
+    FileLineProvider lineProvider;
+    lineProvider.setFilePath(logFileName);
     LogModel model(config.get(), &lineProvider);
 
     auto reloadConfig = [&configFileName, &model, &config] {

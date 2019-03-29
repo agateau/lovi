@@ -11,7 +11,7 @@ public:
     virtual int lineCount() const = 0;
 
 signals:
-    void lineCountChanged(int);
+    void lineCountChanged(int newCount, int oldCount);
 };
 
 

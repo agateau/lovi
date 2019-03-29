@@ -10,6 +10,7 @@ LogModel::LogModel(const Config* config, const LineProvider* lineProvider, QObje
     : QAbstractTableModel(parent)
     , mLineProvider(lineProvider) {
     setConfig(config);
+    connect(mLineProvider, &LineProvider::lineCountChanged, this, &LogModel::onLineCountChanged);
 }
 
 int LogModel::rowCount(const QModelIndex& parent) const {
@@ -110,4 +111,17 @@ void LogModel::applyHighlights(LogCell* cell, int column) const {
             }
         }
     }
+}
+
+void LogModel::onLineCountChanged(int newCount, int oldCount) {
+    if (newCount <= oldCount) {
+        // Full refresh
+        beginResetModel();
+        mLogLineCache.clear();
+        endResetModel();
+        return;
+    }
+    // Assume append
+    beginInsertRows({}, oldCount, newCount - 1);
+    endInsertRows();
 }
