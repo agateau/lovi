@@ -1,4 +1,5 @@
 #include "config.h"
+#include "filewatcher.h"
 #include "lineprovider.h"
 #include "logmodel.h"
 #include "mainwindow.h"
@@ -8,9 +9,7 @@
 #include <QDebug>
 #include <QFile>
 #include <QFileInfo>
-#include <QFileSystemWatcher>
 #include <QJsonDocument>
-#include <QTimer>
 
 #include <iostream>
 #include <memory>
@@ -117,22 +116,9 @@ int main(int argc, char* argv[]) {
             config = std::move(newConfig);
         }
     };
-    QFileSystemWatcher watcher;
-
-    QTimer reloadTimer;
-    reloadTimer.setInterval(500);
-    reloadTimer.setSingleShot(true);
-    QObject::connect(&reloadTimer, &QTimer::timeout, reloadConfig);
-
-    auto scheduleReload = [&reloadTimer] {
-        qDebug() << "Schedule reload";
-        reloadTimer.start();
-    };
-
-    QObject::connect(&watcher, &QFileSystemWatcher::directoryChanged, scheduleReload);
-    QObject::connect(&watcher, &QFileSystemWatcher::fileChanged, scheduleReload);
-    watcher.addPath(configFileName);
-    watcher.addPath(QFileInfo(configFileName).absolutePath());
+    FileWatcher watcher;
+    watcher.setFilePath(configFileName);
+    QObject::connect(&watcher, &FileWatcher::fileChanged, reloadConfig);
 
     //dumpModel(&model);
     MainWindow window(&model);

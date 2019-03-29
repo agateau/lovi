@@ -12,6 +12,7 @@ add_executable(${PROJECT_NAME}
     "main.cpp"
     "conditions.cpp"
     "config.cpp"
+    "filewatcher.cpp"
     "lineprovider.cpp"
     "logmodel.cpp"
     "mainwindow.cpp"
