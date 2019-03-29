@@ -22,7 +22,7 @@ public:
     bool eval(const QString& value) const override;
 
 private:
-    QString mExpected;
+    const QString mExpected;
 };
 
 class ContainsCondition : public Condition {
@@ -32,7 +32,7 @@ public:
     bool eval(const QString& value) const override;
 
 private:
-    QString mExpected;
+    const QString mExpected;
 };
 
 #endif // CONDITIONS_H
