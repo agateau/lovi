@@ -25,5 +25,14 @@ private:
     QString mExpected;
 };
 
+class ContainsCondition : public Condition {
+public:
+    explicit ContainsCondition(int role, const QString& expected);
+
+    bool eval(const QString& value) const override;
+
+private:
+    QString mExpected;
+};
 
 #endif // CONDITIONS_H

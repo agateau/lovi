@@ -9,6 +9,17 @@
 
 using std::unique_ptr;
 
+static unique_ptr<Condition> createCondition(int column, const QString& value, const QString& op) {
+    if (op == "exact") {
+        return std::make_unique<EqualCondition>(column, value);
+    } else if (op.isEmpty() || op == "contains") {
+        return std::make_unique<ContainsCondition>(column, value);
+    } else {
+        qWarning() << "Invalid value for 'op':" << op;
+        return nullptr;
+    }
+}
+
 unique_ptr<Config> Config::fromJsonDocument(const QJsonDocument &doc) {
     auto regex = doc.object().value("parser").toObject().value("regex").toString();
     if (regex.isEmpty()) {
@@ -39,6 +50,7 @@ unique_ptr<Config> Config::fromJsonDocument(const QJsonDocument &doc) {
         auto conditionObj = highlightObj.value("condition").toObject();
         auto columnName = conditionObj.value("column").toString();
         auto value = conditionObj.value("value").toString();
+        auto op = conditionObj.value("op").toString();
         auto bgColor = highlightObj.value("bgColor").toString();
         auto fgColor = highlightObj.value("fgColor").toString();
 
@@ -48,7 +60,10 @@ unique_ptr<Config> Config::fromJsonDocument(const QJsonDocument &doc) {
             return {};
         }
         Highlight highlight;
-        highlight.condition = std::make_unique<EqualCondition>(it.value(), value);
+        highlight.condition = createCondition(it.value(), value, op);
+        if (!highlight.condition) {
+            return {};
+        }
         highlight.bgColor = bgColor;
         highlight.fgColor = fgColor;
         config->highlights.push_back(std::move(highlight));
