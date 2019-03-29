@@ -37,7 +37,7 @@ unique_ptr<Config> Config::fromJsonDocument(const QJsonDocument &doc) {
     unique_ptr<Config> config = std::make_unique<Config>();
     config->parser.setPattern(regex);
     if (!config->parser.isValid()) {
-        qWarning() << "Invalid regex";
+        qWarning() << "Invalid parser regex:" << config->parser.errorString();
         return {};
     }
     config->parser.optimize();
