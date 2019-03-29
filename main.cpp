@@ -1,4 +1,5 @@
 #include "config.h"
+#include "lineprovider.h"
 #include "logmodel.h"
 #include "mainwindow.h"
 
@@ -68,6 +69,23 @@ unique_ptr<Config> loadConfig(const QString& fileName) {
     return Config::fromJsonDocument(doc);
 }
 
+class MemoryLineProvider : public LineProvider {
+public:
+    MemoryLineProvider(const QStringList& lines)
+        : mLines(lines) {}
+
+    const QString& lineAt(int row) const override {
+        return mLines.at(row);
+    }
+
+    int lineCount() const override {
+        return mLines.length();
+    }
+
+private:
+    QStringList mLines;
+};
+
 int main(int argc, char* argv[]) {
     QApplication app(argc, argv);
 
@@ -88,7 +106,8 @@ int main(int argc, char* argv[]) {
         lines = QString::fromUtf8(logContent.value()).split('\n');
     }
 
-    LogModel model(config.get(), lines);
+    MemoryLineProvider lineProvider(lines);
+    LogModel model(config.get(), &lineProvider);
 
     auto reloadConfig = [&configFileName, &model, &config] {
         qDebug() << "Reloading config";

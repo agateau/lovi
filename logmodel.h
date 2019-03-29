@@ -5,6 +5,7 @@
 #include <QColor>
 
 class Config;
+class LineProvider;
 
 struct LogCell {
     QString text;
@@ -22,7 +23,7 @@ struct LogLine {
 
 class LogModel : public QAbstractTableModel {
 public:
-    LogModel(const Config* config, const QStringList& lines, QObject* parent = nullptr);
+    LogModel(const Config* config, const LineProvider* lineProvider, QObject* parent = nullptr);
 
     int rowCount(const QModelIndex& parent = {}) const override;
 
@@ -38,7 +39,7 @@ public:
 
 private:
     const Config* mConfig = nullptr;
-    const QStringList mLines;
+    const LineProvider* mLineProvider = nullptr;
     QStringList mColumns;
     mutable QHash<int, LogLine> mLogLineCache;
 
