@@ -21,6 +21,7 @@ private:
     FileWatcher* const mWatcher;
     QString mFilePath;
     QStringList mLines;
+    qint64 mFileSize = 0;
 };
 
 #endif // FILELINEPROVIDER_H

@@ -35,8 +35,17 @@ void FileLineProvider::readFile() {
         return;
     }
     int oldLineCount = lineCount();
-    QByteArray data = file.readAll();
-    mLines = QString::fromUtf8(data).split('\n');
+    qint64 fileSize = file.size();
+    if (fileSize > mFileSize) {
+        // Assume append
+        file.seek(mFileSize);
+    } else {
+        // Reread all
+        mLines.clear();
+    }
+    mFileSize = fileSize;
+    QString data = QString::fromUtf8(file.readAll());
+    mLines.append(data.split('\n'));
     if (mLines.last().isEmpty()) {
         mLines.removeLast();
     }

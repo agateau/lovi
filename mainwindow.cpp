@@ -12,4 +12,6 @@ MainWindow::MainWindow(LogModel* logModel, QWidget* parent)
     view->setModel(mModel);
     view->setRootIsDecorated(false);
     setCentralWidget(view);
+
+    connect(mModel, &QAbstractItemModel::rowsInserted, view, &QTreeView::scrollToBottom);
 }
