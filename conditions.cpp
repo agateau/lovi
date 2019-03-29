@@ -23,3 +23,13 @@ ContainsCondition::ContainsCondition(int column, const QString& expected)
 bool ContainsCondition::eval(const QString& value) const {
     return value.contains(mExpected);
 }
+
+RegExCondition::RegExCondition(int column, const QRegularExpression& regEx)
+    : Condition(column)
+    , mRegEx(regEx) {
+    mRegEx.optimize();
+}
+
+bool RegExCondition::eval(const QString& value) const {
+    return mRegEx.match(value).hasMatch();
+}

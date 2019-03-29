@@ -14,6 +14,13 @@ static unique_ptr<Condition> createCondition(int column, const QString& value, c
         return std::make_unique<ExactCondition>(column, value);
     } else if (op.isEmpty() || op == "contains") {
         return std::make_unique<ContainsCondition>(column, value);
+    } else if (op == "regex") {
+        QRegularExpression regex(value);
+        if (!regex.isValid()) {
+            qWarning() << value << "is not a valid regex:" << regex.errorString();
+            return nullptr;
+        }
+        return std::make_unique<RegExCondition>(column, regex);
     } else {
         qWarning() << "Invalid value for 'op':" << op;
         return nullptr;

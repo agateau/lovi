@@ -1,6 +1,7 @@
 #ifndef CONDITIONS_H
 #define CONDITIONS_H
 
+#include <QRegularExpression>
 #include <QString>
 
 class Condition {
@@ -33,6 +34,16 @@ public:
 
 private:
     const QString mExpected;
+};
+
+class RegExCondition : public Condition {
+public:
+    explicit RegExCondition(int column, const QRegularExpression& regEx);
+
+    bool eval(const QString& value) const override;
+
+private:
+    const QRegularExpression mRegEx;
 };
 
 #endif // CONDITIONS_H
