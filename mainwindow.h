@@ -6,13 +6,22 @@
 
 class LogModel;
 
+class QTreeView;
+
 class MainWindow : public QMainWindow {
     Q_OBJECT
 public:
     explicit MainWindow(LogModel* model, QWidget* parent = nullptr);
 
 private:
-    LogModel* mModel;
+    void createUi();
+    void createActions();
+    void onRowsInserted();
+
+    QToolBar* mToolBar = nullptr;
+    QAction* mAutoScrollAction = nullptr;
+    LogModel* mModel = nullptr;
+    QTreeView* mTreeView = nullptr;
 };
 
 #endif // MAINWINDOW_H
