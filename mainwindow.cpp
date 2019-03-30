@@ -48,6 +48,7 @@ void MainWindow::setupUi() {
 
 void MainWindow::setupActions() {
     mAutoScrollAction->setText(tr("Auto Scroll"));
+    mAutoScrollAction->setIcon(QIcon::fromTheme("go-bottom"));
     mAutoScrollAction->setCheckable(true);
     connect(mAutoScrollAction, &QAction::toggled, this, [this](bool toggled) {
         if (toggled) {
@@ -56,6 +57,8 @@ void MainWindow::setupActions() {
     });
 
     mToolBar->addAction(mAutoScrollAction);
+    mToolBar->setMovable(false);
+    mToolBar->setToolButtonStyle(Qt::ToolButtonTextBesideIcon);
 }
 
 void MainWindow::onRowsInserted() {
