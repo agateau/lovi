@@ -15,6 +15,7 @@ MainWindow::MainWindow(QWidget* parent)
     : QMainWindow(parent)
     , mLogFormatLoader(std::make_unique<LogFormatLoader>())
     , mOpenLogAction(new QAction(this))
+    , mOpenLogFormatAction(new QAction(this))
     , mAutoScrollAction(new QAction(this))
     , mToolBar(addToolBar(tr("Toolbar")))
     , mTreeView(new QTreeView(this)) {
@@ -54,6 +55,10 @@ void MainWindow::setupActions() {
     mOpenLogAction->setShortcut(QKeySequence::Open);
     connect(mOpenLogAction, &QAction::triggered, this, &MainWindow::showOpenLogDialog);
 
+    mOpenLogFormatAction->setText(tr("Open log format"));
+    mOpenLogFormatAction->setIcon(QIcon::fromTheme("document-open"));
+    connect(mOpenLogFormatAction, &QAction::triggered, this, &MainWindow::showOpenLogFormatDialog);
+
     mAutoScrollAction->setText(tr("Auto Scroll"));
     mAutoScrollAction->setIcon(QIcon::fromTheme("go-bottom"));
     mAutoScrollAction->setCheckable(true);
@@ -64,6 +69,7 @@ void MainWindow::setupActions() {
     });
 
     mToolBar->addAction(mOpenLogAction);
+    mToolBar->addAction(mOpenLogFormatAction);
     mToolBar->addAction(mAutoScrollAction);
     mToolBar->setMovable(false);
     mToolBar->setToolButtonStyle(Qt::ToolButtonTextBesideIcon);
@@ -85,4 +91,15 @@ void MainWindow::showOpenLogDialog() {
         return;
     }
     loadLog(dialog.selectedFiles().first());
+}
+
+void MainWindow::showOpenLogFormatDialog() {
+    QFileDialog dialog(this);
+    dialog.setFileMode(QFileDialog::ExistingFile);
+    dialog.setNameFilter(tr("Log format files (*.json)"));
+    dialog.setWindowTitle(tr("Open log format file"));
+    if (!dialog.exec()) {
+        return;
+    }
+    loadLogFormat(dialog.selectedFiles().first());
 }

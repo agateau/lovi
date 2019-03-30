@@ -27,12 +27,14 @@ private:
     void onRowsInserted();
     void reloadLogFormat();
     void showOpenLogDialog();
+    void showOpenLogFormatDialog();
 
     const std::unique_ptr<LogFormatLoader> mLogFormatLoader;
     std::unique_ptr<LineProvider> mLineProvider;
     std::unique_ptr<LogModel> mLogModel;
 
     QAction* const mOpenLogAction;
+    QAction* const mOpenLogFormatAction;
     QAction* const mAutoScrollAction;
 
     QToolBar* const mToolBar;
