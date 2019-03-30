@@ -27,14 +27,12 @@ int main(int argc, char* argv[]) {
     unique_ptr<QCommandLineParser> parser = createParser();
     parser->process(app);
 
-    QString logFilePath = parser->positionalArguments().first();
-
     MainWindow window;
     if (parser->isSet("format")) {
         window.loadLogFormat(parser->value("format"));
     }
-    if (!logFilePath.isEmpty()) {
-        window.loadLog(logFilePath);
+    if (parser->positionalArguments().length() == 1) {
+        window.loadLog(parser->positionalArguments().first());
     }
     window.show();
     return app.exec();

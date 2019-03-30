@@ -7,12 +7,14 @@
 
 #include <QAction>
 #include <QDebug>
+#include <QFileDialog>
 #include <QToolBar>
 #include <QTreeView>
 
 MainWindow::MainWindow(QWidget* parent)
     : QMainWindow(parent)
     , mLogFormatLoader(std::make_unique<LogFormatLoader>())
+    , mOpenLogAction(new QAction(this))
     , mAutoScrollAction(new QAction(this))
     , mToolBar(addToolBar(tr("Toolbar")))
     , mTreeView(new QTreeView(this)) {
@@ -47,6 +49,11 @@ void MainWindow::setupUi() {
 }
 
 void MainWindow::setupActions() {
+    mOpenLogAction->setText(tr("Open log"));
+    mOpenLogAction->setIcon(QIcon::fromTheme("document-open"));
+    mOpenLogAction->setShortcut(QKeySequence::Open);
+    connect(mOpenLogAction, &QAction::triggered, this, &MainWindow::showOpenLogDialog);
+
     mAutoScrollAction->setText(tr("Auto Scroll"));
     mAutoScrollAction->setIcon(QIcon::fromTheme("go-bottom"));
     mAutoScrollAction->setCheckable(true);
@@ -56,6 +63,7 @@ void MainWindow::setupActions() {
         }
     });
 
+    mToolBar->addAction(mOpenLogAction);
     mToolBar->addAction(mAutoScrollAction);
     mToolBar->setMovable(false);
     mToolBar->setToolButtonStyle(Qt::ToolButtonTextBesideIcon);
@@ -65,4 +73,16 @@ void MainWindow::onRowsInserted() {
     if (mAutoScrollAction->isChecked()) {
         mTreeView->scrollToBottom();
     }
+}
+
+void MainWindow::showOpenLogDialog() {
+    QFileDialog dialog(this);
+    dialog.setFileMode(QFileDialog::ExistingFile);
+    dialog.setNameFilters({tr("Log files (*.log *.log.* *.txt)"),
+                           tr("All files (*)")});
+    dialog.setWindowTitle(tr("Open log file"));
+    if (!dialog.exec()) {
+        return;
+    }
+    loadLog(dialog.selectedFiles().first());
 }
