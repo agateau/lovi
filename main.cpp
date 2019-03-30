@@ -6,9 +6,9 @@
 
 #include <QAbstractListModel>
 #include <QApplication>
+#include <QCommandLineParser>
 #include <QDebug>
 #include <QFile>
-#include <QFileInfo>
 #include <QJsonDocument>
 
 #include <iostream>
@@ -68,11 +68,28 @@ unique_ptr<Config> loadConfig(const QString& fileName) {
     return Config::fromJsonDocument(doc);
 }
 
+unique_ptr<QCommandLineParser> createParser() {
+    unique_ptr<QCommandLineParser> parser = std::make_unique<QCommandLineParser>();
+    parser->setApplicationDescription(QCoreApplication::translate("main", "Log viewer"));
+    parser->addHelpOption();
+    parser->addVersionOption();
+    parser->addPositionalArgument("log_file", QCoreApplication::translate("main", "Log file."));
+    parser->addOption({{"f", "format"},
+                     QCoreApplication::translate("main", "Log format definition."),
+                     QCoreApplication::translate("main", "log_format.json"),
+                     });
+    return parser;
+}
+
 int main(int argc, char* argv[]) {
     QApplication app(argc, argv);
 
-    QString configFileName = QFileInfo(argv[1]).absoluteFilePath();
-    QString logFileName = argv[2];
+    unique_ptr<QCommandLineParser> parser = createParser();
+    parser->process(app);
+
+    QString logFileName = parser->positionalArguments().first();
+    Q_ASSERT(parser->isSet("format"));
+    QString configFileName = parser->value("format");
 
     unique_ptr<Config> config = loadConfig(configFileName);
     if (!config) {
