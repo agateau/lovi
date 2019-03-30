@@ -4,6 +4,8 @@
 #include <QAbstractTableModel>
 #include <QColor>
 
+#include <memory>
+
 class Config;
 class LineProvider;
 
@@ -23,7 +25,7 @@ struct LogLine {
 
 class LogModel : public QAbstractTableModel {
 public:
-    LogModel(const Config* config, const LineProvider* lineProvider, QObject* parent = nullptr);
+    LogModel(const LineProvider* lineProvider, QObject* parent = nullptr);
 
     int rowCount(const QModelIndex& parent = {}) const override;
 
@@ -38,6 +40,7 @@ public:
     void setConfig(const Config* config);
 
 private:
+    std::unique_ptr<Config> mEmptyConfig;
     const Config* mConfig = nullptr;
     const LineProvider* mLineProvider = nullptr;
     QStringList mColumns;

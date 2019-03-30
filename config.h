@@ -16,6 +16,7 @@ public:
     std::vector<Highlight> highlights;
 
     static std::unique_ptr<Config> fromJsonDocument(const QJsonDocument& doc);
+    static std::unique_ptr<Config> createEmptyConfig();
 };
 
 

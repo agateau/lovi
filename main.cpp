@@ -91,14 +91,15 @@ int main(int argc, char* argv[]) {
     Q_ASSERT(parser->isSet("format"));
     QString configFileName = parser->value("format");
 
+    FileLineProvider lineProvider;
+    lineProvider.setFilePath(logFileName);
+    LogModel model(&lineProvider);
+
     unique_ptr<Config> config = loadConfig(configFileName);
     if (!config) {
         return 1;
     }
-
-    FileLineProvider lineProvider;
-    lineProvider.setFilePath(logFileName);
-    LogModel model(config.get(), &lineProvider);
+    model.setConfig(config.get());
 
     auto reloadConfig = [&configFileName, &model, &config] {
         qDebug() << "Reloading config";

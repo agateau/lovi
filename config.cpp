@@ -78,3 +78,9 @@ unique_ptr<Config> Config::fromJsonDocument(const QJsonDocument &doc) {
 
     return config;
 }
+
+std::unique_ptr<Config> Config::createEmptyConfig() {
+    unique_ptr<Config> config = std::make_unique<Config>();
+    config->parser.setPattern("(?<line>.*)");
+    return config;
+}

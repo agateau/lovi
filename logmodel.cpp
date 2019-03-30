@@ -6,10 +6,11 @@
 #include <QColor>
 #include <QDebug>
 
-LogModel::LogModel(const Config* config, const LineProvider* lineProvider, QObject* parent)
+LogModel::LogModel(const LineProvider* lineProvider, QObject* parent)
     : QAbstractTableModel(parent)
     , mLineProvider(lineProvider) {
-    setConfig(config);
+    mEmptyConfig = Config::createEmptyConfig();
+    setConfig(mEmptyConfig.get());
     connect(mLineProvider, &LineProvider::lineCountChanged, this, &LogModel::onLineCountChanged);
 }
 
