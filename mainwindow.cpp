@@ -8,6 +8,7 @@
 #include <QAction>
 #include <QDebug>
 #include <QFileDialog>
+#include <QFileInfo>
 #include <QToolBar>
 #include <QTreeView>
 
@@ -31,6 +32,8 @@ void MainWindow::loadLogFormat(const QString& filePath) {
 }
 
 void MainWindow::loadLog(const QString &filePath) {
+    mLogPath = filePath;
+
     auto fileLineProvider = std::make_unique<FileLineProvider>();
     fileLineProvider->setFilePath(filePath);
     mLineProvider = std::move(fileLineProvider);
@@ -87,6 +90,10 @@ void MainWindow::showOpenLogDialog() {
     dialog.setNameFilters({tr("Log files (*.log *.log.* *.txt)"),
                            tr("All files (*)")});
     dialog.setWindowTitle(tr("Open log file"));
+    if (!mLogPath.isEmpty()) {
+        QString logDir = QFileInfo(mLogPath).absolutePath();
+        dialog.setDirectory(logDir);
+    }
     if (!dialog.exec()) {
         return;
     }

@@ -39,6 +39,8 @@ private:
 
     QToolBar* const mToolBar;
     QTreeView* const mTreeView;
+
+    QString mLogPath;
 };
 
 #endif // MAINWINDOW_H
