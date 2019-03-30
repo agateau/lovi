@@ -11,10 +11,10 @@ find_package(Qt5 REQUIRED Widgets)
 add_executable(${PROJECT_NAME}
     "main.cpp"
     "conditions.cpp"
-    "config.cpp"
     "filelineprovider.cpp"
     "filewatcher.cpp"
     "lineprovider.cpp"
+    "logformat.cpp"
     "logmodel.cpp"
     "mainwindow.cpp"
     )

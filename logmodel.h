@@ -6,7 +6,7 @@
 
 #include <memory>
 
-class Config;
+class LogFormat;
 class LineProvider;
 
 struct LogCell {
@@ -37,11 +37,11 @@ public:
 
     QStringList columns() const;
 
-    void setConfig(const Config* config);
+    void setLogFormat(const LogFormat* logFormat);
 
 private:
-    std::unique_ptr<Config> mEmptyConfig;
-    const Config* mConfig = nullptr;
+    std::unique_ptr<LogFormat> mEmptyLogFormat;
+    const LogFormat* mLogFormat = nullptr;
     const LineProvider* mLineProvider = nullptr;
     QStringList mColumns;
     mutable QHash<int, LogLine> mLogLineCache;

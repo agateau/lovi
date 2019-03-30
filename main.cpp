@@ -1,4 +1,4 @@
-#include "config.h"
+#include "logformat.h"
 #include "filelineprovider.h"
 #include "filewatcher.h"
 #include "logmodel.h"
@@ -69,7 +69,7 @@ int main(int argc, char* argv[]) {
     //dumpModel(&model);
     MainWindow window(&model);
     if (parser->isSet("format")) {
-        window.loadConfig(parser->value("format"));
+        window.loadLogFormat(parser->value("format"));
     }
     window.show();
     return app.exec();

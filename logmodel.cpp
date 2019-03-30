@@ -1,6 +1,6 @@
 #include "logmodel.h"
 
-#include "config.h"
+#include "logformat.h"
 #include "lineprovider.h"
 
 #include <QColor>
@@ -9,8 +9,8 @@
 LogModel::LogModel(const LineProvider* lineProvider, QObject* parent)
     : QAbstractTableModel(parent)
     , mLineProvider(lineProvider) {
-    mEmptyConfig = Config::createEmptyConfig();
-    setConfig(mEmptyConfig.get());
+    mEmptyLogFormat = LogFormat::createEmpty();
+    setLogFormat(mEmptyLogFormat.get());
     connect(mLineProvider, &LineProvider::lineCountChanged, this, &LogModel::onLineCountChanged);
 }
 
@@ -75,18 +75,18 @@ QStringList LogModel::columns() const {
     return mColumns;
 }
 
-void LogModel::setConfig(const Config* config) {
-    Q_ASSERT(config);
+void LogModel::setLogFormat(const LogFormat* logFormat) {
+    Q_ASSERT(logFormat);
     beginResetModel();
-    mConfig = config;
-    mColumns = mConfig->parser.namedCaptureGroups();
+    mLogFormat = logFormat;
+    mColumns = mLogFormat->parser.namedCaptureGroups();
     mColumns.removeFirst();
     mLogLineCache.clear();
     endResetModel();
 }
 
 LogLine LogModel::processLine(const QString& line) const {
-    auto match = mConfig->parser.match(line);
+    auto match = mLogFormat->parser.match(line);
     if (!match.hasMatch()) {
         return {};
     }
@@ -103,7 +103,7 @@ LogLine LogModel::processLine(const QString& line) const {
 }
 
 void LogModel::applyHighlights(LogCell* cell, int column) const {
-    for (const Highlight& highlight : mConfig->highlights) {
+    for (const Highlight& highlight : mLogFormat->highlights) {
         if (highlight.condition->column() == column) {
             if (highlight.condition->eval(cell->text)) {
                 cell->bgColor = highlight.bgColor;

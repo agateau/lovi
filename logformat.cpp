@@ -1,4 +1,4 @@
-#include "config.h"
+#include "logformat.h"
 
 #include "conditions.h"
 
@@ -27,25 +27,25 @@ static unique_ptr<Condition> createCondition(int column, const QString& value, c
     }
 }
 
-unique_ptr<Config> Config::fromJsonDocument(const QJsonDocument &doc) {
+unique_ptr<LogFormat> LogFormat::fromJsonDocument(const QJsonDocument &doc) {
     auto regex = doc.object().value("parser").toObject().value("regex").toString();
     if (regex.isEmpty()) {
         qWarning() << "No regex found";
         return {};
     }
 
-    unique_ptr<Config> config = std::make_unique<Config>();
-    config->parser.setPattern(regex);
-    if (!config->parser.isValid()) {
-        qWarning() << "Invalid parser regex:" << config->parser.errorString();
+    unique_ptr<LogFormat> logFormat = std::make_unique<LogFormat>();
+    logFormat->parser.setPattern(regex);
+    if (!logFormat->parser.isValid()) {
+        qWarning() << "Invalid parser regex:" << logFormat->parser.errorString();
         return {};
     }
-    config->parser.optimize();
+    logFormat->parser.optimize();
 
     QHash<QString, int> columnByName;
     {
         int role = 0;
-        for (const auto& name : config->parser.namedCaptureGroups()) {
+        for (const auto& name : logFormat->parser.namedCaptureGroups()) {
             if (!name.isEmpty()) {
                 columnByName[name] = role++;
             }
@@ -73,14 +73,14 @@ unique_ptr<Config> Config::fromJsonDocument(const QJsonDocument &doc) {
         }
         highlight.bgColor = bgColor;
         highlight.fgColor = fgColor;
-        config->highlights.push_back(std::move(highlight));
+        logFormat->highlights.push_back(std::move(highlight));
     }
 
-    return config;
+    return logFormat;
 }
 
-std::unique_ptr<Config> Config::createEmptyConfig() {
-    unique_ptr<Config> config = std::make_unique<Config>();
-    config->parser.setPattern("(?<line>.*)");
-    return config;
+std::unique_ptr<LogFormat> LogFormat::createEmpty() {
+    unique_ptr<LogFormat> logFormat = std::make_unique<LogFormat>();
+    logFormat->parser.setPattern("(?<line>.*)");
+    return logFormat;
 }

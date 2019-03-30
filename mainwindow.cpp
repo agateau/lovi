@@ -1,6 +1,6 @@
 #include "mainwindow.h"
 
-#include "config.h"
+#include "logformat.h"
 #include "filewatcher.h"
 #include "logmodel.h"
 
@@ -24,7 +24,7 @@ static optional<QByteArray> readFile(const QString& filePath) {
     return file.readAll();
 }
 
-static unique_ptr<Config> loadConfig(const QString& filePath) {
+static unique_ptr<LogFormat> loadLogFormat(const QString& filePath) {
     optional<QByteArray> json = readFile(filePath);
     if (!json.has_value()) {
         return {};
@@ -37,33 +37,33 @@ static unique_ptr<Config> loadConfig(const QString& filePath) {
         return {};
     }
 
-    return Config::fromJsonDocument(doc);
+    return LogFormat::fromJsonDocument(doc);
 }
 
 MainWindow::MainWindow(LogModel* logModel, QWidget* parent)
     : QMainWindow(parent)
-    , mConfigWatcher(new FileWatcher(this))
+    , mLogFormatWatcher(new FileWatcher(this))
     , mModel(logModel) {
 
     createUi();
     createActions();
 
     connect(mModel, &QAbstractItemModel::rowsInserted, this, &MainWindow::onRowsInserted);
-    connect(mConfigWatcher, &FileWatcher::fileChanged, this, &MainWindow::reloadConfig);
+    connect(mLogFormatWatcher, &FileWatcher::fileChanged, this, &MainWindow::reloadLogFormat);
 }
 
 MainWindow::~MainWindow() {
 
 }
 
-void MainWindow::loadConfig(const QString& filePath) {
-    unique_ptr<Config> config = ::loadConfig(filePath);
-    if (!config) {
+void MainWindow::loadLogFormat(const QString& filePath) {
+    unique_ptr<LogFormat> logFormat = ::loadLogFormat(filePath);
+    if (!logFormat) {
         return;
     }
-    mConfigWatcher->setFilePath(filePath);
-    mModel->setConfig(config.get());
-    mConfig = std::move(config);
+    mLogFormatWatcher->setFilePath(filePath);
+    mModel->setLogFormat(logFormat.get());
+    mLogFormat = std::move(logFormat);
 }
 
 void MainWindow::createUi() {
@@ -93,7 +93,7 @@ void MainWindow::onRowsInserted() {
     }
 }
 
-void MainWindow::reloadConfig() {
-    qInfo() << "Reloading config";
-    loadConfig(mConfigWatcher->filePath());
+void MainWindow::reloadLogFormat() {
+    qInfo() << "Reloading log format";
+    loadLogFormat(mLogFormatWatcher->filePath());
 }

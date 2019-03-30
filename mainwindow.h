@@ -6,7 +6,7 @@
 
 #include <memory>
 
-class Config;
+class LogFormat;
 class FileWatcher;
 class LogModel;
 
@@ -18,21 +18,21 @@ public:
     explicit MainWindow(LogModel* model, QWidget* parent = nullptr);
     ~MainWindow();
 
-    void loadConfig(const QString& fileName);
+    void loadLogFormat(const QString& fileName);
 
 private:
     void createUi();
     void createActions();
     void onRowsInserted();
-    void reloadConfig();
+    void reloadLogFormat();
 
-    FileWatcher* const mConfigWatcher;
+    FileWatcher* const mLogFormatWatcher;
     QToolBar* mToolBar = nullptr;
     QAction* mAutoScrollAction = nullptr;
     LogModel* mModel = nullptr;
     QTreeView* mTreeView = nullptr;
 
-    std::unique_ptr<Config> mConfig;
+    std::unique_ptr<LogFormat> mLogFormat;
 };
 
 #endif // MAINWINDOW_H
