@@ -57,6 +57,10 @@ void LogFormatLoader::load(const QString& filePath) {
     mLogFormat = std::move(logFormat);
 }
 
+LogFormat* LogFormatLoader::logFormat() const {
+    return mLogFormat.get();
+}
+
 void LogFormatLoader::reload() {
     qInfo() << "Reloading log format";
     load(mWatcher->filePath());

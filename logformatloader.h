@@ -16,6 +16,8 @@ public:
 
     void load(const QString& filePath);
 
+    LogFormat* logFormat() const;
+
 signals:
     void logFormatChanged(LogFormat* logFormat);
 

@@ -1,5 +1,6 @@
 #include "mainwindow.h"
 
+#include "filelineprovider.h"
 #include "logformat.h"
 #include "logformatloader.h"
 #include "logmodel.h"
@@ -9,31 +10,38 @@
 #include <QToolBar>
 #include <QTreeView>
 
-MainWindow::MainWindow(LogModel* logModel, QWidget* parent)
+MainWindow::MainWindow(QWidget* parent)
     : QMainWindow(parent)
-    , mLogFormatLoader(std::make_unique<LogFormatLoader>())
-    , mModel(logModel) {
-
+    , mLogFormatLoader(std::make_unique<LogFormatLoader>()) {
     createUi();
     createActions();
-
-    connect(mModel, &QAbstractItemModel::rowsInserted, this, &MainWindow::onRowsInserted);
-    connect(mLogFormatLoader.get(), &LogFormatLoader::logFormatChanged, mModel, &LogModel::setLogFormat);
 }
 
 MainWindow::~MainWindow() {
-
 }
 
 void MainWindow::loadLogFormat(const QString& filePath) {
     mLogFormatLoader->load(filePath);
 }
 
+void MainWindow::loadLog(const QString &filePath) {
+    auto fileLineProvider = std::make_unique<FileLineProvider>();
+    fileLineProvider->setFilePath(filePath);
+    mLineProvider = std::move(fileLineProvider);
+
+    mLogModel = std::make_unique<LogModel>(mLineProvider.get());
+    mLogModel->setLogFormat(mLogFormatLoader->logFormat());
+    connect(mLogModel.get(), &QAbstractItemModel::rowsInserted, this, &MainWindow::onRowsInserted);
+
+    connect(mLogFormatLoader.get(), &LogFormatLoader::logFormatChanged, mLogModel.get(), &LogModel::setLogFormat);
+
+    mTreeView->setModel(mLogModel.get());
+}
+
 void MainWindow::createUi() {
     mToolBar = addToolBar(tr("Toolbar"));
 
     mTreeView = new QTreeView();
-    mTreeView->setModel(mModel);
     mTreeView->setRootIsDecorated(false);
     setCentralWidget(mTreeView);
 }
