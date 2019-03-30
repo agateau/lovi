@@ -15,6 +15,7 @@ add_executable(${PROJECT_NAME}
     "filewatcher.cpp"
     "lineprovider.cpp"
     "logformat.cpp"
+    "logformatloader.cpp"
     "logmodel.cpp"
     "mainwindow.cpp"
     )

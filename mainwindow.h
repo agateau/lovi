@@ -6,8 +6,7 @@
 
 #include <memory>
 
-class LogFormat;
-class FileWatcher;
+class LogFormatLoader;
 class LogModel;
 
 class QTreeView;
@@ -26,13 +25,11 @@ private:
     void onRowsInserted();
     void reloadLogFormat();
 
-    FileWatcher* const mLogFormatWatcher;
+    const std::unique_ptr<LogFormatLoader> mLogFormatLoader;
     QToolBar* mToolBar = nullptr;
     QAction* mAutoScrollAction = nullptr;
     LogModel* mModel = nullptr;
     QTreeView* mTreeView = nullptr;
-
-    std::unique_ptr<LogFormat> mLogFormat;
 };
 
 #endif // MAINWINDOW_H
