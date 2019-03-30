@@ -50,6 +50,7 @@ void MainWindow::loadLog(const QString &filePath) {
 void MainWindow::setupUi() {
     mTreeView->setRootIsDecorated(false);
     setCentralWidget(mTreeView);
+    resize(800, 600);
 }
 
 void MainWindow::setupActions() {
