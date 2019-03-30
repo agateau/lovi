@@ -38,6 +38,10 @@ void FileWatcher::setFilePath(const QString& path) {
     mWatcher->addPath(info.absolutePath());
 }
 
+QString FileWatcher::filePath() const {
+    return mPath;
+}
+
 void FileWatcher::onChangeDetected() {
     QFileInfo info(mPath);
     info.refresh();

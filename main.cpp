@@ -8,8 +8,6 @@
 #include <QApplication>
 #include <QCommandLineParser>
 #include <QDebug>
-#include <QFile>
-#include <QJsonDocument>
 
 #include <iostream>
 #include <memory>
@@ -43,31 +41,6 @@ void dumpModel(LogModel* model) {
     cout << "</body></html>\n";
 }
 
-optional<QByteArray> readFile(const QString& fileName) {
-    QFile file(fileName);
-    if (!file.open(QIODevice::ReadOnly)) {
-        qCritical() << "Could not open" << fileName << file.errorString();
-        return {};
-    }
-    return file.readAll();
-}
-
-unique_ptr<Config> loadConfig(const QString& fileName) {
-    optional<QByteArray> json = readFile(fileName);
-    if (!json.has_value()) {
-        return {};
-    }
-
-    QJsonParseError error;
-    auto doc = QJsonDocument::fromJson(json.value(), &error);
-    if (error.error != QJsonParseError::NoError) {
-        qCritical() << "Invalid Json in" << fileName << ":" << error.errorString();
-        return {};
-    }
-
-    return Config::fromJsonDocument(doc);
-}
-
 unique_ptr<QCommandLineParser> createParser() {
     unique_ptr<QCommandLineParser> parser = std::make_unique<QCommandLineParser>();
     parser->setApplicationDescription(QCoreApplication::translate("main", "Log viewer"));
@@ -88,33 +61,16 @@ int main(int argc, char* argv[]) {
     parser->process(app);
 
     QString logFileName = parser->positionalArguments().first();
-    Q_ASSERT(parser->isSet("format"));
-    QString configFileName = parser->value("format");
 
     FileLineProvider lineProvider;
     lineProvider.setFilePath(logFileName);
     LogModel model(&lineProvider);
 
-    unique_ptr<Config> config = loadConfig(configFileName);
-    if (!config) {
-        return 1;
-    }
-    model.setConfig(config.get());
-
-    auto reloadConfig = [&configFileName, &model, &config] {
-        qDebug() << "Reloading config";
-        unique_ptr<Config> newConfig = loadConfig(configFileName);
-        if (newConfig) {
-            model.setConfig(newConfig.get());
-            config = std::move(newConfig);
-        }
-    };
-    FileWatcher watcher;
-    watcher.setFilePath(configFileName);
-    QObject::connect(&watcher, &FileWatcher::fileChanged, reloadConfig);
-
     //dumpModel(&model);
     MainWindow window(&model);
+    if (parser->isSet("format")) {
+        window.loadConfig(parser->value("format"));
+    }
     window.show();
     return app.exec();
 }

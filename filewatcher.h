@@ -16,6 +16,7 @@ public:
     explicit FileWatcher(QObject* parent = nullptr);
 
     void setFilePath(const QString& path);
+    QString filePath() const;
 
 signals:
     void fileChanged();
