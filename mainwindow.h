@@ -22,8 +22,8 @@ public:
     void loadLog(const QString& filePath);
 
 private:
-    void createUi();
-    void createActions();
+    void setupUi();
+    void setupActions();
     void onRowsInserted();
     void reloadLogFormat();
 
@@ -31,9 +31,10 @@ private:
     std::unique_ptr<LineProvider> mLineProvider;
     std::unique_ptr<LogModel> mLogModel;
 
-    QToolBar* mToolBar = nullptr;
-    QAction* mAutoScrollAction = nullptr;
-    QTreeView* mTreeView = nullptr;
+    QAction* const mAutoScrollAction;
+
+    QToolBar* const mToolBar;
+    QTreeView* const mTreeView;
 };
 
 #endif // MAINWINDOW_H

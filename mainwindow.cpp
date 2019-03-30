@@ -12,9 +12,12 @@
 
 MainWindow::MainWindow(QWidget* parent)
     : QMainWindow(parent)
-    , mLogFormatLoader(std::make_unique<LogFormatLoader>()) {
-    createUi();
-    createActions();
+    , mLogFormatLoader(std::make_unique<LogFormatLoader>())
+    , mAutoScrollAction(new QAction(this))
+    , mToolBar(addToolBar(tr("Toolbar")))
+    , mTreeView(new QTreeView(this)) {
+    setupUi();
+    setupActions();
 }
 
 MainWindow::~MainWindow() {
@@ -38,16 +41,13 @@ void MainWindow::loadLog(const QString &filePath) {
     mTreeView->setModel(mLogModel.get());
 }
 
-void MainWindow::createUi() {
-    mToolBar = addToolBar(tr("Toolbar"));
-
-    mTreeView = new QTreeView();
+void MainWindow::setupUi() {
     mTreeView->setRootIsDecorated(false);
     setCentralWidget(mTreeView);
 }
 
-void MainWindow::createActions() {
-    mAutoScrollAction = new QAction("Auto Scroll");
+void MainWindow::setupActions() {
+    mAutoScrollAction->setText(tr("Auto Scroll"));
     mAutoScrollAction->setCheckable(true);
     connect(mAutoScrollAction, &QAction::toggled, this, [this](bool toggled) {
         if (toggled) {
