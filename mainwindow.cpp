@@ -20,7 +20,7 @@ MainWindow::MainWindow(QWidget* parent)
     : QMainWindow(parent)
     , mLogFormatLoader(std::make_unique<LogFormatLoader>())
     , mOpenLogAction(new QAction(this))
-    , mOpenLogFormatAction(new QAction(this))
+    , mSelectLogFormatAction(new QAction(this))
     , mAutoScrollAction(new QAction(this))
     , mToolBar(addToolBar(tr("Toolbar")))
     , mTreeView(new QTreeView(this)) {
@@ -71,16 +71,19 @@ void MainWindow::setupUi() {
 }
 
 void MainWindow::setupActions() {
-    mOpenLogAction->setText(tr("Open log"));
+    mOpenLogAction->setText(tr("Open"));
+    mOpenLogAction->setToolTip(tr("Open log file"));
     mOpenLogAction->setIcon(QIcon::fromTheme("document-open"));
     mOpenLogAction->setShortcut(QKeySequence::Open);
     connect(mOpenLogAction, &QAction::triggered, this, &MainWindow::showOpenLogDialog);
 
-    mOpenLogFormatAction->setText(tr("Open log format"));
-    mOpenLogFormatAction->setIcon(QIcon::fromTheme("document-open"));
-    connect(mOpenLogFormatAction, &QAction::triggered, this, &MainWindow::showOpenLogFormatDialog);
+    mSelectLogFormatAction->setText(tr("Format"));
+    mSelectLogFormatAction->setToolTip(tr("Select log format"));
+    mSelectLogFormatAction->setIcon(QIcon::fromTheme("object-columns"));
+    connect(mSelectLogFormatAction, &QAction::triggered, this, &MainWindow::showLogFormatDialog);
 
-    mAutoScrollAction->setText(tr("Auto Scroll"));
+    mAutoScrollAction->setText(tr("Auto scroll"));
+    mAutoScrollAction->setToolTip(tr("Automatically scroll down when new lines are logged"));
     mAutoScrollAction->setIcon(QIcon::fromTheme("go-bottom"));
     mAutoScrollAction->setCheckable(true);
     connect(mAutoScrollAction, &QAction::toggled, this, [this](bool toggled) {
@@ -90,7 +93,7 @@ void MainWindow::setupActions() {
     });
 
     mToolBar->addAction(mOpenLogAction);
-    mToolBar->addAction(mOpenLogFormatAction);
+    mToolBar->addAction(mSelectLogFormatAction);
     mToolBar->addAction(mAutoScrollAction);
     mToolBar->setMovable(false);
     mToolBar->setToolButtonStyle(Qt::ToolButtonTextBesideIcon);
@@ -121,7 +124,7 @@ void MainWindow::showOpenLogDialog() {
     loadLog(dialog.selectedFiles().first());
 }
 
-void MainWindow::showOpenLogFormatDialog() {
+void MainWindow::showLogFormatDialog() {
     LogFormatDialog dialog(mLogFormatPath, this);
     if (!dialog.exec()) {
         return;

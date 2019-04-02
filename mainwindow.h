@@ -27,7 +27,7 @@ private:
     void onRowsInserted();
     void reloadLogFormat();
     void showOpenLogDialog();
-    void showOpenLogFormatDialog();
+    void showLogFormatDialog();
     void copySelectedLines();
 
     const std::unique_ptr<LogFormatLoader> mLogFormatLoader;
@@ -35,7 +35,7 @@ private:
     std::unique_ptr<LogModel> mLogModel;
 
     QAction* const mOpenLogAction;
-    QAction* const mOpenLogFormatAction;
+    QAction* const mSelectLogFormatAction;
     QAction* const mAutoScrollAction;
 
     QToolBar* const mToolBar;
