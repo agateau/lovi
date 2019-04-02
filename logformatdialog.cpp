@@ -8,10 +8,31 @@ static QString logFormatDirPath() {
     return QStandardPaths::writableLocation(QStandardPaths::AppLocalDataLocation) + "/logformats";
 }
 
+/**
+ * Override QFileSystemModel to hide the icon and the filename extension
+ * Faster to write and use than using a proxy model
+ */
+class MyModel : public QFileSystemModel {
+public:
+    MyModel(QObject* parent = nullptr) : QFileSystemModel(parent) {}
+
+    QVariant data(const QModelIndex& index, int role = Qt::DisplayRole) const override {
+        if (role == Qt::DecorationRole) {
+            return {};
+        }
+        auto value = QFileSystemModel::data(index, role);
+        if (role == Qt::DisplayRole) {
+            QString name = value.toString();
+            return QFileInfo(name).baseName();
+        }
+        return value;
+    }
+};
+
 LogFormatDialog::LogFormatDialog(const QString& logFormatPath, QWidget* parent)
     : QDialog(parent)
     , ui(std::make_unique<Ui::LogFormatDialog>())
-    , mModel(std::make_unique<QFileSystemModel>())
+    , mModel(std::make_unique<MyModel>())
     , mDirPath(logFormatDirPath())
     , mInitialLogFormatPath(logFormatPath) {
     ui->setupUi(this);
