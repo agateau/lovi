@@ -12,6 +12,7 @@
 #include <QDebug>
 #include <QFileDialog>
 #include <QFileInfo>
+#include <QTimer>
 #include <QToolBar>
 #include <QTreeView>
 
@@ -94,7 +95,10 @@ void MainWindow::setupActions() {
 
 void MainWindow::onRowsInserted() {
     if (mAutoScrollAction->isChecked()) {
-        mTreeView->scrollToBottom();
+        // Delay the call a bit to ensure the view has created the rows
+        QTimer::singleShot(0, this, [this] {
+            mTreeView->scrollToBottom();
+        });
     }
 }
 
