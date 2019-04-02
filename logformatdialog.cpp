@@ -42,6 +42,11 @@ LogFormatDialog::LogFormatDialog(const QString& logFormatPath, QWidget* parent)
     connect(mModel.get(), &QAbstractItemModel::rowsInserted, this, &LogFormatDialog::onRowsInserted);
     ui->listView->setModel(mModel.get());
     ui->listView->setRootIndex(mModel->setRootPath(mDirPath));
+    connect(ui->listView, &QAbstractItemView::doubleClicked, this, [this](const QModelIndex& index) {
+        if (index.isValid()) {
+            accept();
+        }
+    });
 }
 
 LogFormatDialog::~LogFormatDialog() {
