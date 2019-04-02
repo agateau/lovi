@@ -76,9 +76,12 @@ QStringList LogModel::columns() const {
 }
 
 void LogModel::setLogFormat(const LogFormat* logFormat) {
-    Q_ASSERT(logFormat);
     beginResetModel();
-    mLogFormat = logFormat;
+    if (logFormat) {
+        mLogFormat = logFormat;
+    } else {
+        mLogFormat = mEmptyLogFormat.get();
+    }
     mColumns = mLogFormat->parser.namedCaptureGroups();
     mColumns.removeFirst();
     mLogLineCache.clear();
