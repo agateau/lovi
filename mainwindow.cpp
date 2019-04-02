@@ -70,6 +70,11 @@ void MainWindow::setupUi() {
     resize(800, 600);
 }
 
+static void appendShortcutToToolTip(QAction* action) {
+    auto shortcut = action->shortcut().toString(QKeySequence::NativeText);
+    action->setToolTip(QString("%1 (%2)").arg(action->toolTip(), shortcut));
+}
+
 void MainWindow::setupActions() {
     mOpenLogAction->setText(tr("Open"));
     mOpenLogAction->setToolTip(tr("Open log file"));
@@ -79,10 +84,12 @@ void MainWindow::setupActions() {
 
     mSelectLogFormatAction->setText(tr("Format"));
     mSelectLogFormatAction->setToolTip(tr("Select log format"));
+    mSelectLogFormatAction->setShortcut(Qt::SHIFT | Qt::Key_F);
     mSelectLogFormatAction->setIcon(QIcon::fromTheme("object-columns"));
     connect(mSelectLogFormatAction, &QAction::triggered, this, &MainWindow::showLogFormatDialog);
 
     mAutoScrollAction->setText(tr("Auto scroll"));
+    mAutoScrollAction->setShortcut(Qt::SHIFT | Qt::Key_S);
     mAutoScrollAction->setToolTip(tr("Automatically scroll down when new lines are logged"));
     mAutoScrollAction->setIcon(QIcon::fromTheme("go-bottom"));
     mAutoScrollAction->setCheckable(true);
@@ -91,6 +98,10 @@ void MainWindow::setupActions() {
             mTreeView->scrollToBottom();
         }
     });
+
+    for (auto action: {mOpenLogAction, mSelectLogFormatAction, mAutoScrollAction}) {
+        appendShortcutToToolTip(action);
+    }
 
     mToolBar->addAction(mOpenLogAction);
     mToolBar->addAction(mSelectLogFormatAction);
