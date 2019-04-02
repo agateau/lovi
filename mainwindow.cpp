@@ -2,6 +2,7 @@
 
 #include "filelineprovider.h"
 #include "logformat.h"
+#include "logformatdialog.h"
 #include "logformatloader.h"
 #include "logmodel.h"
 
@@ -28,6 +29,7 @@ MainWindow::~MainWindow() {
 }
 
 void MainWindow::loadLogFormat(const QString& filePath) {
+    mLogFormatPath = filePath;
     mLogFormatLoader->load(filePath);
 }
 
@@ -102,12 +104,9 @@ void MainWindow::showOpenLogDialog() {
 }
 
 void MainWindow::showOpenLogFormatDialog() {
-    QFileDialog dialog(this);
-    dialog.setFileMode(QFileDialog::ExistingFile);
-    dialog.setNameFilter(tr("Log format files (*.json)"));
-    dialog.setWindowTitle(tr("Open log format file"));
+    LogFormatDialog dialog(mLogFormatPath, this);
     if (!dialog.exec()) {
         return;
     }
-    loadLogFormat(dialog.selectedFiles().first());
+    loadLogFormat(dialog.logFormatPath());
 }
