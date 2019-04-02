@@ -61,15 +61,18 @@ QString LogFormatDialog::logFormatPath() const {
 }
 
 void LogFormatDialog::onRowsInserted(const QModelIndex& parent, int first, int last) {
-    if (mInitialLogFormatPath.isEmpty()) {
-        return;
-    }
-    for (int row = first; row <= last; ++row) {
-        auto index = mModel->index(row, 0, parent);
-        if (index.data(QFileSystemModel::FilePathRole).toString() == mInitialLogFormatPath) {
-            ui->listView->setCurrentIndex(index);
-            mInitialLogFormatPath.clear();
-            return;
+    auto selectInitialLogFormat = [this, parent, first, last]() {
+        for (int row = first; row <= last; ++row) {
+            auto index = mModel->index(row, 0, parent);
+            if (index.data(QFileSystemModel::FilePathRole).toString() == mInitialLogFormatPath) {
+                ui->listView->setCurrentIndex(index);
+                mInitialLogFormatPath.clear();
+                return;
+            }
         }
+    };
+
+    if (!mInitialLogFormatPath.isEmpty()) {
+        selectInitialLogFormat();
     }
 }
