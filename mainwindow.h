@@ -25,6 +25,7 @@ private:
     void setupUi();
     void setupActions();
     void onRowsInserted();
+    void onSelectionChanged();
     void reloadLogFormat();
     void showOpenLogDialog();
     void showLogFormatDialog();
@@ -37,6 +38,7 @@ private:
     QAction* const mOpenLogAction;
     QAction* const mSelectLogFormatAction;
     QAction* const mAutoScrollAction;
+    QAction* const mCopyLinesAction;
 
     QToolBar* const mToolBar;
     QTreeView* const mTreeView;

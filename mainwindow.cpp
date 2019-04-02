@@ -22,6 +22,7 @@ MainWindow::MainWindow(QWidget* parent)
     , mOpenLogAction(new QAction(this))
     , mSelectLogFormatAction(new QAction(this))
     , mAutoScrollAction(new QAction(this))
+    , mCopyLinesAction(new QAction(this))
     , mToolBar(addToolBar(tr("Toolbar")))
     , mTreeView(new QTreeView(this)) {
     setupUi();
@@ -51,6 +52,10 @@ void MainWindow::loadLog(const QString &filePath) {
     connect(mLogFormatLoader.get(), &LogFormatLoader::logFormatChanged, mLogModel.get(), &LogModel::setLogFormat);
 
     mTreeView->setModel(mLogModel.get());
+
+    // Must be done here because the selectionModel is (re)set by setModel()
+    connect(mTreeView->selectionModel(), &QItemSelectionModel::selectionChanged, this, &MainWindow::onSelectionChanged);
+    onSelectionChanged();
 }
 
 void MainWindow::setupUi() {
@@ -59,13 +64,14 @@ void MainWindow::setupUi() {
     mTreeView->setRootIsDecorated(false);
     mTreeView->setContextMenuPolicy(Qt::ActionsContextMenu);
     mTreeView->setSelectionMode(QAbstractItemView::ExtendedSelection);
+    mTreeView->addAction(mCopyLinesAction);
     setCentralWidget(mTreeView);
 
-    QAction* copyAction = new QAction(this);
-    copyAction->setText(tr("Copy"));
-    copyAction->setShortcut(QKeySequence::Copy);
-    connect(copyAction, &QAction::triggered, this, &MainWindow::copySelectedLines);
-    mTreeView->addAction(copyAction);
+    mToolBar->addAction(mOpenLogAction);
+    mToolBar->addAction(mSelectLogFormatAction);
+    mToolBar->addAction(mAutoScrollAction);
+    mToolBar->setMovable(false);
+    mToolBar->setToolButtonStyle(Qt::ToolButtonTextBesideIcon);
 
     resize(800, 600);
 }
@@ -103,11 +109,10 @@ void MainWindow::setupActions() {
         appendShortcutToToolTip(action);
     }
 
-    mToolBar->addAction(mOpenLogAction);
-    mToolBar->addAction(mSelectLogFormatAction);
-    mToolBar->addAction(mAutoScrollAction);
-    mToolBar->setMovable(false);
-    mToolBar->setToolButtonStyle(Qt::ToolButtonTextBesideIcon);
+    mCopyLinesAction->setText(tr("Copy"));
+    mCopyLinesAction->setShortcut(QKeySequence::Copy);
+    mCopyLinesAction->setEnabled(false);
+    connect(mCopyLinesAction, &QAction::triggered, this, &MainWindow::copySelectedLines);
 }
 
 void MainWindow::onRowsInserted() {
@@ -117,6 +122,12 @@ void MainWindow::onRowsInserted() {
             mTreeView->scrollToBottom();
         });
     }
+}
+
+void MainWindow::onSelectionChanged() {
+    int lineCount = mTreeView->selectionModel()->selectedRows().count();
+    mCopyLinesAction->setEnabled(lineCount > 0);
+    mCopyLinesAction->setText(tr("Copy %n line(s)", "", lineCount));
 }
 
 void MainWindow::showOpenLogDialog() {
@@ -144,15 +155,13 @@ void MainWindow::showLogFormatDialog() {
 }
 
 void MainWindow::copySelectedLines() {
-    QStringList list;
     auto selectedRows = mTreeView->selectionModel()->selectedRows();
     if (selectedRows.empty()) {
-        int row = mTreeView->currentIndex().row();
-        list << mLineProvider->lineAt(row);
-    } else {
-        for (const auto& index : selectedRows) {
-            list << mLineProvider->lineAt(index.row());
-        }
+        return;
+    }
+    QStringList list;
+    for (const auto& index : selectedRows) {
+        list << mLineProvider->lineAt(index.row());
     }
     qApp->clipboard()->setText(list.join("\n"));
 }
