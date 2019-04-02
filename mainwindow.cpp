@@ -38,6 +38,7 @@ void MainWindow::loadLogFormat(const QString& filePath) {
 
 void MainWindow::loadLog(const QString &filePath) {
     mLogPath = filePath;
+    setWindowTitle(QString("%1 - Lovi").arg(mLogPath));
 
     auto fileLineProvider = std::make_unique<FileLineProvider>();
     fileLineProvider->setFilePath(filePath);
@@ -53,6 +54,8 @@ void MainWindow::loadLog(const QString &filePath) {
 }
 
 void MainWindow::setupUi() {
+    setWindowTitle("Lovi");
+
     mTreeView->setRootIsDecorated(false);
     mTreeView->setContextMenuPolicy(Qt::ActionsContextMenu);
     mTreeView->setSelectionMode(QAbstractItemView::ExtendedSelection);
