@@ -28,6 +28,7 @@ private:
     void reloadLogFormat();
     void showOpenLogDialog();
     void showOpenLogFormatDialog();
+    void copySelectedLines();
 
     const std::unique_ptr<LogFormatLoader> mLogFormatLoader;
     std::unique_ptr<LineProvider> mLineProvider;

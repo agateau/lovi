@@ -7,6 +7,8 @@
 #include "logmodel.h"
 
 #include <QAction>
+#include <QApplication>
+#include <QClipboard>
 #include <QDebug>
 #include <QFileDialog>
 #include <QFileInfo>
@@ -51,7 +53,16 @@ void MainWindow::loadLog(const QString &filePath) {
 
 void MainWindow::setupUi() {
     mTreeView->setRootIsDecorated(false);
+    mTreeView->setContextMenuPolicy(Qt::ActionsContextMenu);
+    mTreeView->setSelectionMode(QAbstractItemView::ExtendedSelection);
     setCentralWidget(mTreeView);
+
+    QAction* copyAction = new QAction(this);
+    copyAction->setText(tr("Copy"));
+    copyAction->setShortcut(QKeySequence::Copy);
+    connect(copyAction, &QAction::triggered, this, &MainWindow::copySelectedLines);
+    mTreeView->addAction(copyAction);
+
     resize(800, 600);
 }
 
@@ -109,4 +120,18 @@ void MainWindow::showOpenLogFormatDialog() {
         return;
     }
     loadLogFormat(dialog.logFormatPath());
+}
+
+void MainWindow::copySelectedLines() {
+    QStringList list;
+    auto selectedRows = mTreeView->selectionModel()->selectedRows();
+    if (selectedRows.empty()) {
+        int row = mTreeView->currentIndex().row();
+        list << mLineProvider->lineAt(row);
+    } else {
+        for (const auto& index : selectedRows) {
+            list << mLineProvider->lineAt(index.row());
+        }
+    }
+    qApp->clipboard()->setText(list.join("\n"));
 }
