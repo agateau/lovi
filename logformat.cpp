@@ -34,7 +34,7 @@ static std::optional<QColor> initColor(const QString& text) {
     return QColor(text);
 }
 
-unique_ptr<LogFormat> LogFormat::fromJsonDocument(const QJsonDocument &doc) {
+unique_ptr<LogFormat> LogFormat::fromJsonDocument(const QJsonDocument& doc) {
     auto regex = doc.object().value("parser").toObject().value("regex").toString();
     if (regex.isEmpty()) {
         qWarning() << "No regex found";

@@ -19,5 +19,4 @@ public:
     static std::unique_ptr<LogFormat> createEmpty();
 };
 
-
 #endif // LOGFORMAT_H

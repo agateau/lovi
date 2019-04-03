@@ -36,11 +36,8 @@ static unique_ptr<LogFormat> loadLogFormat(const QString& filePath) {
     return LogFormat::fromJsonDocument(doc);
 }
 
-
 LogFormatLoader::LogFormatLoader(QObject* parent)
-    : QObject(parent)
-    , mWatcher(std::make_unique<FileWatcher>()) {
-
+        : QObject(parent), mWatcher(std::make_unique<FileWatcher>()) {
     connect(mWatcher.get(), &FileWatcher::fileChanged, this, &LogFormatLoader::reload);
 }
 

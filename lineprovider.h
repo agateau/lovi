@@ -14,5 +14,4 @@ signals:
     void lineCountChanged(int newCount, int oldCount);
 };
 
-
 #endif // LINEPROVIDER_H

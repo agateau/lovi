@@ -11,10 +11,7 @@ using namespace std::chrono_literals;
 static const std::chrono::duration DELAY_INTERVAL = 100ms;
 
 FileWatcher::FileWatcher(QObject* parent)
-    : QObject(parent)
-    , mWatcher(new QFileSystemWatcher(this))
-    , mTimer(new QTimer(this)) {
-
+        : QObject(parent), mWatcher(new QFileSystemWatcher(this)), mTimer(new QTimer(this)) {
     connect(mWatcher, &QFileSystemWatcher::directoryChanged, this, &FileWatcher::onChangeDetected);
     connect(mWatcher, &QFileSystemWatcher::fileChanged, this, &FileWatcher::onChangeDetected);
 

@@ -14,10 +14,11 @@ unique_ptr<QCommandLineParser> createParser() {
     parser->addHelpOption();
     parser->addVersionOption();
     parser->addPositionalArgument("log_file", QCoreApplication::translate("main", "Log file."));
-    parser->addOption({{"f", "format"},
-                     QCoreApplication::translate("main", "Log format definition."),
-                     QCoreApplication::translate("main", "log_format.json"),
-                     });
+    parser->addOption({
+        {"f", "format"},
+        QCoreApplication::translate("main", "Log format definition."),
+        QCoreApplication::translate("main", "log_format.json"),
+    });
     return parser;
 }
 

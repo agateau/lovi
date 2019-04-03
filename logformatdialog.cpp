@@ -14,7 +14,8 @@ static QString logFormatDirPath() {
  */
 class MyModel : public QFileSystemModel {
 public:
-    MyModel(QObject* parent = nullptr) : QFileSystemModel(parent) {}
+    MyModel(QObject* parent = nullptr) : QFileSystemModel(parent) {
+    }
 
     QVariant data(const QModelIndex& index, int role = Qt::DisplayRole) const override {
         if (role == Qt::DecorationRole) {
@@ -30,23 +31,25 @@ public:
 };
 
 LogFormatDialog::LogFormatDialog(const QString& logFormatPath, QWidget* parent)
-    : QDialog(parent)
-    , ui(std::make_unique<Ui::LogFormatDialog>())
-    , mModel(std::make_unique<MyModel>())
-    , mDirPath(logFormatDirPath())
-    , mInitialLogFormatPath(logFormatPath) {
+        : QDialog(parent)
+        , ui(std::make_unique<Ui::LogFormatDialog>())
+        , mModel(std::make_unique<MyModel>())
+        , mDirPath(logFormatDirPath())
+        , mInitialLogFormatPath(logFormatPath) {
     ui->setupUi(this);
 
     mModel->setFilter(QDir::Files);
     mModel->sort(0);
-    connect(mModel.get(), &QAbstractItemModel::rowsInserted, this, &LogFormatDialog::onRowsInserted);
+    connect(
+        mModel.get(), &QAbstractItemModel::rowsInserted, this, &LogFormatDialog::onRowsInserted);
     ui->listView->setModel(mModel.get());
     ui->listView->setRootIndex(mModel->setRootPath(mDirPath));
-    connect(ui->listView, &QAbstractItemView::doubleClicked, this, [this](const QModelIndex& index) {
-        if (index.isValid()) {
-            accept();
-        }
-    });
+    connect(
+        ui->listView, &QAbstractItemView::doubleClicked, this, [this](const QModelIndex& index) {
+            if (index.isValid()) {
+                accept();
+            }
+        });
 }
 
 LogFormatDialog::~LogFormatDialog() {

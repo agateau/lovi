@@ -17,14 +17,14 @@
 #include <QTreeView>
 
 MainWindow::MainWindow(QWidget* parent)
-    : QMainWindow(parent)
-    , mLogFormatLoader(std::make_unique<LogFormatLoader>())
-    , mOpenLogAction(new QAction(this))
-    , mSelectLogFormatAction(new QAction(this))
-    , mAutoScrollAction(new QAction(this))
-    , mCopyLinesAction(new QAction(this))
-    , mToolBar(addToolBar(tr("Toolbar")))
-    , mTreeView(new QTreeView(this)) {
+        : QMainWindow(parent)
+        , mLogFormatLoader(std::make_unique<LogFormatLoader>())
+        , mOpenLogAction(new QAction(this))
+        , mSelectLogFormatAction(new QAction(this))
+        , mAutoScrollAction(new QAction(this))
+        , mCopyLinesAction(new QAction(this))
+        , mToolBar(addToolBar(tr("Toolbar")))
+        , mTreeView(new QTreeView(this)) {
     setupUi();
     setupActions();
 }
@@ -37,7 +37,7 @@ void MainWindow::loadLogFormat(const QString& filePath) {
     mLogFormatLoader->load(filePath);
 }
 
-void MainWindow::loadLog(const QString &filePath) {
+void MainWindow::loadLog(const QString& filePath) {
     mLogPath = filePath;
     setWindowTitle(QString("%1 - Lovi").arg(mLogPath));
 
@@ -49,12 +49,18 @@ void MainWindow::loadLog(const QString &filePath) {
     mLogModel->setLogFormat(mLogFormatLoader->logFormat());
     connect(mLogModel.get(), &QAbstractItemModel::rowsInserted, this, &MainWindow::onRowsInserted);
 
-    connect(mLogFormatLoader.get(), &LogFormatLoader::logFormatChanged, mLogModel.get(), &LogModel::setLogFormat);
+    connect(mLogFormatLoader.get(),
+            &LogFormatLoader::logFormatChanged,
+            mLogModel.get(),
+            &LogModel::setLogFormat);
 
     mTreeView->setModel(mLogModel.get());
 
     // Must be done here because the selectionModel is (re)set by setModel()
-    connect(mTreeView->selectionModel(), &QItemSelectionModel::selectionChanged, this, &MainWindow::onSelectionChanged);
+    connect(mTreeView->selectionModel(),
+            &QItemSelectionModel::selectionChanged,
+            this,
+            &MainWindow::onSelectionChanged);
     onSelectionChanged();
 }
 
@@ -105,7 +111,7 @@ void MainWindow::setupActions() {
         }
     });
 
-    for (auto action: {mOpenLogAction, mSelectLogFormatAction, mAutoScrollAction}) {
+    for (auto action : {mOpenLogAction, mSelectLogFormatAction, mAutoScrollAction}) {
         appendShortcutToToolTip(action);
     }
 
@@ -118,9 +124,7 @@ void MainWindow::setupActions() {
 void MainWindow::onRowsInserted() {
     if (mAutoScrollAction->isChecked()) {
         // Delay the call a bit to ensure the view has created the rows
-        QTimer::singleShot(0, this, [this] {
-            mTreeView->scrollToBottom();
-        });
+        QTimer::singleShot(0, this, [this] { mTreeView->scrollToBottom(); });
     }
 }
 
@@ -133,8 +137,7 @@ void MainWindow::onSelectionChanged() {
 void MainWindow::showOpenLogDialog() {
     QFileDialog dialog(this);
     dialog.setFileMode(QFileDialog::ExistingFile);
-    dialog.setNameFilters({tr("Log files (*.log *.log.* *.txt)"),
-                           tr("All files (*)")});
+    dialog.setNameFilters({tr("Log files (*.log *.log.* *.txt)"), tr("All files (*)")});
     dialog.setWindowTitle(tr("Open log file"));
     if (!mLogPath.isEmpty()) {
         QString logDir = QFileInfo(mLogPath).absolutePath();

@@ -1,7 +1,7 @@
 #include "logmodel.h"
 
-#include "logformat.h"
 #include "lineprovider.h"
+#include "logformat.h"
 
 #include <QColor>
 #include <QDebug>
@@ -9,8 +9,7 @@
 using std::optional;
 
 LogModel::LogModel(const LineProvider* lineProvider, QObject* parent)
-    : QAbstractTableModel(parent)
-    , mLineProvider(lineProvider) {
+        : QAbstractTableModel(parent), mLineProvider(lineProvider) {
     mEmptyLogFormat = LogFormat::createEmpty();
     setLogFormat(mEmptyLogFormat.get());
     connect(mLineProvider, &LineProvider::lineCountChanged, this, &LogModel::onLineCountChanged);
@@ -49,7 +48,8 @@ QVariant LogModel::data(const QModelIndex& index, int role) const {
     }
     if (!logLine.isValid()) {
         const QString& line = mLineProvider->lineAt(row);
-        return role == Qt::DisplayRole && index.column() == mColumns.count() - 1 ? QVariant(line) : QVariant();
+        return role == Qt::DisplayRole && index.column() == mColumns.count() - 1 ? QVariant(line)
+                                                                                 : QVariant();
     }
     const auto& cell = logLine.cells.at(index.column());
     switch (role) {

@@ -6,8 +6,7 @@
 #include <QFile>
 
 FileLineProvider::FileLineProvider(QObject* parent)
-    : LineProvider(parent)
-    , mWatcher(new FileWatcher(this)) {
+        : LineProvider(parent), mWatcher(new FileWatcher(this)) {
     connect(mWatcher, &FileWatcher::fileChanged, this, &FileLineProvider::readFile);
 }
 
