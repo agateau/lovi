@@ -7,12 +7,13 @@
 #include <QString>
 
 #include <memory>
+#include <optional>
 
 class Highlight {
 public:
     std::unique_ptr<Condition> condition;
-    QColor bgColor;
-    QColor fgColor;
+    std::optional<QColor> bgColor;
+    std::optional<QColor> fgColor;
 };
 
 #endif // HIGHLIGHT_H

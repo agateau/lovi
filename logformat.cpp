@@ -27,6 +27,13 @@ static unique_ptr<Condition> createCondition(int column, const QString& value, c
     }
 }
 
+static std::optional<QColor> initColor(const QString& text) {
+    if (text == "auto") {
+        return {};
+    }
+    return QColor(text);
+}
+
 unique_ptr<LogFormat> LogFormat::fromJsonDocument(const QJsonDocument &doc) {
     auto regex = doc.object().value("parser").toObject().value("regex").toString();
     if (regex.isEmpty()) {
@@ -71,8 +78,8 @@ unique_ptr<LogFormat> LogFormat::fromJsonDocument(const QJsonDocument &doc) {
         if (!highlight.condition) {
             return {};
         }
-        highlight.bgColor = bgColor;
-        highlight.fgColor = fgColor;
+        highlight.bgColor = initColor(bgColor);
+        highlight.fgColor = initColor(fgColor);
         logFormat->highlights.push_back(std::move(highlight));
     }
 

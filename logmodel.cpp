@@ -6,6 +6,8 @@
 #include <QColor>
 #include <QDebug>
 
+using std::optional;
+
 LogModel::LogModel(const LineProvider* lineProvider, QObject* parent)
     : QAbstractTableModel(parent)
     , mLineProvider(lineProvider) {
@@ -105,12 +107,31 @@ LogLine LogModel::processLine(const QString& line) const {
     return logLine;
 }
 
+static std::vector<QColor> generateAutoColorVector() {
+    std::vector<QColor> colors;
+    for (qreal hue = 0; hue < 1; hue += 1.0 / 20) {
+        colors.push_back(QColor::fromHsvF(hue, 0.5, 0.9));
+    }
+    return colors;
+}
+
+static QColor getColor(const optional<QColor>& colorOpt, const QString& text) {
+    if (colorOpt.has_value()) {
+        return colorOpt.value();
+    }
+    static std::vector<QColor> autoColors = generateAutoColorVector();
+    int sum = std::accumulate(text.begin(), text.end(), 0, [](int currentSum, const QChar& ch) {
+        return currentSum + ch.toLatin1();
+    });
+    return autoColors.at(sum % autoColors.size());
+}
+
 void LogModel::applyHighlights(LogCell* cell, int column) const {
     for (const Highlight& highlight : mLogFormat->highlights) {
         if (highlight.condition->column() == column) {
             if (highlight.condition->eval(cell->text)) {
-                cell->bgColor = highlight.bgColor;
-                cell->fgColor = highlight.fgColor;
+                cell->bgColor = getColor(highlight.bgColor, cell->text);
+                cell->fgColor = getColor(highlight.fgColor, cell->text);
                 return;
             }
         }
