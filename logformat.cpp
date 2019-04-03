@@ -27,11 +27,11 @@ static unique_ptr<Condition> createCondition(int column, const QString& value, c
     }
 }
 
-static std::optional<QColor> initColor(const QString& text) {
-    if (text == "auto") {
+static std::optional<HighlightColor> initColor(const QString& text) {
+    if (text.isEmpty()) {
         return {};
     }
-    return QColor(text);
+    return HighlightColor(text);
 }
 
 unique_ptr<LogFormat> LogFormat::fromJsonDocument(const QJsonDocument& doc) {

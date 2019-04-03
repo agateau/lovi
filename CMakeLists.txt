@@ -14,6 +14,7 @@ add_executable(${PROJECT_NAME}
     "conditions.cpp"
     "filelineprovider.cpp"
     "filewatcher.cpp"
+    "highlight.cpp"
     "lineprovider.cpp"
     "logformat.cpp"
     "logformatdialog.cpp"
