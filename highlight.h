@@ -23,6 +23,8 @@ private:
 class Highlight {
 public:
     std::unique_ptr<Condition> condition;
+    std::optional<HighlightColor> rowBgColor;
+    std::optional<HighlightColor> rowFgColor;
     std::optional<HighlightColor> bgColor;
     std::optional<HighlightColor> fgColor;
 };

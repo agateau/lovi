@@ -65,8 +65,6 @@ unique_ptr<LogFormat> LogFormat::fromJsonDocument(const QJsonDocument& doc) {
         auto columnName = conditionObj.value("column").toString();
         auto value = conditionObj.value("value").toString();
         auto op = conditionObj.value("op").toString();
-        auto bgColor = highlightObj.value("bgColor").toString();
-        auto fgColor = highlightObj.value("fgColor").toString();
 
         auto it = columnByName.find(columnName);
         if (it == columnByName.end()) {
@@ -78,6 +76,13 @@ unique_ptr<LogFormat> LogFormat::fromJsonDocument(const QJsonDocument& doc) {
         if (!highlight.condition) {
             return {};
         }
+
+        auto rowBgColor = highlightObj.value("rowBgColor").toString();
+        auto rowFgColor = highlightObj.value("rowFgColor").toString();
+        auto bgColor = highlightObj.value("bgColor").toString();
+        auto fgColor = highlightObj.value("fgColor").toString();
+        highlight.rowBgColor = initColor(rowBgColor);
+        highlight.rowFgColor = initColor(rowFgColor);
         highlight.bgColor = initColor(bgColor);
         highlight.fgColor = initColor(fgColor);
         logFormat->highlights.push_back(std::move(highlight));

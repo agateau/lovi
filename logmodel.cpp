@@ -54,9 +54,13 @@ QVariant LogModel::data(const QModelIndex& index, int role) const {
     const auto& cell = logLine.cells.at(index.column());
     switch (role) {
     case Qt::BackgroundColorRole:
-        return cell.bgColor.isValid() ? QVariant(cell.bgColor) : QVariant();
+        return cell.bgColor.isValid()
+                   ? QVariant(cell.bgColor)
+                   : logLine.bgColor.isValid() ? QVariant(logLine.bgColor) : QVariant();
     case Qt::TextColorRole:
-        return cell.fgColor.isValid() ? QVariant(cell.fgColor) : QVariant();
+        return cell.fgColor.isValid()
+                   ? QVariant(cell.fgColor)
+                   : logLine.fgColor.isValid() ? QVariant(logLine.fgColor) : QVariant();
     case Qt::DisplayRole:
         return cell.text;
     };
@@ -102,26 +106,26 @@ LogLine LogModel::processLine(const QString& line) const {
     for (int column = 0; column < count; ++column) {
         LogCell& cell = logLine.cells[column];
         cell.text = match.captured(column + 1).trimmed();
-        applyHighlights(&cell, column);
+        applyHighlights(&logLine, &cell, column);
     }
     return logLine;
 }
 
-static void applyColor(QColor* out, const optional<HighlightColor>& color, const QString& text) {
-    if (!color.has_value()) {
-        return;
-    }
-    *out = color.value().toColor(text);
+static QColor getColor(const optional<HighlightColor>& color, const QString& text) {
+    return color.has_value() ? color.value().toColor(text) : QColor();
 }
 
-void LogModel::applyHighlights(LogCell* cell, int column) const {
+void LogModel::applyHighlights(LogLine* line, LogCell* cell, int column) const {
     for (const Highlight& highlight : mLogFormat->highlights) {
-        if (highlight.condition->column() == column) {
-            if (highlight.condition->eval(cell->text)) {
-                applyColor(&cell->bgColor, highlight.bgColor, cell->text);
-                applyColor(&cell->fgColor, highlight.fgColor, cell->text);
-                return;
+        if (highlight.condition->column() == column && highlight.condition->eval(cell->text)) {
+            if (highlight.rowBgColor.has_value()) {
+                line->bgColor = highlight.rowBgColor.value().toColor(cell->text);
             }
+            if (highlight.rowFgColor.has_value()) {
+                line->fgColor = highlight.rowFgColor.value().toColor(cell->text);
+            }
+            cell->bgColor = getColor(highlight.bgColor, cell->text);
+            cell->fgColor = getColor(highlight.fgColor, cell->text);
         }
     }
 }

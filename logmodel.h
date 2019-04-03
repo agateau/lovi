@@ -16,6 +16,8 @@ struct LogCell {
 };
 
 struct LogLine {
+    QColor bgColor;
+    QColor fgColor;
     std::vector<LogCell> cells;
 
     bool isValid() const {
@@ -49,7 +51,7 @@ private:
 
     LogLine processLine(const QString& line) const;
 
-    void applyHighlights(LogCell* logCell, int column) const;
+    void applyHighlights(LogLine* logLine, LogCell* logCell, int column) const;
 
     void onLineCountChanged(int newCount, int oldCount);
 };
