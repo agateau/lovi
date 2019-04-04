@@ -1,5 +1,6 @@
 #include "mainwindow.h"
 
+#include "config.h"
 #include "filelineprovider.h"
 #include "logformat.h"
 #include "logformatdialog.h"
@@ -16,8 +17,11 @@
 #include <QToolBar>
 #include <QTreeView>
 
-MainWindow::MainWindow(QWidget* parent)
+static const int MAX_RECENT_FILES = 10;
+
+MainWindow::MainWindow(Config* config, QWidget* parent)
         : QMainWindow(parent)
+        , mConfig(config)
         , mLogFormatLoader(std::make_unique<LogFormatLoader>())
         , mOpenLogAction(new QAction(this))
         , mSelectLogFormatAction(new QAction(this))
@@ -40,6 +44,7 @@ void MainWindow::loadLogFormat(const QString& filePath) {
 void MainWindow::loadLog(const QString& filePath) {
     mLogPath = filePath;
     setWindowTitle(QString("%1 - Lovi").arg(mLogPath));
+    addLogToRecentFiles();
 
     auto fileLineProvider = std::make_unique<FileLineProvider>();
     fileLineProvider->setFilePath(filePath);
@@ -167,4 +172,14 @@ void MainWindow::copySelectedLines() {
         list << mLineProvider->lineAt(index.row());
     }
     qApp->clipboard()->setText(list.join("\n"));
+}
+
+void MainWindow::addLogToRecentFiles() {
+    QStringList files = mConfig->recentLogFiles();
+    files.removeOne(mLogPath);
+    files.insert(0, mLogPath);
+    while (files.length() > MAX_RECENT_FILES) {
+        files.takeLast();
+    }
+    mConfig->setRecentLogFiles(files);
 }

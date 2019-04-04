@@ -7,6 +7,7 @@ set(CMAKE_AUTOUIC ON)
 add_executable(${PROJECT_NAME}
     main.cpp
     conditions.cpp
+    config.cpp
     filelineprovider.cpp
     filewatcher.cpp
     highlight.cpp

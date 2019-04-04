@@ -1,8 +1,12 @@
 #include "mainwindow.h"
 
+#include "config.h"
+
 #include <QApplication>
 #include <QCommandLineParser>
 #include <QDebug>
+#include <QDir>
+#include <QStandardPaths>
 
 #include <memory>
 
@@ -22,13 +26,22 @@ unique_ptr<QCommandLineParser> createParser() {
     return parser;
 }
 
+static QString getConfigPath() {
+    QString configDir = QStandardPaths::writableLocation(QStandardPaths::AppConfigLocation);
+    if (!QDir(configDir).mkpath(".")) {
+        qWarning() << "Could not create dir" << configDir;
+    }
+    return configDir + "/config.json";
+}
+
 int main(int argc, char* argv[]) {
     QApplication app(argc, argv);
 
     unique_ptr<QCommandLineParser> parser = createParser();
     parser->process(app);
 
-    MainWindow window;
+    Config config(getConfigPath());
+    MainWindow window(&config);
     if (parser->isSet("format")) {
         window.loadLogFormat(parser->value("format"));
     }

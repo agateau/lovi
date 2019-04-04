@@ -6,6 +6,7 @@
 
 #include <memory>
 
+class Config;
 class LineProvider;
 class LogFormatLoader;
 class LogModel;
@@ -15,7 +16,7 @@ class QTreeView;
 class MainWindow : public QMainWindow {
     Q_OBJECT
 public:
-    explicit MainWindow(QWidget* parent = nullptr);
+    explicit MainWindow(Config* config, QWidget* parent = nullptr);
     ~MainWindow();
 
     void loadLogFormat(const QString& filePath);
@@ -30,6 +31,9 @@ private:
     void showOpenLogDialog();
     void showLogFormatDialog();
     void copySelectedLines();
+    void addLogToRecentFiles();
+
+    Config* const mConfig;
 
     const std::unique_ptr<LogFormatLoader> mLogFormatLoader;
     std::unique_ptr<LineProvider> mLineProvider;
