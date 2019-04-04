@@ -32,6 +32,7 @@ private:
     void showLogFormatDialog();
     void copySelectedLines();
     void addLogToRecentFiles();
+    void fillRecentFilesMenu();
 
     Config* const mConfig;
 
@@ -44,6 +45,7 @@ private:
     QAction* const mAutoScrollAction;
     QAction* const mCopyLinesAction;
 
+    QMenu* const mRecentFilesMenu;
     QToolBar* const mToolBar;
     QTreeView* const mTreeView;
 

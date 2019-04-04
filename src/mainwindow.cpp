@@ -13,6 +13,7 @@
 #include <QDebug>
 #include <QFileDialog>
 #include <QFileInfo>
+#include <QMenu>
 #include <QTimer>
 #include <QToolBar>
 #include <QTreeView>
@@ -27,10 +28,11 @@ MainWindow::MainWindow(Config* config, QWidget* parent)
         , mSelectLogFormatAction(new QAction(this))
         , mAutoScrollAction(new QAction(this))
         , mCopyLinesAction(new QAction(this))
+        , mRecentFilesMenu(new QMenu(this))
         , mToolBar(addToolBar(tr("Toolbar")))
         , mTreeView(new QTreeView(this)) {
-    setupUi();
     setupActions();
+    setupUi();
 }
 
 MainWindow::~MainWindow() {
@@ -81,6 +83,7 @@ void MainWindow::setupUi() {
     mToolBar->addAction(mOpenLogAction);
     mToolBar->addAction(mSelectLogFormatAction);
     mToolBar->addAction(mAutoScrollAction);
+
     mToolBar->setMovable(false);
     mToolBar->setToolButtonStyle(Qt::ToolButtonTextBesideIcon);
 
@@ -97,7 +100,9 @@ void MainWindow::setupActions() {
     mOpenLogAction->setToolTip(tr("Open log file"));
     mOpenLogAction->setIcon(QIcon::fromTheme("document-open"));
     mOpenLogAction->setShortcut(QKeySequence::Open);
+    mOpenLogAction->setMenu(mRecentFilesMenu);
     connect(mOpenLogAction, &QAction::triggered, this, &MainWindow::showOpenLogDialog);
+    connect(mRecentFilesMenu, &QMenu::aboutToShow, this, &MainWindow::fillRecentFilesMenu);
 
     mSelectLogFormatAction->setText(tr("Format"));
     mSelectLogFormatAction->setToolTip(tr("Select log format"));
@@ -182,4 +187,11 @@ void MainWindow::addLogToRecentFiles() {
         files.takeLast();
     }
     mConfig->setRecentLogFiles(files);
+}
+
+void MainWindow::fillRecentFilesMenu() {
+    mRecentFilesMenu->clear();
+    for (const auto& filePath : mConfig->recentLogFiles()) {
+        mRecentFilesMenu->addAction(filePath, this, [this, filePath] { loadLog(filePath); });
+    }
 }
