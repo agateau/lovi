@@ -19,7 +19,6 @@
 #ifndef FILEWATCHER_H
 #define FILEWATCHER_H
 
-#include <QDateTime>
 #include <QObject>
 
 class QFileSystemWatcher;
@@ -40,11 +39,11 @@ signals:
 
 private:
     void scheduleNotification();
-    void onChangeDetected();
+    void onDirectoryChanged();
 
     QFileSystemWatcher* const mWatcher;
+    bool mExists = false;
     QString mPath;
-    QDateTime mLastModified;
 };
 
 #endif // FILEWATCHER_H

@@ -24,8 +24,9 @@
 
 FileWatcher::FileWatcher(QObject* parent)
         : QObject(parent), mWatcher(new QFileSystemWatcher(this)) {
-    connect(mWatcher, &QFileSystemWatcher::directoryChanged, this, &FileWatcher::onChangeDetected);
-    connect(mWatcher, &QFileSystemWatcher::fileChanged, this, &FileWatcher::onChangeDetected);
+    connect(
+        mWatcher, &QFileSystemWatcher::directoryChanged, this, &FileWatcher::onDirectoryChanged);
+    connect(mWatcher, &QFileSystemWatcher::fileChanged, this, &FileWatcher::fileChanged);
 }
 
 void FileWatcher::setFilePath(const QString& path) {
@@ -38,28 +39,32 @@ void FileWatcher::setFilePath(const QString& path) {
     }
     mPath = path;
     QFileInfo info(mPath);
-    mLastModified = info.lastModified();
-    mWatcher->addPath(mPath);
     mWatcher->addPath(info.absolutePath());
+    mExists = info.exists();
+    if (mExists) {
+        mWatcher->addPath(mPath);
+    }
 }
 
 QString FileWatcher::filePath() const {
     return mPath;
 }
 
-void FileWatcher::onChangeDetected() {
+void FileWatcher::onDirectoryChanged() {
     QFileInfo info(mPath);
     info.refresh();
-    QDateTime lastModified = info.lastModified();
-    if (mLastModified == lastModified) {
-        // Another file in the dir changed
-        return;
-    }
-    mLastModified = lastModified;
-    if (!info.exists(mPath)) {
+    bool exists = info.exists(mPath);
+    if (!mExists && exists) {
+        // File got (re)created
+        qInfo() << mPath << "has been created";
+        mExists = true;
+        mWatcher->addPath(mPath);
+        fileChanged();
+    } else if (mExists && !exists) {
+        // File got deleted
+        qInfo() << mPath << "has been deleted";
+        mExists = false;
         mWatcher->removePath(mPath);
+        fileChanged();
     }
-    // If the file was (re)created, start watching it. Adding the same path twice is not a problem.
-    mWatcher->addPath(mPath);
-    fileChanged();
 }
