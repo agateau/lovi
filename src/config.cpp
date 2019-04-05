@@ -65,7 +65,6 @@ void Config::load() {
             mRecentLogFiles << value.toString();
         }
     }
-    qDebug() << mRecentLogFiles;
 }
 
 void Config::save() const {
