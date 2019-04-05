@@ -26,6 +26,8 @@
 class FileWatcher;
 class LogFormat;
 
+class QTimer;
+
 class LogFormatLoader : public QObject {
     Q_OBJECT
 public:
@@ -47,6 +49,7 @@ private:
     void reload();
 
     const std::unique_ptr<FileWatcher> mWatcher;
+    const std::unique_ptr<QTimer> mReloadTimer;
     QString mLogFormatName;
     std::unique_ptr<LogFormat> mLogFormat;
 };

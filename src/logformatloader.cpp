@@ -26,9 +26,16 @@
 #include <QJsonDocument>
 #include <QJsonParseError>
 #include <QStandardPaths>
+#include <QTimer>
+
+#include <chrono>
 
 using std::optional;
 using std::unique_ptr;
+
+using namespace std::chrono_literals;
+
+static const std::chrono::duration DELAY_INTERVAL = 100ms;
 
 static optional<QByteArray> readFile(const QString& filePath) {
     QFile file(filePath);
@@ -56,8 +63,14 @@ static unique_ptr<LogFormat> loadLogFormat(const QString& filePath) {
 }
 
 LogFormatLoader::LogFormatLoader(QObject* parent)
-        : QObject(parent), mWatcher(std::make_unique<FileWatcher>()) {
-    connect(mWatcher.get(), &FileWatcher::fileChanged, this, &LogFormatLoader::reload);
+        : QObject(parent)
+        , mWatcher(std::make_unique<FileWatcher>())
+        , mReloadTimer(std::make_unique<QTimer>()) {
+    mReloadTimer->setInterval(DELAY_INTERVAL);
+    mReloadTimer->setSingleShot(true);
+    connect(mReloadTimer.get(), &QTimer::timeout, this, &LogFormatLoader::reload);
+
+    connect(mWatcher.get(), &FileWatcher::fileChanged, this, [this] { mReloadTimer->start(); });
 }
 
 LogFormatLoader::~LogFormatLoader() {

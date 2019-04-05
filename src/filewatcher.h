@@ -22,7 +22,6 @@
 #include <QDateTime>
 #include <QObject>
 
-class QTimer;
 class QFileSystemWatcher;
 
 /**
@@ -43,8 +42,7 @@ private:
     void scheduleNotification();
     void onChangeDetected();
 
-    QFileSystemWatcher* mWatcher = nullptr;
-    QTimer* mTimer = nullptr;
+    QFileSystemWatcher* const mWatcher;
     QString mPath;
     QDateTime mLastModified;
 };

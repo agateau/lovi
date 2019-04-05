@@ -20,22 +20,11 @@
 
 #include <QFileInfo>
 #include <QFileSystemWatcher>
-#include <QTimer>
-
-#include <chrono>
-
-using namespace std::chrono_literals;
-
-static const std::chrono::duration DELAY_INTERVAL = 100ms;
 
 FileWatcher::FileWatcher(QObject* parent)
-        : QObject(parent), mWatcher(new QFileSystemWatcher(this)), mTimer(new QTimer(this)) {
+        : QObject(parent), mWatcher(new QFileSystemWatcher(this)) {
     connect(mWatcher, &QFileSystemWatcher::directoryChanged, this, &FileWatcher::onChangeDetected);
     connect(mWatcher, &QFileSystemWatcher::fileChanged, this, &FileWatcher::onChangeDetected);
-
-    mTimer->setInterval(DELAY_INTERVAL);
-    mTimer->setSingleShot(true);
-    connect(mTimer, &QTimer::timeout, this, &FileWatcher::fileChanged);
 }
 
 void FileWatcher::setFilePath(const QString& path) {
@@ -66,5 +55,5 @@ void FileWatcher::onChangeDetected() {
         return;
     }
     mLastModified = lastModified;
-    mTimer->start();
+    fileChanged();
 }
