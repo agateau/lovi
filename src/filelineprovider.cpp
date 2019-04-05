@@ -24,7 +24,7 @@
 #include <QFile>
 
 FileLineProvider::FileLineProvider(QObject* parent)
-        : LineProvider(parent), mWatcher(new FileWatcher(this)) {
+        : LineProvider(parent), mWatcher(new FileWatcher(this)), mFile(new QFile(this)) {
     connect(mWatcher, &FileWatcher::fileChanged, this, &FileLineProvider::readFile);
 }
 
@@ -42,29 +42,50 @@ void FileLineProvider::setFilePath(const QString& filePath) {
     }
     mFilePath = filePath;
     mWatcher->setFilePath(mFilePath);
+    mFile->setFileName(mFilePath);
+    if (!mFile->exists()) {
+        return;
+    }
     readFile();
 }
 
 void FileLineProvider::readFile() {
-    QFile file(mFilePath);
-    if (!file.open(QIODevice::ReadOnly)) {
-        qWarning() << "Failed to open" << mFilePath << ":" << file.errorString();
+    int oldLineCount = lineCount();
+
+    if (!mFile->exists()) {
+        qInfo() << "File is gone";
+        mFile->close();
+        reset();
+        lineCountChanged(lineCount(), oldLineCount);
         return;
     }
-    int oldLineCount = lineCount();
-    qint64 fileSize = file.size();
-    if (fileSize > mFileSize) {
-        // Assume append
-        file.seek(mFileSize);
-    } else {
-        // Reread all
-        mLines.clear();
+
+    if (!mFile->isOpen() && !mFile->open(QIODevice::ReadOnly)) {
+        qWarning() << "Failed to open" << mFilePath << ":" << mFile->errorString();
+        reset();
+        lineCountChanged(lineCount(), oldLineCount);
+        return;
     }
+
+    qint64 fileSize = mFile->size();
+    if (fileSize <= mFileSize) {
+        qInfo() << "File truncated, rereading";
+        reset();
+    }
+
     mFileSize = fileSize;
-    QString data = QString::fromUtf8(file.readAll());
+    QString data = QString::fromUtf8(mFile->readAll());
     mLines.append(data.split('\n'));
     if (mLines.last().isEmpty()) {
         mLines.removeLast();
     }
     lineCountChanged(lineCount(), oldLineCount);
+}
+
+void FileLineProvider::reset() {
+    if (mFile->isOpen()) {
+        mFile->seek(0);
+    }
+    mFileSize = 0;
+    mLines.clear();
 }

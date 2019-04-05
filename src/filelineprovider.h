@@ -23,6 +23,8 @@
 
 class FileWatcher;
 
+class QFile;
+
 class FileLineProvider : public LineProvider {
     Q_OBJECT
 public:
@@ -35,8 +37,10 @@ public:
 
 private:
     void readFile();
+    void reset();
 
     FileWatcher* const mWatcher;
+    QFile* const mFile;
     QString mFilePath;
     QStringList mLines;
     qint64 mFileSize = 0;
