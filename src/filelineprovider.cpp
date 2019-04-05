@@ -68,7 +68,7 @@ void FileLineProvider::readFile() {
     }
 
     qint64 fileSize = mFile->size();
-    if (fileSize <= mFileSize) {
+    if (mFileSize > 0 && fileSize <= mFileSize) {
         qInfo() << "File truncated, rereading";
         reset();
     }
