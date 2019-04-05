@@ -32,16 +32,15 @@ class LogFormatDialog;
 class LogFormatDialog : public QDialog {
     Q_OBJECT
 public:
-    explicit LogFormatDialog(const QString& logFormatPath, QWidget* parent = nullptr);
+    explicit LogFormatDialog(const QString& logFormatName, QWidget* parent = nullptr);
     ~LogFormatDialog();
 
-    QString logFormatPath() const;
+    QString logFormatName() const;
 
 private:
     void onRowsInserted(const QModelIndex& parent, int first, int last);
     const std::unique_ptr<Ui::LogFormatDialog> ui;
     const std::unique_ptr<QFileSystemModel> mModel;
-    const QString mDirPath;
 
     QString mInitialLogFormatPath;
 };

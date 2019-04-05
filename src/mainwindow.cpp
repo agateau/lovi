@@ -56,11 +56,11 @@ MainWindow::MainWindow(Config* config, QWidget* parent)
 MainWindow::~MainWindow() {
 }
 
-void MainWindow::loadLogFormat(const QString& filePath) {
-    mLogFormatPath = filePath;
-    mLogFormatLoader->load(filePath);
-    if (!mLogPath.isEmpty() && !mLogFormatPath.isEmpty()) {
-        mConfig->setLogFormatForFile(mLogPath, mLogFormatPath);
+void MainWindow::loadLogFormat(const QString& logFormatName) {
+    mLogFormatName = logFormatName;
+    mLogFormatLoader->load(logFormatName);
+    if (!mLogPath.isEmpty() && !mLogFormatName.isEmpty()) {
+        mConfig->setLogFormatForFile(mLogPath, mLogFormatName);
     }
 }
 
@@ -75,9 +75,9 @@ void MainWindow::loadLog(const QString& filePath) {
 
     mLogModel = std::make_unique<LogModel>(mLineProvider.get());
 
-    QString logFormatPath = mConfig->logFormatForFile().value(mLogPath);
-    if (!logFormatPath.isEmpty()) {
-        loadLogFormat(logFormatPath);
+    QString logFormatName = mConfig->logFormatForFile().value(mLogPath);
+    if (!logFormatName.isEmpty()) {
+        loadLogFormat(logFormatName);
     }
 
     mLogModel->setLogFormat(mLogFormatLoader->logFormat());
@@ -187,11 +187,11 @@ void MainWindow::showOpenLogDialog() {
 }
 
 void MainWindow::showLogFormatDialog() {
-    LogFormatDialog dialog(mLogFormatPath, this);
+    LogFormatDialog dialog(mLogFormatName, this);
     if (!dialog.exec()) {
         return;
     }
-    loadLogFormat(dialog.logFormatPath());
+    loadLogFormat(dialog.logFormatName());
 }
 
 void MainWindow::copySelectedLines() {

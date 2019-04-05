@@ -68,7 +68,7 @@ private:
     QTreeView* const mTreeView;
 
     QString mLogPath;
-    QString mLogFormatPath;
+    QString mLogFormatName;
 };
 
 #endif // MAINWINDOW_H

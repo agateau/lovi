@@ -25,6 +25,7 @@
 #include <QFile>
 #include <QJsonDocument>
 #include <QJsonParseError>
+#include <QStandardPaths>
 
 using std::optional;
 using std::unique_ptr;
@@ -62,7 +63,10 @@ LogFormatLoader::LogFormatLoader(QObject* parent)
 LogFormatLoader::~LogFormatLoader() {
 }
 
-void LogFormatLoader::load(const QString& filePath) {
+void LogFormatLoader::load(const QString& name) {
+    mLogFormatName = name;
+    QString filePath = LogFormatLoader::pathForLogFormat(mLogFormatName);
+
     unique_ptr<LogFormat> logFormat = ::loadLogFormat(filePath);
     if (!logFormat) {
         return;
@@ -76,7 +80,15 @@ LogFormat* LogFormatLoader::logFormat() const {
     return mLogFormat.get();
 }
 
+QString LogFormatLoader::logFormatsDirPath() {
+    return QStandardPaths::writableLocation(QStandardPaths::AppLocalDataLocation) + "/logformats";
+}
+
+QString LogFormatLoader::pathForLogFormat(const QString& name) {
+    return QString("%1/%2.json").arg(logFormatsDirPath(), name);
+}
+
 void LogFormatLoader::reload() {
     qInfo() << "Reloading log format";
-    load(mWatcher->filePath());
+    load(mLogFormatName);
 }

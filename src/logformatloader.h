@@ -32,9 +32,13 @@ public:
     explicit LogFormatLoader(QObject* parent = nullptr);
     ~LogFormatLoader();
 
-    void load(const QString& filePath);
+    void load(const QString& name);
 
     LogFormat* logFormat() const;
+
+    static QString logFormatsDirPath();
+
+    static QString pathForLogFormat(const QString& name);
 
 signals:
     void logFormatChanged(LogFormat* logFormat);
@@ -43,6 +47,7 @@ private:
     void reload();
 
     const std::unique_ptr<FileWatcher> mWatcher;
+    QString mLogFormatName;
     std::unique_ptr<LogFormat> mLogFormat;
 };
 

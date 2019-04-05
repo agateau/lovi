@@ -39,7 +39,7 @@ unique_ptr<QCommandLineParser> createParser() {
     parser->addOption({
         {"f", "format"},
         QCoreApplication::translate("main", "Log format definition."),
-        QCoreApplication::translate("main", "log_format.json"),
+        QCoreApplication::translate("main", "log_format_name"),
     });
     return parser;
 }

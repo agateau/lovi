@@ -17,14 +17,12 @@
  * this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 #include "logformatdialog.h"
+
+#include "logformatloader.h"
 #include "ui_logformatdialog.h"
 
 #include <QFileSystemModel>
 #include <QStandardPaths>
-
-static QString logFormatDirPath() {
-    return QStandardPaths::writableLocation(QStandardPaths::AppLocalDataLocation) + "/logformats";
-}
 
 /**
  * Override QFileSystemModel to hide the icon and the filename extension
@@ -52,7 +50,6 @@ LogFormatDialog::LogFormatDialog(const QString& logFormatPath, QWidget* parent)
         : QDialog(parent)
         , ui(std::make_unique<Ui::LogFormatDialog>())
         , mModel(std::make_unique<MyModel>())
-        , mDirPath(logFormatDirPath())
         , mInitialLogFormatPath(logFormatPath) {
     ui->setupUi(this);
 
@@ -61,7 +58,8 @@ LogFormatDialog::LogFormatDialog(const QString& logFormatPath, QWidget* parent)
     connect(
         mModel.get(), &QAbstractItemModel::rowsInserted, this, &LogFormatDialog::onRowsInserted);
     ui->listView->setModel(mModel.get());
-    ui->listView->setRootIndex(mModel->setRootPath(mDirPath));
+    QString dirPath = LogFormatLoader::logFormatsDirPath();
+    ui->listView->setRootIndex(mModel->setRootPath(dirPath));
     connect(
         ui->listView, &QAbstractItemView::doubleClicked, this, [this](const QModelIndex& index) {
             if (index.isValid()) {
@@ -73,12 +71,12 @@ LogFormatDialog::LogFormatDialog(const QString& logFormatPath, QWidget* parent)
 LogFormatDialog::~LogFormatDialog() {
 }
 
-QString LogFormatDialog::logFormatPath() const {
+QString LogFormatDialog::logFormatName() const {
     auto index = ui->listView->currentIndex();
     if (!index.isValid()) {
         return {};
     }
-    return index.data(QFileSystemModel::FilePathRole).toString();
+    return index.data().toString();
 }
 
 void LogFormatDialog::onRowsInserted(const QModelIndex& parent, int first, int last) {
