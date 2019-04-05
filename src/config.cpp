@@ -39,6 +39,15 @@ void Config::setRecentLogFiles(const QStringList& files) {
     save();
 }
 
+QHash<QString, QString> Config::logFormatForFile() const {
+    return mLogFormatForFile;
+}
+
+void Config::setLogFormatForFile(const QString& file, const QString& format) {
+    mLogFormatForFile[file] = format;
+    save();
+}
+
 void Config::load() {
     QFile file(mConfigPath);
     if (!file.exists()) {
@@ -65,6 +74,14 @@ void Config::load() {
             mRecentLogFiles << value.toString();
         }
     }
+
+    mLogFormatForFile.clear();
+    {
+        auto obj = root.value("logFormatForFile").toObject();
+        for (const QString& key : obj.keys()) {
+            mLogFormatForFile[key] = obj.value(key).toString();
+        }
+    }
 }
 
 void Config::save() const {
@@ -81,6 +98,16 @@ void Config::save() const {
             array << QJsonValue(value);
         }
         root["recentLogFiles"] = array;
+    }
+
+    {
+        QJsonObject obj;
+        auto it = mLogFormatForFile.constBegin();
+        auto end = mLogFormatForFile.constEnd();
+        for (; it != end; ++it) {
+            obj[it.key()] = it.value();
+        }
+        root["logFormatForFile"] = obj;
     }
     file.write(QJsonDocument(root).toJson());
 }

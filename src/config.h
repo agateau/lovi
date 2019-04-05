@@ -19,6 +19,7 @@
 #ifndef CONFIG_H
 #define CONFIG_H
 
+#include <QHash>
 #include <QObject>
 
 class Config : public QObject {
@@ -29,12 +30,16 @@ public:
     QStringList recentLogFiles() const;
     void setRecentLogFiles(const QStringList& files);
 
+    QHash<QString, QString> logFormatForFile() const;
+    void setLogFormatForFile(const QString& file, const QString& format);
+
 private:
     void load();
     void save() const;
     const QString mConfigPath;
 
     QStringList mRecentLogFiles;
+    QHash<QString, QString> mLogFormatForFile;
 };
 
 #endif // CONFIG_H

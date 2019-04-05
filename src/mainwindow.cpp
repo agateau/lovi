@@ -59,6 +59,9 @@ MainWindow::~MainWindow() {
 void MainWindow::loadLogFormat(const QString& filePath) {
     mLogFormatPath = filePath;
     mLogFormatLoader->load(filePath);
+    if (!mLogPath.isEmpty() && !mLogFormatPath.isEmpty()) {
+        mConfig->setLogFormatForFile(mLogPath, mLogFormatPath);
+    }
 }
 
 void MainWindow::loadLog(const QString& filePath) {
@@ -71,6 +74,12 @@ void MainWindow::loadLog(const QString& filePath) {
     mLineProvider = std::move(fileLineProvider);
 
     mLogModel = std::make_unique<LogModel>(mLineProvider.get());
+
+    QString logFormatPath = mConfig->logFormatForFile().value(mLogPath);
+    if (!logFormatPath.isEmpty()) {
+        loadLogFormat(logFormatPath);
+    }
+
     mLogModel->setLogFormat(mLogFormatLoader->logFormat());
     connect(mLogModel.get(), &QAbstractItemModel::rowsInserted, this, &MainWindow::onRowsInserted);
 
