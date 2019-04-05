@@ -18,6 +18,7 @@
  */
 #include "filewatcher.h"
 
+#include <QDebug>
 #include <QFileInfo>
 #include <QFileSystemWatcher>
 
@@ -55,5 +56,10 @@ void FileWatcher::onChangeDetected() {
         return;
     }
     mLastModified = lastModified;
+    if (!info.exists(mPath)) {
+        mWatcher->removePath(mPath);
+    }
+    // If the file was (re)created, start watching it. Adding the same path twice is not a problem.
+    mWatcher->addPath(mPath);
     fileChanged();
 }
