@@ -24,6 +24,7 @@
 #include "logformatdialog.h"
 #include "logformatloader.h"
 #include "logmodel.h"
+#include "stdinlineprovider.h"
 
 #include <QAction>
 #include <QApplication>
@@ -65,17 +66,24 @@ void MainWindow::loadLogFormat(const QString& logFormatName) {
 }
 
 void MainWindow::loadLog(const QString& filePath) {
+    bool isStdin = filePath == "-";
+
     mLogPath = filePath;
-    setWindowTitle(QString("%1 - Lovi").arg(mLogPath));
-    addLogToRecentFiles();
+    QString titlePath = isStdin ? "<stdin>" : mLogPath;
+    setWindowTitle(QString("%1 - Lovi").arg(titlePath));
+    if (!isStdin) {
+        addLogToRecentFiles();
+    }
 
     createLineProvider();
 
     mLogModel = std::make_unique<LogModel>(mLineProvider.get());
 
-    QString logFormatName = mConfig->logFormatForFile().value(mLogPath);
-    if (!logFormatName.isEmpty()) {
-        loadLogFormat(logFormatName);
+    if (!isStdin) {
+        QString logFormatName = mConfig->logFormatForFile().value(mLogPath);
+        if (!logFormatName.isEmpty()) {
+            loadLogFormat(logFormatName);
+        }
     }
 
     mLogModel->setLogFormat(mLogFormatLoader->logFormat());
@@ -222,5 +230,9 @@ void MainWindow::fillRecentFilesMenu() {
 }
 
 void MainWindow::createLineProvider() {
-    mLineProvider = std::make_unique<FileLineProvider>(mLogPath);
+    if (mLogPath == "-") {
+        mLineProvider = std::make_unique<StdinLineProvider>();
+    } else {
+        mLineProvider = std::make_unique<FileLineProvider>(mLogPath);
+    }
 }

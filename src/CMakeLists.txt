@@ -18,6 +18,7 @@ add_library(lovilib STATIC
     logformatloader.cpp
     logmodel.cpp
     mainwindow.cpp
+    stdinlineprovider.cpp
     )
 
 target_include_directories(lovilib PUBLIC ${CMAKE_CURRENT_BINARY_DIR})
