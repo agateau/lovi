@@ -59,12 +59,12 @@ void FileWatcher::onDirectoryChanged() {
         qInfo() << mPath << "has been created";
         mExists = true;
         mWatcher->addPath(mPath);
-        fileChanged();
+        fileCreated();
     } else if (mExists && !exists) {
         // File got deleted
         qInfo() << mPath << "has been deleted";
         mExists = false;
         mWatcher->removePath(mPath);
-        fileChanged();
+        fileDeleted();
     }
 }

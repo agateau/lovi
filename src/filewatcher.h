@@ -36,6 +36,8 @@ public:
 
 signals:
     void fileChanged();
+    void fileDeleted();
+    void fileCreated();
 
 private:
     void scheduleNotification();

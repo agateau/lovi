@@ -70,7 +70,9 @@ LogFormatLoader::LogFormatLoader(QObject* parent)
     mReloadTimer->setSingleShot(true);
     connect(mReloadTimer.get(), &QTimer::timeout, this, &LogFormatLoader::reload);
 
-    connect(mWatcher.get(), &FileWatcher::fileChanged, this, [this] { mReloadTimer->start(); });
+    auto scheduleReload = [this] { mReloadTimer->start(); };
+    connect(mWatcher.get(), &FileWatcher::fileChanged, this, scheduleReload);
+    connect(mWatcher.get(), &FileWatcher::fileCreated, this, scheduleReload);
 }
 
 LogFormatLoader::~LogFormatLoader() {

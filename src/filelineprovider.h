@@ -38,6 +38,8 @@ public:
 private:
     void readFile();
     void reset();
+    void onFileDeleted();
+    void onFileCreated();
 
     FileWatcher* const mWatcher;
     QFile* const mFile;

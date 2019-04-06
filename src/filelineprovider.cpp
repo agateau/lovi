@@ -26,6 +26,8 @@
 FileLineProvider::FileLineProvider(QObject* parent)
         : LineProvider(parent), mWatcher(new FileWatcher(this)), mFile(new QFile(this)) {
     connect(mWatcher, &FileWatcher::fileChanged, this, &FileLineProvider::readFile);
+    connect(mWatcher, &FileWatcher::fileCreated, this, &FileLineProvider::onFileCreated);
+    connect(mWatcher, &FileWatcher::fileDeleted, this, &FileLineProvider::onFileDeleted);
 }
 
 const QString& FileLineProvider::lineAt(int row) const {
@@ -43,29 +45,13 @@ void FileLineProvider::setFilePath(const QString& filePath) {
     mFilePath = filePath;
     mWatcher->setFilePath(mFilePath);
     mFile->setFileName(mFilePath);
-    if (!mFile->exists()) {
-        return;
+    if (mFile->exists()) {
+        onFileCreated();
     }
-    readFile();
 }
 
 void FileLineProvider::readFile() {
     int oldLineCount = lineCount();
-
-    if (!mFile->exists()) {
-        qInfo() << "File is gone";
-        mFile->close();
-        reset();
-        lineCountChanged(lineCount(), oldLineCount);
-        return;
-    }
-
-    if (!mFile->isOpen() && !mFile->open(QIODevice::ReadOnly)) {
-        qWarning() << "Failed to open" << mFilePath << ":" << mFile->errorString();
-        reset();
-        lineCountChanged(lineCount(), oldLineCount);
-        return;
-    }
 
     qint64 fileSize = mFile->size();
     if (mFileSize > 0 && fileSize <= mFileSize) {
@@ -88,4 +74,22 @@ void FileLineProvider::reset() {
     }
     mFileSize = 0;
     mLines.clear();
+}
+
+void FileLineProvider::onFileCreated() {
+    int oldLineCount = lineCount();
+    if (!mFile->open(QIODevice::ReadOnly)) {
+        qWarning() << "Failed to open" << mFilePath << ":" << mFile->errorString();
+        reset();
+        lineCountChanged(lineCount(), oldLineCount);
+        return;
+    }
+    readFile();
+}
+
+void FileLineProvider::onFileDeleted() {
+    int oldLineCount = lineCount();
+    mFile->close();
+    reset();
+    lineCountChanged(lineCount(), oldLineCount);
 }
