@@ -4,8 +4,8 @@ set(CMAKE_INCLUDE_CURRENT_DIR ON)
 set(CMAKE_AUTOMOC ON)
 set(CMAKE_AUTOUIC ON)
 
-add_executable(${PROJECT_NAME}
-    main.cpp
+# Lib
+add_library(lovilib STATIC
     conditions.cpp
     config.cpp
     filelineprovider.cpp
@@ -20,11 +20,13 @@ add_executable(${PROJECT_NAME}
     mainwindow.cpp
     )
 
-target_include_directories(${PROJECT_NAME} PUBLIC ${CMAKE_CURRENT_BINARY_DIR})
+target_include_directories(lovilib PUBLIC ${CMAKE_CURRENT_BINARY_DIR})
 
-target_link_libraries(${PROJECT_NAME}
-    Qt5::Widgets
-    )
+target_link_libraries(lovilib Qt5::Widgets)
+
+# Main
+add_executable(lovi main.cpp)
+target_link_libraries(lovi lovilib)
 
 # Install
 install(TARGETS ${PROJECT_NAME} DESTINATION bin)
