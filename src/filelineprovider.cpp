@@ -22,12 +22,26 @@
 
 #include <QDebug>
 #include <QFile>
+#include <QTimer>
 
-FileLineProvider::FileLineProvider(QObject* parent)
-        : LineProvider(parent), mWatcher(new FileWatcher(this)), mFile(new QFile(this)) {
-    connect(mWatcher, &FileWatcher::fileChanged, this, &FileLineProvider::readFile);
-    connect(mWatcher, &FileWatcher::fileCreated, this, &FileLineProvider::onFileCreated);
-    connect(mWatcher, &FileWatcher::fileDeleted, this, &FileLineProvider::onFileDeleted);
+FileLineProvider::FileLineProvider(const QString& filePath, QObject* parent)
+        : LineProvider(parent)
+        , mFilePath(filePath)
+        , mWatcher(std::make_unique<FileWatcher>(this))
+        , mFile(std::make_unique<QFile>(this)) {
+    mWatcher->setFilePath(mFilePath);
+    mFile->setFileName(mFilePath);
+
+    connect(mWatcher.get(), &FileWatcher::fileChanged, this, &FileLineProvider::readFile);
+    connect(mWatcher.get(), &FileWatcher::fileCreated, this, &FileLineProvider::onFileCreated);
+    connect(mWatcher.get(), &FileWatcher::fileDeleted, this, &FileLineProvider::onFileDeleted);
+
+    if (mFile->exists()) {
+        QTimer::singleShot(0, this, &FileLineProvider::onFileCreated);
+    }
+}
+
+FileLineProvider::~FileLineProvider() {
 }
 
 const QString& FileLineProvider::lineAt(int row) const {
@@ -36,18 +50,6 @@ const QString& FileLineProvider::lineAt(int row) const {
 
 int FileLineProvider::lineCount() const {
     return mLines.length();
-}
-
-void FileLineProvider::setFilePath(const QString& filePath) {
-    if (mFilePath == filePath) {
-        return;
-    }
-    mFilePath = filePath;
-    mWatcher->setFilePath(mFilePath);
-    mFile->setFileName(mFilePath);
-    if (mFile->exists()) {
-        onFileCreated();
-    }
 }
 
 void FileLineProvider::readFile() {

@@ -69,9 +69,7 @@ void MainWindow::loadLog(const QString& filePath) {
     setWindowTitle(QString("%1 - Lovi").arg(mLogPath));
     addLogToRecentFiles();
 
-    auto fileLineProvider = std::make_unique<FileLineProvider>();
-    fileLineProvider->setFilePath(filePath);
-    mLineProvider = std::move(fileLineProvider);
+    createLineProvider();
 
     mLogModel = std::make_unique<LogModel>(mLineProvider.get());
 
@@ -221,4 +219,8 @@ void MainWindow::fillRecentFilesMenu() {
     for (const auto& filePath : mConfig->recentLogFiles()) {
         mRecentFilesMenu->addAction(filePath, this, [this, filePath] { loadLog(filePath); });
     }
+}
+
+void MainWindow::createLineProvider() {
+    mLineProvider = std::make_unique<FileLineProvider>(mLogPath);
 }

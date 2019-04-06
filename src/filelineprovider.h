@@ -21,6 +21,8 @@
 
 #include "lineprovider.h"
 
+#include <memory>
+
 class FileWatcher;
 
 class QFile;
@@ -28,12 +30,11 @@ class QFile;
 class FileLineProvider : public LineProvider {
     Q_OBJECT
 public:
-    explicit FileLineProvider(QObject* parent = nullptr);
+    explicit FileLineProvider(const QString& filePath, QObject* parent = nullptr);
+    ~FileLineProvider();
 
     const QString& lineAt(int row) const override;
     int lineCount() const override;
-
-    void setFilePath(const QString& filePath);
 
 private:
     void readFile();
@@ -41,9 +42,9 @@ private:
     void onFileDeleted();
     void onFileCreated();
 
-    FileWatcher* const mWatcher;
-    QFile* const mFile;
-    QString mFilePath;
+    const QString mFilePath;
+    const std::unique_ptr<FileWatcher> mWatcher;
+    const std::unique_ptr<QFile> mFile;
     QStringList mLines;
     qint64 mFileSize = 0;
 };

@@ -51,6 +51,7 @@ private:
     void copySelectedLines();
     void addLogToRecentFiles();
     void fillRecentFilesMenu();
+    void createLineProvider();
 
     Config* const mConfig;
 
