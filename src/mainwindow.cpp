@@ -193,11 +193,16 @@ void MainWindow::showOpenLogDialog() {
 }
 
 void MainWindow::showLogFormatDialog() {
-    LogFormatDialog dialog(mLogFormatName, this);
-    if (!dialog.exec()) {
+    if (mLogFormatDialog) {
+        mLogFormatDialog->show();
+        mLogFormatDialog->activateWindow();
         return;
     }
-    loadLogFormat(dialog.logFormatName());
+    mLogFormatDialog = new LogFormatDialog(mLogFormatName, this);
+    connect(mLogFormatDialog.data(), &LogFormatDialog::logFormatChanged, [this] {
+        loadLogFormat(mLogFormatDialog->logFormatName());
+    });
+    mLogFormatDialog->show();
 }
 
 void MainWindow::copySelectedLines() {

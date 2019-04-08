@@ -37,6 +37,9 @@ public:
 
     QString logFormatName() const;
 
+signals:
+    void logFormatChanged();
+
 private:
     void onRowsInserted(const QModelIndex& parent, int first, int last);
     const std::unique_ptr<Ui::LogFormatDialog> ui;

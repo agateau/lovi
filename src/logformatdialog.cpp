@@ -60,6 +60,14 @@ LogFormatDialog::LogFormatDialog(const QString& logFormatPath, QWidget* parent)
     ui->listView->setModel(mModel.get());
     QString dirPath = LogFormatLoader::logFormatsDirPath();
     ui->listView->setRootIndex(mModel->setRootPath(dirPath));
+    connect(ui->listView->selectionModel(),
+            &QItemSelectionModel::currentChanged,
+            this,
+            [this](const QModelIndex& index) {
+                if (index.isValid()) {
+                    logFormatChanged();
+                }
+            });
     connect(
         ui->listView, &QAbstractItemView::doubleClicked, this, [this](const QModelIndex& index) {
             if (index.isValid()) {

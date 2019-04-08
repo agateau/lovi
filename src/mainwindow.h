@@ -21,11 +21,13 @@
 
 #include <QMainWindow>
 #include <QObject>
+#include <QPointer>
 
 #include <memory>
 
 class Config;
 class LineProvider;
+class LogFormatDialog;
 class LogFormatLoader;
 class LogModel;
 
@@ -67,6 +69,7 @@ private:
     QMenu* const mRecentFilesMenu;
     QToolBar* const mToolBar;
     QTreeView* const mTreeView;
+    QPointer<LogFormatDialog> mLogFormatDialog;
 
     QString mLogPath;
     QString mLogFormatName;
