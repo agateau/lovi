@@ -1,6 +1,5 @@
 cmake_minimum_required(VERSION 3.0.0)
 
-set(CMAKE_INCLUDE_CURRENT_DIR ON)
 set(CMAKE_AUTOMOC ON)
 set(CMAKE_AUTOUIC ON)
 
@@ -21,7 +20,7 @@ add_library(lovilib STATIC
     stdinlineprovider.cpp
     )
 
-target_include_directories(lovilib PUBLIC ${CMAKE_CURRENT_BINARY_DIR})
+target_include_directories(lovilib PUBLIC ${CMAKE_CURRENT_BINARY_DIR} ${CMAKE_CURRENT_SOURCE_DIR})
 
 target_link_libraries(lovilib Qt5::Widgets)
 
