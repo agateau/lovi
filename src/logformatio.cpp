@@ -130,14 +130,14 @@ shared_ptr<LogFormat> load(const QString& name) {
     QString filePath = LogFormatIO::pathForLogFormat(name);
     optional<QByteArray> json = readFile(filePath);
     if (!json.has_value()) {
-        return {};
+        return LogFormat::createEmpty();
     }
 
     QJsonParseError error;
     auto doc = QJsonDocument::fromJson(json.value(), &error);
     if (error.error != QJsonParseError::NoError) {
         qCritical() << "Invalid Json in" << filePath << ":" << error.errorString();
-        return {};
+        return LogFormat::createEmpty();
     }
 
     auto logFormat = loadLogFormat(doc);
