@@ -18,24 +18,20 @@
  */
 #include "logformatloader.h"
 
-#include "filewatcher.h"
+#include "conditions.h"
 #include "logformat.h"
 
 #include <QDebug>
 #include <QFile>
+#include <QJsonArray>
 #include <QJsonDocument>
+#include <QJsonObject>
 #include <QJsonParseError>
 #include <QStandardPaths>
-#include <QTimer>
-
-#include <chrono>
 
 using std::optional;
+using std::shared_ptr;
 using std::unique_ptr;
-
-using namespace std::chrono_literals;
-
-static const std::chrono::duration DELAY_INTERVAL = 100ms;
 
 static optional<QByteArray> readFile(const QString& filePath) {
     QFile file(filePath);
@@ -46,7 +42,90 @@ static optional<QByteArray> readFile(const QString& filePath) {
     return file.readAll();
 }
 
-static unique_ptr<LogFormat> loadLogFormat(const QString& filePath) {
+static unique_ptr<Condition> createCondition(int column, const QString& value, const QString& op) {
+    if (op == "exact") {
+        return std::make_unique<ExactCondition>(column, value);
+    } else if (op.isEmpty() || op == "contains") {
+        return std::make_unique<ContainsCondition>(column, value);
+    } else if (op == "regex") {
+        QRegularExpression regex(value);
+        if (!regex.isValid()) {
+            qWarning() << value << "is not a valid regex:" << regex.errorString();
+            return nullptr;
+        }
+        return std::make_unique<RegExCondition>(column, regex);
+    } else {
+        qWarning() << "Invalid value for 'op':" << op;
+        return nullptr;
+    }
+}
+
+static std::optional<HighlightColor> initColor(const QString& text) {
+    if (text.isEmpty()) {
+        return {};
+    }
+    return HighlightColor(text);
+}
+
+static shared_ptr<LogFormat> loadLogFormat(const QJsonDocument& doc) {
+    auto regex = doc.object().value("parser").toObject().value("regex").toString();
+    if (regex.isEmpty()) {
+        qWarning() << "No regex found";
+        return {};
+    }
+
+    shared_ptr<LogFormat> logFormat = std::make_shared<LogFormat>();
+    logFormat->parser.setPattern(regex);
+    if (!logFormat->parser.isValid()) {
+        qWarning() << "Invalid parser regex:" << logFormat->parser.errorString();
+        return {};
+    }
+    logFormat->parser.optimize();
+
+    QHash<QString, int> columnByName;
+    {
+        int role = 0;
+        for (const auto& name : logFormat->parser.namedCaptureGroups()) {
+            if (!name.isEmpty()) {
+                columnByName[name] = role++;
+            }
+        }
+    }
+
+    for (QJsonValue jsonValue : doc.object().value("highlights").toArray()) {
+        QJsonObject highlightObj = jsonValue.toObject();
+        auto conditionObj = highlightObj.value("condition").toObject();
+        auto columnName = conditionObj.value("column").toString();
+        auto value = conditionObj.value("value").toString();
+        auto op = conditionObj.value("op").toString();
+
+        auto it = columnByName.find(columnName);
+        if (it == columnByName.end()) {
+            qWarning() << "No column named" << columnName;
+            return {};
+        }
+        Highlight highlight;
+        highlight.condition = createCondition(it.value(), value, op);
+        if (!highlight.condition) {
+            return {};
+        }
+
+        auto rowBgColor = highlightObj.value("rowBgColor").toString();
+        auto rowFgColor = highlightObj.value("rowFgColor").toString();
+        auto bgColor = highlightObj.value("bgColor").toString();
+        auto fgColor = highlightObj.value("fgColor").toString();
+        highlight.rowBgColor = initColor(rowBgColor);
+        highlight.rowFgColor = initColor(rowFgColor);
+        highlight.bgColor = initColor(bgColor);
+        highlight.fgColor = initColor(fgColor);
+        logFormat->highlights.push_back(std::move(highlight));
+    }
+
+    return logFormat;
+}
+
+static shared_ptr<LogFormat> loadLogFormat(const QString& name) {
+    QString filePath = LogFormatLoader::pathForLogFormat(name);
     optional<QByteArray> json = readFile(filePath);
     if (!json.has_value()) {
         return {};
@@ -59,20 +138,12 @@ static unique_ptr<LogFormat> loadLogFormat(const QString& filePath) {
         return {};
     }
 
-    return LogFormat::fromJsonDocument(doc);
+    auto logFormat = loadLogFormat(doc);
+    logFormat->name = name;
+    return logFormat;
 }
 
-LogFormatLoader::LogFormatLoader(QObject* parent)
-        : QObject(parent)
-        , mWatcher(std::make_unique<FileWatcher>())
-        , mReloadTimer(std::make_unique<QTimer>()) {
-    mReloadTimer->setInterval(DELAY_INTERVAL);
-    mReloadTimer->setSingleShot(true);
-    connect(mReloadTimer.get(), &QTimer::timeout, this, &LogFormatLoader::reload);
-
-    auto scheduleReload = [this] { mReloadTimer->start(); };
-    connect(mWatcher.get(), &FileWatcher::fileChanged, this, scheduleReload);
-    connect(mWatcher.get(), &FileWatcher::fileCreated, this, scheduleReload);
+LogFormatLoader::LogFormatLoader(QObject* parent) : QObject(parent) {
 }
 
 LogFormatLoader::~LogFormatLoader() {
@@ -80,19 +151,15 @@ LogFormatLoader::~LogFormatLoader() {
 
 void LogFormatLoader::load(const QString& name) {
     mLogFormatName = name;
-    QString filePath = LogFormatLoader::pathForLogFormat(mLogFormatName);
-
-    unique_ptr<LogFormat> logFormat = ::loadLogFormat(filePath);
+    shared_ptr<LogFormat> logFormat = ::loadLogFormat(mLogFormatName);
     if (!logFormat) {
         return;
     }
-    mWatcher->setFilePath(filePath);
-    logFormatChanged(logFormat.get());
     mLogFormat = std::move(logFormat);
 }
 
-LogFormat* LogFormatLoader::logFormat() const {
-    return mLogFormat.get();
+std::shared_ptr<LogFormat> LogFormatLoader::logFormat() const {
+    return mLogFormat;
 }
 
 QString LogFormatLoader::logFormatsDirPath() {

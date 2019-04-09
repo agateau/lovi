@@ -26,15 +26,13 @@
 #include <memory>
 #include <vector>
 
-class QJsonDocument;
-
 class LogFormat {
 public:
+    QString name;
     QRegularExpression parser;
     std::vector<Highlight> highlights;
 
-    static std::unique_ptr<LogFormat> fromJsonDocument(const QJsonDocument& doc);
-    static std::unique_ptr<LogFormat> createEmpty();
+    static std::shared_ptr<LogFormat> createEmpty();
 };
 
 #endif // LOGFORMAT_H

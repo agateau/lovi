@@ -20,14 +20,29 @@
 #define LOGFORMATDIALOG_H
 
 #include <QDialog>
+#include <QFileSystemModel>
 
 #include <memory>
-
-class QFileSystemModel;
 
 namespace Ui {
 class LogFormatDialog;
 }
+
+class LogFormat;
+
+class LogFormatModel : public QFileSystemModel {
+    Q_OBJECT
+public:
+    LogFormatModel(QObject* parent = nullptr);
+    ~LogFormatModel();
+
+    QVariant data(const QModelIndex& index, int role = Qt::DisplayRole) const override;
+
+    std::shared_ptr<LogFormat> logFormatForIndex(const QModelIndex& index) const;
+
+private:
+    QString nameForIndex(const QModelIndex& index) const;
+};
 
 class LogFormatDialog : public QDialog {
     Q_OBJECT
@@ -38,12 +53,16 @@ public:
     QString logFormatName() const;
 
 signals:
-    void logFormatChanged();
+    void logFormatChanged(const std::shared_ptr<LogFormat>& logFormat);
 
 private:
+    void setupSideBar();
+    void setupEditor();
+
+    void onCurrentChanged(const QModelIndex& index);
     void onRowsInserted(const QModelIndex& parent, int first, int last);
     const std::unique_ptr<Ui::LogFormatDialog> ui;
-    const std::unique_ptr<QFileSystemModel> mModel;
+    const std::unique_ptr<LogFormatModel> mModel;
 
     QString mInitialLogFormatPath;
 };

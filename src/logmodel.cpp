@@ -29,7 +29,7 @@ using std::optional;
 LogModel::LogModel(const LineProvider* lineProvider, QObject* parent)
         : QAbstractTableModel(parent), mLineProvider(lineProvider) {
     mEmptyLogFormat = LogFormat::createEmpty();
-    setLogFormat(mEmptyLogFormat.get());
+    setLogFormat(mEmptyLogFormat);
     connect(mLineProvider, &LineProvider::lineCountChanged, this, &LogModel::onLineCountChanged);
 }
 
@@ -99,12 +99,12 @@ QStringList LogModel::columns() const {
     return mColumns;
 }
 
-void LogModel::setLogFormat(const LogFormat* logFormat) {
+void LogModel::setLogFormat(const std::shared_ptr<LogFormat>& logFormat) {
     beginResetModel();
     if (logFormat) {
         mLogFormat = logFormat;
     } else {
-        mLogFormat = mEmptyLogFormat.get();
+        mLogFormat = mEmptyLogFormat;
     }
     mColumns = mLogFormat->parser.namedCaptureGroups();
     mColumns.removeFirst();

@@ -42,7 +42,6 @@ static const int MAX_RECENT_FILES = 10;
 MainWindow::MainWindow(Config* config, QWidget* parent)
         : QMainWindow(parent)
         , mConfig(config)
-        , mLogFormatLoader(std::make_unique<LogFormatLoader>())
         , mOpenLogAction(new QAction(this))
         , mSelectLogFormatAction(new QAction(this))
         , mAutoScrollAction(new QAction(this))
@@ -58,11 +57,9 @@ MainWindow::~MainWindow() {
 }
 
 void MainWindow::loadLogFormat(const QString& logFormatName) {
-    mLogFormatName = logFormatName;
-    mLogFormatLoader->load(logFormatName);
-    if (!mLogPath.isEmpty() && !mLogFormatName.isEmpty()) {
-        mConfig->setLogFormatForFile(mLogPath, mLogFormatName);
-    }
+    LogFormatLoader loader;
+    loader.load(logFormatName);
+    setLogFormat(loader.logFormat());
 }
 
 void MainWindow::loadLog(const QString& filePath) {
@@ -86,13 +83,7 @@ void MainWindow::loadLog(const QString& filePath) {
         }
     }
 
-    mLogModel->setLogFormat(mLogFormatLoader->logFormat());
     connect(mLogModel.get(), &QAbstractItemModel::rowsInserted, this, &MainWindow::onRowsInserted);
-
-    connect(mLogFormatLoader.get(),
-            &LogFormatLoader::logFormatChanged,
-            mLogModel.get(),
-            &LogModel::setLogFormat);
 
     mTreeView->setModel(mLogModel.get());
 
@@ -198,10 +189,11 @@ void MainWindow::showLogFormatDialog() {
         mLogFormatDialog->activateWindow();
         return;
     }
-    mLogFormatDialog = new LogFormatDialog(mLogFormatName, this);
-    connect(mLogFormatDialog.data(), &LogFormatDialog::logFormatChanged, [this] {
-        loadLogFormat(mLogFormatDialog->logFormatName());
-    });
+    mLogFormatDialog = new LogFormatDialog(mLogFormat->name, this);
+    connect(mLogFormatDialog.data(),
+            &LogFormatDialog::logFormatChanged,
+            this,
+            &MainWindow::setLogFormat);
     mLogFormatDialog->show();
 }
 
@@ -239,5 +231,13 @@ void MainWindow::createLineProvider() {
         mLineProvider = std::make_unique<StdinLineProvider>();
     } else {
         mLineProvider = std::make_unique<FileLineProvider>(mLogPath);
+    }
+}
+
+void MainWindow::setLogFormat(const std::shared_ptr<LogFormat>& logFormat) {
+    mLogFormat = logFormat;
+    mLogModel->setLogFormat(mLogFormat);
+    if (!mLogPath.isEmpty() && !mLogFormat->name.isEmpty()) {
+        mConfig->setLogFormatForFile(mLogPath, mLogFormat->name);
     }
 }

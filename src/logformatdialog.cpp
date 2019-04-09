@@ -18,41 +18,59 @@
  */
 #include "logformatdialog.h"
 
+#include "logformat.h"
 #include "logformatloader.h"
 #include "ui_logformatdialog.h"
 
-#include <QFileSystemModel>
 #include <QStandardPaths>
 
-/**
- * Override QFileSystemModel to hide the icon and the filename extension
- * Faster to write and use than using a proxy model
- */
-class MyModel : public QFileSystemModel {
-public:
-    MyModel(QObject* parent = nullptr) : QFileSystemModel(parent) {
-    }
+using std::shared_ptr;
 
-    QVariant data(const QModelIndex& index, int role = Qt::DisplayRole) const override {
-        if (role == Qt::DecorationRole) {
-            return {};
-        }
-        auto value = QFileSystemModel::data(index, role);
-        if (role == Qt::DisplayRole) {
-            QString name = value.toString();
-            return QFileInfo(name).baseName();
-        }
-        return value;
-    }
-};
+//- LogFormatModel -----------------------------
+LogFormatModel::LogFormatModel(QObject* parent) : QFileSystemModel(parent) {
+}
 
+LogFormatModel::~LogFormatModel() {
+}
+
+QVariant LogFormatModel::data(const QModelIndex& index, int role) const {
+    if (role == Qt::DecorationRole) {
+        return {};
+    }
+    if (role == Qt::DisplayRole) {
+        return nameForIndex(index);
+    }
+    return {};
+}
+
+shared_ptr<LogFormat> LogFormatModel::logFormatForIndex(const QModelIndex& index) const {
+    QString name = nameForIndex(index);
+    LogFormatLoader loader;
+    loader.load(name);
+    return loader.logFormat();
+}
+
+QString LogFormatModel::nameForIndex(const QModelIndex& index) const {
+    QVariant value = QFileSystemModel::data(index, Qt::DisplayRole);
+    QString name = value.toString();
+    return QFileInfo(name).baseName();
+}
+
+//- LogFormatDialog ----------------------------
 LogFormatDialog::LogFormatDialog(const QString& logFormatPath, QWidget* parent)
         : QDialog(parent)
         , ui(std::make_unique<Ui::LogFormatDialog>())
-        , mModel(std::make_unique<MyModel>())
+        , mModel(std::make_unique<LogFormatModel>())
         , mInitialLogFormatPath(logFormatPath) {
     ui->setupUi(this);
+    setupSideBar();
+    setupEditor();
+}
 
+LogFormatDialog::~LogFormatDialog() {
+}
+
+void LogFormatDialog::setupSideBar() {
     mModel->setFilter(QDir::Files);
     mModel->sort(0);
     connect(
@@ -63,11 +81,7 @@ LogFormatDialog::LogFormatDialog(const QString& logFormatPath, QWidget* parent)
     connect(ui->listView->selectionModel(),
             &QItemSelectionModel::currentChanged,
             this,
-            [this](const QModelIndex& index) {
-                if (index.isValid()) {
-                    logFormatChanged();
-                }
-            });
+            &LogFormatDialog::onCurrentChanged);
     connect(
         ui->listView, &QAbstractItemView::doubleClicked, this, [this](const QModelIndex& index) {
             if (index.isValid()) {
@@ -76,7 +90,8 @@ LogFormatDialog::LogFormatDialog(const QString& logFormatPath, QWidget* parent)
         });
 }
 
-LogFormatDialog::~LogFormatDialog() {
+void LogFormatDialog::setupEditor() {
+    ui->containerWidget->layout()->setMargin(0);
 }
 
 QString LogFormatDialog::logFormatName() const {
@@ -85,6 +100,17 @@ QString LogFormatDialog::logFormatName() const {
         return {};
     }
     return index.data().toString();
+}
+
+void LogFormatDialog::onCurrentChanged(const QModelIndex& index) {
+    if (!index.isValid()) {
+        return;
+    }
+
+    shared_ptr<LogFormat> logFormat = mModel->logFormatForIndex(index);
+    ui->parserLineEdit->setText(logFormat->parser.pattern());
+
+    logFormatChanged(logFormat);
 }
 
 void LogFormatDialog::onRowsInserted(const QModelIndex& parent, int first, int last) {

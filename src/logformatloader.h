@@ -23,10 +23,7 @@
 
 #include <memory>
 
-class FileWatcher;
 class LogFormat;
-
-class QTimer;
 
 class LogFormatLoader : public QObject {
     Q_OBJECT
@@ -36,22 +33,17 @@ public:
 
     void load(const QString& name);
 
-    LogFormat* logFormat() const;
+    std::shared_ptr<LogFormat> logFormat() const;
 
     static QString logFormatsDirPath();
 
     static QString pathForLogFormat(const QString& name);
 
-signals:
-    void logFormatChanged(LogFormat* logFormat);
-
 private:
     void reload();
 
-    const std::unique_ptr<FileWatcher> mWatcher;
-    const std::unique_ptr<QTimer> mReloadTimer;
     QString mLogFormatName;
-    std::unique_ptr<LogFormat> mLogFormat;
+    std::shared_ptr<LogFormat> mLogFormat;
 };
 
 #endif // LOGFORMATLOADER_H

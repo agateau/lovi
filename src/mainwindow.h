@@ -28,7 +28,7 @@
 class Config;
 class LineProvider;
 class LogFormatDialog;
-class LogFormatLoader;
+class LogFormat;
 class LogModel;
 
 class QTreeView;
@@ -54,10 +54,10 @@ private:
     void addLogToRecentFiles();
     void fillRecentFilesMenu();
     void createLineProvider();
+    void setLogFormat(const std::shared_ptr<LogFormat>& logFormat);
 
     Config* const mConfig;
 
-    const std::unique_ptr<LogFormatLoader> mLogFormatLoader;
     std::unique_ptr<LineProvider> mLineProvider;
     std::unique_ptr<LogModel> mLogModel;
 
@@ -72,7 +72,7 @@ private:
     QPointer<LogFormatDialog> mLogFormatDialog;
 
     QString mLogPath;
-    QString mLogFormatName;
+    std::shared_ptr<LogFormat> mLogFormat;
 };
 
 #endif // MAINWINDOW_H
