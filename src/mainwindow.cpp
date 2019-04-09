@@ -22,7 +22,7 @@
 #include "filelineprovider.h"
 #include "logformat.h"
 #include "logformatdialog.h"
-#include "logformatloader.h"
+#include "logformatio.h"
 #include "logmodel.h"
 #include "stdinlineprovider.h"
 
@@ -57,7 +57,7 @@ MainWindow::~MainWindow() {
 }
 
 void MainWindow::loadLogFormat(const QString& logFormatName) {
-    LogFormatLoader loader;
+    LogFormatIO loader;
     loader.load(logFormatName);
     setLogFormat(loader.logFormat());
 }

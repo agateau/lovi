@@ -14,7 +14,7 @@ add_library(lovilib STATIC
     logformat.cpp
     logformatdialog.cpp
     logformatdialog.ui
-    logformatloader.cpp
+    logformatio.cpp
     logmodel.cpp
     mainwindow.cpp
     stdinlineprovider.cpp

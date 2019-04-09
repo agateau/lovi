@@ -16,8 +16,8 @@
  * You should have received a copy of the GNU General Public License along with
  * this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-#ifndef LOGFORMATLOADER_H
-#define LOGFORMATLOADER_H
+#ifndef LOGFORMATIO_H
+#define LOGFORMATIO_H
 
 #include <QObject>
 
@@ -25,11 +25,11 @@
 
 class LogFormat;
 
-class LogFormatLoader : public QObject {
+class LogFormatIO : public QObject {
     Q_OBJECT
 public:
-    explicit LogFormatLoader(QObject* parent = nullptr);
-    ~LogFormatLoader();
+    explicit LogFormatIO(QObject* parent = nullptr);
+    ~LogFormatIO();
 
     void load(const QString& name);
 
@@ -46,4 +46,4 @@ private:
     std::shared_ptr<LogFormat> mLogFormat;
 };
 
-#endif // LOGFORMATLOADER_H
+#endif // LOGFORMATIO_H

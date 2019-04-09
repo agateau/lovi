@@ -19,7 +19,7 @@
 #include "logformatdialog.h"
 
 #include "logformat.h"
-#include "logformatloader.h"
+#include "logformatio.h"
 #include "ui_logformatdialog.h"
 
 #include <QPushButton>
@@ -46,7 +46,7 @@ QVariant LogFormatModel::data(const QModelIndex& index, int role) const {
 
 shared_ptr<LogFormat> LogFormatModel::logFormatForIndex(const QModelIndex& index) const {
     QString name = nameForIndex(index);
-    LogFormatLoader loader;
+    LogFormatIO loader;
     loader.load(name);
     return loader.logFormat();
 }
@@ -77,7 +77,7 @@ void LogFormatDialog::setupSideBar() {
     connect(
         mModel.get(), &QAbstractItemModel::rowsInserted, this, &LogFormatDialog::onRowsInserted);
     ui->listView->setModel(mModel.get());
-    QString dirPath = LogFormatLoader::logFormatsDirPath();
+    QString dirPath = LogFormatIO::logFormatsDirPath();
     ui->listView->setRootIndex(mModel->setRootPath(dirPath));
     connect(ui->listView->selectionModel(),
             &QItemSelectionModel::currentChanged,

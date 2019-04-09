@@ -16,7 +16,7 @@
  * You should have received a copy of the GNU General Public License along with
  * this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-#include "logformatloader.h"
+#include "logformatio.h"
 
 #include "conditions.h"
 #include "logformat.h"
@@ -125,7 +125,7 @@ static shared_ptr<LogFormat> loadLogFormat(const QJsonDocument& doc) {
 }
 
 static shared_ptr<LogFormat> loadLogFormat(const QString& name) {
-    QString filePath = LogFormatLoader::pathForLogFormat(name);
+    QString filePath = LogFormatIO::pathForLogFormat(name);
     optional<QByteArray> json = readFile(filePath);
     if (!json.has_value()) {
         return {};
@@ -143,13 +143,13 @@ static shared_ptr<LogFormat> loadLogFormat(const QString& name) {
     return logFormat;
 }
 
-LogFormatLoader::LogFormatLoader(QObject* parent) : QObject(parent) {
+LogFormatIO::LogFormatIO(QObject* parent) : QObject(parent) {
 }
 
-LogFormatLoader::~LogFormatLoader() {
+LogFormatIO::~LogFormatIO() {
 }
 
-void LogFormatLoader::load(const QString& name) {
+void LogFormatIO::load(const QString& name) {
     mLogFormatName = name;
     shared_ptr<LogFormat> logFormat = ::loadLogFormat(mLogFormatName);
     if (!logFormat) {
@@ -158,19 +158,19 @@ void LogFormatLoader::load(const QString& name) {
     mLogFormat = std::move(logFormat);
 }
 
-std::shared_ptr<LogFormat> LogFormatLoader::logFormat() const {
+std::shared_ptr<LogFormat> LogFormatIO::logFormat() const {
     return mLogFormat;
 }
 
-QString LogFormatLoader::logFormatsDirPath() {
+QString LogFormatIO::logFormatsDirPath() {
     return QStandardPaths::writableLocation(QStandardPaths::AppLocalDataLocation) + "/logformats";
 }
 
-QString LogFormatLoader::pathForLogFormat(const QString& name) {
+QString LogFormatIO::pathForLogFormat(const QString& name) {
     return QString("%1/%2.json").arg(logFormatsDirPath(), name);
 }
 
-void LogFormatLoader::reload() {
+void LogFormatIO::reload() {
     qInfo() << "Reloading log format";
     load(mLogFormatName);
 }
