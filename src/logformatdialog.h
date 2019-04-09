@@ -61,6 +61,8 @@ private:
 
     void onCurrentChanged(const QModelIndex& index);
     void onRowsInserted(const QModelIndex& parent, int first, int last);
+    void applyChanges();
+
     const std::unique_ptr<Ui::LogFormatDialog> ui;
     const std::unique_ptr<LogFormatModel> mModel;
 

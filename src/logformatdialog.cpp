@@ -22,6 +22,7 @@
 #include "logformatloader.h"
 #include "ui_logformatdialog.h"
 
+#include <QPushButton>
 #include <QStandardPaths>
 
 using std::shared_ptr;
@@ -92,6 +93,11 @@ void LogFormatDialog::setupSideBar() {
 
 void LogFormatDialog::setupEditor() {
     ui->containerWidget->layout()->setMargin(0);
+
+    connect(ui->parserLineEdit, &QLineEdit::editingFinished, this, &LogFormatDialog::applyChanges);
+
+    // Do not close the dialog when the user presses Enter
+    ui->buttonBox->button(QDialogButtonBox::Close)->setAutoDefault(false);
 }
 
 QString LogFormatDialog::logFormatName() const {
@@ -128,4 +134,15 @@ void LogFormatDialog::onRowsInserted(const QModelIndex& parent, int first, int l
     if (!mInitialLogFormatPath.isEmpty()) {
         selectInitialLogFormat();
     }
+}
+
+void LogFormatDialog::applyChanges() {
+    auto index = ui->listView->currentIndex();
+    if (!index.isValid()) {
+        return;
+    }
+    shared_ptr<LogFormat> logFormat = mModel->logFormatForIndex(index);
+    logFormat->parser.setPattern(ui->parserLineEdit->text());
+    // TODO: serialize
+    logFormatChanged(logFormat);
 }
