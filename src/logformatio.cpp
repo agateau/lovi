@@ -124,7 +124,9 @@ static shared_ptr<LogFormat> loadLogFormat(const QJsonDocument& doc) {
     return logFormat;
 }
 
-static shared_ptr<LogFormat> loadLogFormat(const QString& name) {
+namespace LogFormatIO {
+
+shared_ptr<LogFormat> load(const QString& name) {
     QString filePath = LogFormatIO::pathForLogFormat(name);
     optional<QByteArray> json = readFile(filePath);
     if (!json.has_value()) {
@@ -143,34 +145,12 @@ static shared_ptr<LogFormat> loadLogFormat(const QString& name) {
     return logFormat;
 }
 
-LogFormatIO::LogFormatIO(QObject* parent) : QObject(parent) {
-}
-
-LogFormatIO::~LogFormatIO() {
-}
-
-void LogFormatIO::load(const QString& name) {
-    mLogFormatName = name;
-    shared_ptr<LogFormat> logFormat = ::loadLogFormat(mLogFormatName);
-    if (!logFormat) {
-        return;
-    }
-    mLogFormat = std::move(logFormat);
-}
-
-std::shared_ptr<LogFormat> LogFormatIO::logFormat() const {
-    return mLogFormat;
-}
-
-QString LogFormatIO::logFormatsDirPath() {
+QString logFormatsDirPath() {
     return QStandardPaths::writableLocation(QStandardPaths::AppLocalDataLocation) + "/logformats";
 }
 
-QString LogFormatIO::pathForLogFormat(const QString& name) {
+QString pathForLogFormat(const QString& name) {
     return QString("%1/%2.json").arg(logFormatsDirPath(), name);
 }
 
-void LogFormatIO::reload() {
-    qInfo() << "Reloading log format";
-    load(mLogFormatName);
-}
+} // namespace LogFormatIO

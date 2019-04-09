@@ -19,31 +19,20 @@
 #ifndef LOGFORMATIO_H
 #define LOGFORMATIO_H
 
-#include <QObject>
+#include <QString>
 
 #include <memory>
 
 class LogFormat;
 
-class LogFormatIO : public QObject {
-    Q_OBJECT
-public:
-    explicit LogFormatIO(QObject* parent = nullptr);
-    ~LogFormatIO();
+namespace LogFormatIO {
 
-    void load(const QString& name);
+std::shared_ptr<LogFormat> load(const QString& name);
 
-    std::shared_ptr<LogFormat> logFormat() const;
+QString logFormatsDirPath();
 
-    static QString logFormatsDirPath();
+QString pathForLogFormat(const QString& name);
 
-    static QString pathForLogFormat(const QString& name);
-
-private:
-    void reload();
-
-    QString mLogFormatName;
-    std::shared_ptr<LogFormat> mLogFormat;
-};
+}; // namespace LogFormatIO
 
 #endif // LOGFORMATIO_H

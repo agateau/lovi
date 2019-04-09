@@ -46,9 +46,7 @@ QVariant LogFormatModel::data(const QModelIndex& index, int role) const {
 
 shared_ptr<LogFormat> LogFormatModel::logFormatForIndex(const QModelIndex& index) const {
     QString name = nameForIndex(index);
-    LogFormatIO loader;
-    loader.load(name);
-    return loader.logFormat();
+    return LogFormatIO::load(name);
 }
 
 QString LogFormatModel::nameForIndex(const QModelIndex& index) const {

@@ -57,9 +57,7 @@ MainWindow::~MainWindow() {
 }
 
 void MainWindow::loadLogFormat(const QString& logFormatName) {
-    LogFormatIO loader;
-    loader.load(logFormatName);
-    setLogFormat(loader.logFormat());
+    setLogFormat(LogFormatIO::load(logFormatName));
 }
 
 void MainWindow::loadLog(const QString& filePath) {
