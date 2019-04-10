@@ -41,6 +41,7 @@ private:
 
 class Highlight {
 public:
+    QString conditionDefinition;
     std::unique_ptr<Condition> condition;
     std::optional<HighlightColor> rowBgColor;
     std::optional<HighlightColor> rowFgColor;

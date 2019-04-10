@@ -120,13 +120,11 @@ static shared_ptr<LogFormat> loadLogFormat(const QJsonDocument& doc) {
 
     for (QJsonValue jsonValue : doc.object().value("highlights").toArray()) {
         QJsonObject highlightObj = jsonValue.toObject();
-        auto conditionString = highlightObj.value("condition").toString();
 
         Highlight highlight;
-        highlight.condition = createCondition(conditionString, columnByName);
-        if (!highlight.condition) {
-            return {};
-        }
+        highlight.conditionDefinition = highlightObj.value("condition").toString();
+
+        highlight.condition = createCondition(highlight.conditionDefinition, columnByName);
 
         auto rowBgColor = highlightObj.value("rowBgColor").toString();
         auto rowFgColor = highlightObj.value("rowFgColor").toString();
