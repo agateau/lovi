@@ -6,6 +6,7 @@ set(CMAKE_AUTOUIC ON)
 # Lib
 add_library(lovilib STATIC
     conditions.cpp
+    conditionio.cpp
     config.cpp
     filelineprovider.cpp
     filewatcher.cpp

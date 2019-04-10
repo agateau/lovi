@@ -18,6 +18,7 @@
  */
 #include "logformatio.h"
 
+#include "conditionio.h"
 #include "conditions.h"
 #include "logformat.h"
 
@@ -42,12 +43,37 @@ static optional<QByteArray> readFile(const QString& filePath) {
     return file.readAll();
 }
 
-static unique_ptr<Condition> createCondition(int column, const QString& value, const QString& op) {
-    if (op == "exact") {
+static unique_ptr<Condition> createCondition(const QString& conditionString,
+                                             const QHash<QString, int>& columnByName) {
+    QStringList tokens;
+    {
+        optional<QStringList> maybeTokens = ConditionIO::tokenize(conditionString);
+        if (!maybeTokens.has_value()) {
+            return {};
+        }
+        tokens = maybeTokens.value();
+    }
+    if (tokens.length() != 3) {
+        qWarning() << "Wrong number of tokens in" << conditionString;
+        return {};
+    }
+
+    auto columnName = tokens.at(0);
+    auto op = tokens.at(1);
+    auto value = tokens.at(2);
+
+    auto it = columnByName.find(columnName);
+    if (it == columnByName.end()) {
+        qWarning() << "No column named" << columnName;
+        return {};
+    }
+    int column = *it;
+
+    if (op == "==") {
         return std::make_unique<ExactCondition>(column, value);
-    } else if (op.isEmpty() || op == "contains") {
+    } else if (op == "contains") {
         return std::make_unique<ContainsCondition>(column, value);
-    } else if (op == "regex") {
+    } else if (op == "~") {
         QRegularExpression regex(value);
         if (!regex.isValid()) {
             qWarning() << value << "is not a valid regex:" << regex.errorString();
@@ -55,7 +81,7 @@ static unique_ptr<Condition> createCondition(int column, const QString& value, c
         }
         return std::make_unique<RegExCondition>(column, regex);
     } else {
-        qWarning() << "Invalid value for 'op':" << op;
+        qWarning() << "Invalid operator:" << op;
         return nullptr;
     }
 }
@@ -94,18 +120,10 @@ static shared_ptr<LogFormat> loadLogFormat(const QJsonDocument& doc) {
 
     for (QJsonValue jsonValue : doc.object().value("highlights").toArray()) {
         QJsonObject highlightObj = jsonValue.toObject();
-        auto conditionObj = highlightObj.value("condition").toObject();
-        auto columnName = conditionObj.value("column").toString();
-        auto value = conditionObj.value("value").toString();
-        auto op = conditionObj.value("op").toString();
+        auto conditionString = highlightObj.value("condition").toString();
 
-        auto it = columnByName.find(columnName);
-        if (it == columnByName.end()) {
-            qWarning() << "No column named" << columnName;
-            return {};
-        }
         Highlight highlight;
-        highlight.condition = createCondition(it.value(), value, op);
+        highlight.condition = createCondition(conditionString, columnByName);
         if (!highlight.condition) {
             return {};
         }
@@ -141,6 +159,9 @@ shared_ptr<LogFormat> load(const QString& name) {
     }
 
     auto logFormat = loadLogFormat(doc);
+    if (!logFormat) {
+        return LogFormat::createEmpty();
+    }
     logFormat->name = name;
     return logFormat;
 }

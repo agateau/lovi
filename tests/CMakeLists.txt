@@ -1,4 +1,5 @@
 add_executable(tests
+    conditioniotest.cpp
     tests.cpp
     filewatchertest.cpp
     testutils.cpp
