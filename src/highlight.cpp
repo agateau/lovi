@@ -45,3 +45,7 @@ QColor HighlightColor::toColor(const QString& matchingText) const {
         });
     return autoColors.at(sum % autoColors.size());
 }
+
+QString HighlightColor::toString() const {
+    return mIsAuto ? "auto" : mColor.name();
+}

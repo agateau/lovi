@@ -32,6 +32,7 @@ public:
     explicit HighlightColor(const QString& text);
 
     QColor toColor(const QString& matchingText) const;
+    QString toString() const;
 
 private:
     bool mIsAuto = false;
