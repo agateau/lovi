@@ -135,7 +135,8 @@ static QColor getColor(const optional<HighlightColor>& color, const QString& tex
 
 void LogModel::applyHighlights(LogLine* line, LogCell* cell, int column) const {
     for (const Highlight& highlight : mLogFormat->highlights) {
-        if (highlight.condition->column() == column && highlight.condition->eval(cell->text)) {
+        const auto& condition = highlight.condition;
+        if (condition && condition->column() == column && condition->eval(cell->text)) {
             if (highlight.rowBgColor.has_value()) {
                 line->bgColor = highlight.rowBgColor.value().toColor(cell->text);
             }

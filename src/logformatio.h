@@ -29,6 +29,12 @@ namespace LogFormatIO {
 
 std::shared_ptr<LogFormat> load(const QString& name);
 
+bool save(std::shared_ptr<LogFormat>& logFormat);
+
+// For unit-testing
+std::shared_ptr<LogFormat> loadFromPath(const QString& path);
+bool saveToPath(std::shared_ptr<LogFormat>& logFormat, const QString& path);
+
 QString logFormatsDirPath();
 
 QString pathForLogFormat(const QString& name);

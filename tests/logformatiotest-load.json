@@ -1,0 +1,23 @@
+{
+    "parser": {
+        "regex": "^(?<level>[DEW])/(?<app>[^:]*): (?<message>.*)"
+    },
+    "highlights": [
+        {
+            "condition": "level == E",
+            "rowBgColor": "#ff0000"
+        },
+        {
+            "condition": "level == W",
+            "rowFgColor": "#ff8800"
+        },
+        {
+            "condition": "message ~ start.*",
+            "bgColor": "auto"
+        },
+        {
+            "condition": "message contains bob",
+            "fgColor": "#00ff00"
+        }
+    ]
+}

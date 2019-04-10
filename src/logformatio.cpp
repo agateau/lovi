@@ -24,10 +24,12 @@
 
 #include <QDebug>
 #include <QFile>
+#include <QFileInfo>
 #include <QJsonArray>
 #include <QJsonDocument>
 #include <QJsonObject>
 #include <QJsonParseError>
+#include <QSaveFile>
 #include <QStandardPaths>
 
 using std::optional;
@@ -140,10 +142,53 @@ static shared_ptr<LogFormat> loadLogFormat(const QJsonDocument& doc) {
     return logFormat;
 }
 
+//- Save --------------------------------
+static void
+saveColor(QJsonObject* root, const QString& key, const optional<HighlightColor>& color) {
+    if (!color.has_value()) {
+        return;
+    }
+    root->insert(key, color.value().toString());
+}
+
+static QJsonObject saveHighlight(const Highlight& highlight) {
+    QJsonObject root;
+    root["condition"] = highlight.conditionDefinition;
+    saveColor(&root, "rowBgColor", highlight.rowBgColor);
+    saveColor(&root, "rowFgColor", highlight.rowFgColor);
+    saveColor(&root, "bgColor", highlight.bgColor);
+    saveColor(&root, "fgColor", highlight.fgColor);
+    return root;
+}
+
+static QJsonDocument saveToJson(const shared_ptr<LogFormat>& logFormat) {
+    QJsonObject root;
+    {
+        QJsonObject parser;
+        parser["regex"] = logFormat->parser.pattern();
+        root["parser"] = parser;
+    }
+
+    QJsonArray highlightsArray;
+    for (const auto& highlight : logFormat->highlights) {
+        QJsonObject highlightObj = saveHighlight(highlight);
+        highlightsArray.append(highlightObj);
+    }
+    root["highlights"] = highlightsArray;
+
+    QJsonDocument doc;
+    doc.setObject(root);
+    return doc;
+}
+
 namespace LogFormatIO {
 
 shared_ptr<LogFormat> load(const QString& name) {
     QString filePath = LogFormatIO::pathForLogFormat(name);
+    return loadFromPath(filePath);
+}
+
+shared_ptr<LogFormat> loadFromPath(const QString& filePath) {
     optional<QByteArray> json = readFile(filePath);
     if (!json.has_value()) {
         return LogFormat::createEmpty();
@@ -160,7 +205,7 @@ shared_ptr<LogFormat> load(const QString& name) {
     if (!logFormat) {
         return LogFormat::createEmpty();
     }
-    logFormat->name = name;
+    logFormat->name = QFileInfo(filePath).baseName();
     return logFormat;
 }
 
@@ -170,6 +215,28 @@ QString logFormatsDirPath() {
 
 QString pathForLogFormat(const QString& name) {
     return QString("%1/%2.json").arg(logFormatsDirPath(), name);
+}
+
+bool save(std::shared_ptr<LogFormat>& logFormat) {
+    QString filePath = LogFormatIO::pathForLogFormat(logFormat->name);
+    return saveToPath(logFormat, filePath);
+}
+
+bool saveToPath(std::shared_ptr<LogFormat>& logFormat, const QString& filePath) {
+    QSaveFile file(filePath);
+    if (!file.open(QIODevice::WriteOnly)) {
+        qWarning() << "Failed to open" << filePath << "for writing. Error:" << file.errorString();
+        return false;
+    }
+
+    auto doc = saveToJson(logFormat);
+    file.write(doc.toJson());
+
+    if (!file.commit()) {
+        qWarning() << "Failed to write changes to" << filePath << ". Error:" << file.errorString();
+        return false;
+    }
+    return true;
 }
 
 } // namespace LogFormatIO

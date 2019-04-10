@@ -141,6 +141,6 @@ void LogFormatDialog::applyChanges() {
     }
     shared_ptr<LogFormat> logFormat = mModel->logFormatForIndex(index);
     logFormat->parser.setPattern(ui->parserLineEdit->text());
-    // TODO: serialize
+    LogFormatIO::save(logFormat);
     logFormatChanged(logFormat);
 }
