@@ -45,49 +45,6 @@ static optional<QByteArray> readFile(const QString& filePath) {
     return file.readAll();
 }
 
-static unique_ptr<Condition> createCondition(const QString& conditionString,
-                                             const QHash<QString, int>& columnByName) {
-    QStringList tokens;
-    {
-        optional<QStringList> maybeTokens = ConditionIO::tokenize(conditionString);
-        if (!maybeTokens.has_value()) {
-            return {};
-        }
-        tokens = maybeTokens.value();
-    }
-    if (tokens.length() != 3) {
-        qWarning() << "Wrong number of tokens in" << conditionString;
-        return {};
-    }
-
-    auto columnName = tokens.at(0);
-    auto op = tokens.at(1);
-    auto value = tokens.at(2);
-
-    auto it = columnByName.find(columnName);
-    if (it == columnByName.end()) {
-        qWarning() << "No column named" << columnName;
-        return {};
-    }
-    int column = *it;
-
-    if (op == "==") {
-        return std::make_unique<ExactCondition>(column, value);
-    } else if (op == "contains") {
-        return std::make_unique<ContainsCondition>(column, value);
-    } else if (op == "~") {
-        QRegularExpression regex(value);
-        if (!regex.isValid()) {
-            qWarning() << value << "is not a valid regex:" << regex.errorString();
-            return nullptr;
-        }
-        return std::make_unique<RegExCondition>(column, regex);
-    } else {
-        qWarning() << "Invalid operator:" << op;
-        return nullptr;
-    }
-}
-
 static std::optional<HighlightColor> initColor(const QString& text) {
     if (text.isEmpty()) {
         return {};
@@ -110,12 +67,11 @@ static shared_ptr<LogFormat> loadLogFormat(const QJsonDocument& doc) {
     }
     logFormat->parser.optimize();
 
-    QHash<QString, int> columnByName;
     {
         int role = 0;
         for (const auto& name : logFormat->parser.namedCaptureGroups()) {
             if (!name.isEmpty()) {
-                columnByName[name] = role++;
+                logFormat->columnHash[name] = role++;
             }
         }
     }
@@ -126,7 +82,8 @@ static shared_ptr<LogFormat> loadLogFormat(const QJsonDocument& doc) {
         Highlight highlight;
         highlight.conditionDefinition = highlightObj.value("condition").toString();
 
-        highlight.condition = createCondition(highlight.conditionDefinition, columnByName);
+        highlight.condition =
+            ConditionIO::parse(highlight.conditionDefinition, logFormat->columnHash);
 
         auto rowBgColor = highlightObj.value("rowBgColor").toString();
         auto rowFgColor = highlightObj.value("rowFgColor").toString();

@@ -19,13 +19,22 @@
 #ifndef CONDITIONIO_H
 #define CONDITIONIO_H
 
+#include "logformat.h"
+
+#include <QHash>
 #include <QString>
 #include <QStringList>
 
+#include <memory>
 #include <optional>
 
+class Condition;
+
 namespace ConditionIO {
+
 std::optional<QStringList> tokenize(const QString& text);
-}
+
+std::unique_ptr<Condition> parse(const QString& text, const ColumnHash& columnHash);
+} // namespace ConditionIO
 
 #endif // CONDITIONIO_H

@@ -26,6 +26,8 @@
 #include <memory>
 #include <vector>
 
+using ColumnHash = QHash<QString, int>;
+
 class LogFormat {
 public:
     QString name;
@@ -33,6 +35,8 @@ public:
     std::vector<Highlight> highlights;
 
     static std::shared_ptr<LogFormat> createEmpty();
+
+    ColumnHash columnHash;
 };
 
 #endif // LOGFORMAT_H
