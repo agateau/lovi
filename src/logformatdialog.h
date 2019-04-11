@@ -28,6 +28,7 @@ namespace Ui {
 class LogFormatDialog;
 }
 
+class HighlightModel;
 class LogFormat;
 
 class LogFormatModel : public QFileSystemModel {
@@ -65,6 +66,7 @@ private:
 
     const std::unique_ptr<Ui::LogFormatDialog> ui;
     const std::unique_ptr<LogFormatModel> mModel;
+    const std::unique_ptr<HighlightModel> mHighlightModel;
 
     QString mInitialLogFormatPath;
 };

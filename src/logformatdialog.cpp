@@ -18,6 +18,7 @@
  */
 #include "logformatdialog.h"
 
+#include "highlightmodel.h"
 #include "logformat.h"
 #include "logformatio.h"
 #include "ui_logformatdialog.h"
@@ -60,6 +61,7 @@ LogFormatDialog::LogFormatDialog(const QString& logFormatPath, QWidget* parent)
         : QDialog(parent)
         , ui(std::make_unique<Ui::LogFormatDialog>())
         , mModel(std::make_unique<LogFormatModel>())
+        , mHighlightModel(std::make_unique<HighlightModel>())
         , mInitialLogFormatPath(logFormatPath) {
     ui->setupUi(this);
     setupSideBar();
@@ -92,6 +94,8 @@ void LogFormatDialog::setupSideBar() {
 void LogFormatDialog::setupEditor() {
     ui->containerWidget->layout()->setMargin(0);
 
+    ui->highlightListView->setModel(mHighlightModel.get());
+
     connect(ui->parserLineEdit, &QLineEdit::editingFinished, this, &LogFormatDialog::applyChanges);
 
     // Do not close the dialog when the user presses Enter
@@ -113,6 +117,7 @@ void LogFormatDialog::onCurrentChanged(const QModelIndex& index) {
 
     shared_ptr<LogFormat> logFormat = mModel->logFormatForIndex(index);
     ui->parserLineEdit->setText(logFormat->parser.pattern());
+    mHighlightModel->setLogFormat(logFormat);
 
     logFormatChanged(logFormat);
 }
