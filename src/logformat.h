@@ -31,12 +31,19 @@ using ColumnHash = QHash<QString, int>;
 class LogFormat {
 public:
     QString name;
-    QRegularExpression parser;
+    void setParserPattern(const QString& pattern);
+    QString parserPattern() const;
+
+    const QRegularExpression& parser() const;
+    ColumnHash columnHash() const;
+
     std::vector<Highlight> highlights;
 
     static std::shared_ptr<LogFormat> createEmpty();
 
-    ColumnHash columnHash;
+private:
+    QRegularExpression mParser;
+    ColumnHash mColumnHash;
 };
 
 #endif // LOGFORMAT_H

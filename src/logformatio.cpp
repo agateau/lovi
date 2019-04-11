@@ -60,20 +60,10 @@ static shared_ptr<LogFormat> loadLogFormat(const QJsonDocument& doc) {
     }
 
     shared_ptr<LogFormat> logFormat = std::make_shared<LogFormat>();
-    logFormat->parser.setPattern(regex);
-    if (!logFormat->parser.isValid()) {
-        qWarning() << "Invalid parser regex:" << logFormat->parser.errorString();
+    logFormat->setParserPattern(regex);
+    if (!logFormat->parser().isValid()) {
+        qWarning() << "Invalid parser regex:" << logFormat->parser().errorString();
         return {};
-    }
-    logFormat->parser.optimize();
-
-    {
-        int role = 0;
-        for (const auto& name : logFormat->parser.namedCaptureGroups()) {
-            if (!name.isEmpty()) {
-                logFormat->columnHash[name] = role++;
-            }
-        }
     }
 
     for (QJsonValue jsonValue : doc.object().value("highlights").toArray()) {
@@ -83,7 +73,7 @@ static shared_ptr<LogFormat> loadLogFormat(const QJsonDocument& doc) {
         highlight.conditionDefinition = highlightObj.value("condition").toString();
 
         highlight.condition =
-            ConditionIO::parse(highlight.conditionDefinition, logFormat->columnHash);
+            ConditionIO::parse(highlight.conditionDefinition, logFormat->columnHash());
 
         auto rowBgColor = highlightObj.value("rowBgColor").toString();
         auto rowFgColor = highlightObj.value("rowFgColor").toString();
@@ -128,7 +118,7 @@ static QJsonDocument saveToJson(const shared_ptr<LogFormat>& logFormat) {
     QJsonObject root;
     {
         QJsonObject parser;
-        parser["regex"] = logFormat->parser.pattern();
+        parser["regex"] = logFormat->parserPattern();
         root["parser"] = parser;
     }
 

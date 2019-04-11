@@ -18,7 +18,7 @@ struct Fixture {
 
 void checkLogFormatEquality(const LogFormat& f1, const LogFormat& f2) {
     REQUIRE(f1.name == f2.name);
-    REQUIRE(f1.parser.pattern() == f2.parser.pattern());
+    REQUIRE(f1.parserPattern() == f2.parserPattern());
 
     for (size_t idx = 0; idx < f1.highlights.size(); ++idx) {
         REQUIRE(idx < f2.highlights.size());
@@ -33,7 +33,7 @@ TEST_CASE("logformatio") {
     shared_ptr<LogFormat> format = LogFormatIO::loadFromPath(testFile);
 
     SECTION("load") {
-        REQUIRE(format->parser.pattern() == "^(?<level>[DEW])/(?<app>[^:]*): (?<message>.*)");
+        REQUIRE(format->parserPattern() == "^(?<level>[DEW])/(?<app>[^:]*): (?<message>.*)");
         auto it = format->highlights.begin();
         auto end = format->highlights.end();
         REQUIRE(it != end);

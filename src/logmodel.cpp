@@ -106,14 +106,14 @@ void LogModel::setLogFormat(const std::shared_ptr<LogFormat>& logFormat) {
     } else {
         mLogFormat = mEmptyLogFormat;
     }
-    mColumns = mLogFormat->parser.namedCaptureGroups();
+    mColumns = mLogFormat->parser().namedCaptureGroups();
     mColumns.removeFirst();
     mLogLineCache.clear();
     endResetModel();
 }
 
 LogLine LogModel::processLine(const QString& line) const {
-    auto match = mLogFormat->parser.match(line);
+    auto match = mLogFormat->parser().match(line);
     if (!match.hasMatch()) {
         return {};
     }

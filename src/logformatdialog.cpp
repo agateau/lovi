@@ -127,7 +127,7 @@ void LogFormatDialog::onCurrentChanged(const QModelIndex& index) {
     }
 
     shared_ptr<LogFormat> logFormat = mModel->logFormatForIndex(index);
-    ui->parserLineEdit->setText(logFormat->parser.pattern());
+    ui->parserLineEdit->setText(logFormat->parserPattern());
     mHighlightModel->setLogFormat(logFormat);
 
     logFormatChanged(logFormat);
@@ -151,7 +151,7 @@ void LogFormatDialog::onHighlightEdited() {
     auto logFormat = mHighlightModel->logFormat();
     auto highlight = ui->highlightWidget->highlight();
     highlight->condition =
-        ConditionIO::parse(highlight->conditionDefinition, logFormat->columnHash);
+        ConditionIO::parse(highlight->conditionDefinition, logFormat->columnHash());
 
     LogFormatIO::save(logFormat);
     logFormatChanged(logFormat);
@@ -180,7 +180,7 @@ void LogFormatDialog::applyChanges() {
         return;
     }
     shared_ptr<LogFormat> logFormat = mModel->logFormatForIndex(index);
-    logFormat->parser.setPattern(ui->parserLineEdit->text());
+    logFormat->setParserPattern(ui->parserLineEdit->text());
     LogFormatIO::save(logFormat);
     logFormatChanged(logFormat);
 }

@@ -24,8 +24,33 @@
 
 using std::shared_ptr;
 
+void LogFormat::setParserPattern(const QString& pattern) {
+    mParser.setPattern(pattern);
+    mParser.optimize();
+
+    mColumnHash.clear();
+    int role = 0;
+    for (const auto& name : mParser.namedCaptureGroups()) {
+        if (!name.isEmpty()) {
+            mColumnHash[name] = role++;
+        }
+    }
+}
+
+QString LogFormat::parserPattern() const {
+    return mParser.pattern();
+}
+
+const QRegularExpression& LogFormat::parser() const {
+    return mParser;
+}
+
+ColumnHash LogFormat::columnHash() const {
+    return mColumnHash;
+}
+
 std::shared_ptr<LogFormat> LogFormat::createEmpty() {
     shared_ptr<LogFormat> logFormat = std::make_shared<LogFormat>();
-    logFormat->parser.setPattern("(?<line>.*)");
+    logFormat->setParserPattern("(?<line>.*)");
     return logFormat;
 }
