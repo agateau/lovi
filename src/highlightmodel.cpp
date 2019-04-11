@@ -32,6 +32,10 @@ void HighlightModel::setLogFormat(const std::shared_ptr<LogFormat>& logFormat) {
     endResetModel();
 }
 
+std::shared_ptr<LogFormat> HighlightModel::logFormat() const {
+    return mLogFormat;
+}
+
 int HighlightModel::rowCount(const QModelIndex& parent) const {
     if (parent.isValid() || !mLogFormat) {
         return 0;
@@ -60,4 +64,8 @@ QVariant HighlightModel::data(const QModelIndex& index, int role) const {
         }
     }
     return {};
+}
+
+void HighlightModel::notifyHighlightChanged(const QModelIndex& index) {
+    dataChanged(index, index);
 }

@@ -18,6 +18,7 @@
  */
 #include "logformatdialog.h"
 
+#include "conditionio.h"
 #include "highlightmodel.h"
 #include "logformat.h"
 #include "logformatio.h"
@@ -96,7 +97,17 @@ void LogFormatDialog::setupEditor() {
 
     ui->highlightListView->setModel(mHighlightModel.get());
 
+    connect(ui->highlightListView->selectionModel(),
+            &QItemSelectionModel::currentChanged,
+            this,
+            &LogFormatDialog::onCurrentHighlightChanged);
+
     connect(ui->parserLineEdit, &QLineEdit::editingFinished, this, &LogFormatDialog::applyChanges);
+
+    connect(ui->highlightWidget,
+            &HighlightWidget::highlightChanged,
+            this,
+            &LogFormatDialog::onHighlightEdited);
 
     // Do not close the dialog when the user presses Enter
     ui->buttonBox->button(QDialogButtonBox::Close)->setAutoDefault(false);
@@ -119,6 +130,30 @@ void LogFormatDialog::onCurrentChanged(const QModelIndex& index) {
     ui->parserLineEdit->setText(logFormat->parser.pattern());
     mHighlightModel->setLogFormat(logFormat);
 
+    logFormatChanged(logFormat);
+}
+
+void LogFormatDialog::onCurrentHighlightChanged(const QModelIndex& index) {
+    if (!index.isValid()) {
+        ui->highlightWidget->setHighlight(nullptr);
+        return;
+    }
+    int row = index.row();
+    auto logFormat = mHighlightModel->logFormat();
+    ui->highlightWidget->setHighlight(&logFormat->highlights.at(row));
+}
+
+void LogFormatDialog::onHighlightEdited() {
+    auto index = ui->highlightListView->currentIndex();
+    Q_ASSERT(index.isValid());
+    mHighlightModel->notifyHighlightChanged(index);
+
+    auto logFormat = mHighlightModel->logFormat();
+    auto highlight = ui->highlightWidget->highlight();
+    highlight->condition =
+        ConditionIO::parse(highlight->conditionDefinition, logFormat->columnHash);
+
+    LogFormatIO::save(logFormat);
     logFormatChanged(logFormat);
 }
 

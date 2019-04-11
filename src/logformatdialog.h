@@ -61,6 +61,8 @@ private:
     void setupEditor();
 
     void onCurrentChanged(const QModelIndex& index);
+    void onCurrentHighlightChanged(const QModelIndex& index);
+    void onHighlightEdited();
     void onRowsInserted(const QModelIndex& parent, int first, int last);
     void applyChanges();
 

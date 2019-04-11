@@ -12,6 +12,8 @@ add_library(lovilib STATIC
     filewatcher.cpp
     highlight.cpp
     highlightmodel.cpp
+    highlightwidget.cpp
+    highlightwidget.ui
     lineprovider.cpp
     logformat.cpp
     logformatdialog.cpp

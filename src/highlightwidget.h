@@ -16,32 +16,35 @@
  * You should have received a copy of the GNU General Public License along with
  * this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-#ifndef HIGHLIGHTMODEL_H
-#define HIGHLIGHTMODEL_H
+#ifndef HIGHLIGHTWIDGET_H
+#define HIGHLIGHTWIDGET_H
 
-#include <QAbstractItemModel>
+#include "highlight.h"
+
+#include <QWidget>
 
 #include <memory>
 
-class LogFormat;
+namespace Ui {
+class HighlightWidget;
+}
 
-class HighlightModel : public QAbstractListModel {
+class HighlightWidget : public QWidget {
     Q_OBJECT
 public:
-    HighlightModel(QObject* parent = nullptr);
+    explicit HighlightWidget(QWidget* parent = nullptr);
+    ~HighlightWidget();
 
-    void setLogFormat(const std::shared_ptr<LogFormat>& logFormat);
+    void setHighlight(Highlight* highlight);
+    Highlight* highlight() const;
 
-    std::shared_ptr<LogFormat> logFormat() const;
-
-    int rowCount(const QModelIndex& parent = {}) const override;
-
-    QVariant data(const QModelIndex& index, int role = Qt::DisplayRole) const override;
-
-    void notifyHighlightChanged(const QModelIndex& index);
+signals:
+    void highlightChanged();
 
 private:
-    std::shared_ptr<LogFormat> mLogFormat;
+    void setupUi();
+    const std::unique_ptr<Ui::HighlightWidget> ui;
+    Highlight* mHighlight = nullptr;
 };
 
-#endif // HIGHLIGHTMODEL_H
+#endif // HIGHLIGHTWIDGET_H

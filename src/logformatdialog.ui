@@ -74,15 +74,18 @@
         </property>
        </widget>
       </item>
-      <item row="0" column="1">
-       <widget class="QLineEdit" name="parserLineEdit"/>
-      </item>
       <item row="1" column="0" colspan="2">
        <widget class="QListView" name="highlightListView">
         <property name="editTriggers">
          <set>QAbstractItemView::NoEditTriggers</set>
         </property>
        </widget>
+      </item>
+      <item row="0" column="1">
+       <widget class="QLineEdit" name="parserLineEdit"/>
+      </item>
+      <item row="2" column="0" colspan="2">
+       <widget class="HighlightWidget" name="highlightWidget" native="true"/>
       </item>
      </layout>
     </widget>
@@ -99,6 +102,14 @@
    </item>
   </layout>
  </widget>
+ <customwidgets>
+  <customwidget>
+   <class>HighlightWidget</class>
+   <extends>QWidget</extends>
+   <header>highlightwidget.h</header>
+   <container>1</container>
+  </customwidget>
+ </customwidgets>
  <tabstops>
   <tabstop>listView</tabstop>
   <tabstop>addFormatToolButton</tabstop>
@@ -113,8 +124,8 @@
    <slot>accept()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>248</x>
-     <y>254</y>
+     <x>503</x>
+     <y>313</y>
     </hint>
     <hint type="destinationlabel">
      <x>157</x>
@@ -129,8 +140,8 @@
    <slot>reject()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>316</x>
-     <y>260</y>
+     <x>510</x>
+     <y>313</y>
     </hint>
     <hint type="destinationlabel">
      <x>286</x>
