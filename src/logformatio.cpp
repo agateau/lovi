@@ -132,8 +132,15 @@ static shared_ptr<LogFormat> loadLogFormat(const QJsonDocument& doc) {
         auto rowFgColor = highlightObj.value("rowFgColor").toString();
         auto bgColor = highlightObj.value("bgColor").toString();
         auto fgColor = highlightObj.value("fgColor").toString();
-        highlight.rowBgColor = initColor(rowBgColor);
-        highlight.rowFgColor = initColor(rowFgColor);
+        QString scope = highlightObj.value("scope").toString();
+        if (scope == "row") {
+            highlight.scope = Highlight::Row;
+        } else if (scope == "cell") {
+            highlight.scope = Highlight::Cell;
+        } else {
+            qWarning() << "Invalid scope value:" << scope;
+            continue;
+        }
         highlight.bgColor = initColor(bgColor);
         highlight.fgColor = initColor(fgColor);
         logFormat->highlights.push_back(std::move(highlight));
@@ -154,8 +161,7 @@ saveColor(QJsonObject* root, const QString& key, const optional<HighlightColor>&
 static QJsonObject saveHighlight(const Highlight& highlight) {
     QJsonObject root;
     root["condition"] = highlight.conditionDefinition;
-    saveColor(&root, "rowBgColor", highlight.rowBgColor);
-    saveColor(&root, "rowFgColor", highlight.rowFgColor);
+    root["scope"] = highlight.scope == Highlight::Row ? "row" : "cell";
     saveColor(&root, "bgColor", highlight.bgColor);
     saveColor(&root, "fgColor", highlight.fgColor);
     return root;

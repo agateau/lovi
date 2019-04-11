@@ -41,10 +41,10 @@ private:
 
 class Highlight {
 public:
+    enum ColorScope { Row, Cell };
     QString conditionDefinition;
     std::unique_ptr<Condition> condition;
-    std::optional<HighlightColor> rowBgColor;
-    std::optional<HighlightColor> rowFgColor;
+    ColorScope scope;
     std::optional<HighlightColor> bgColor;
     std::optional<HighlightColor> fgColor;
 };

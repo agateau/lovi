@@ -34,17 +34,33 @@ TEST_CASE("logformatio") {
 
     SECTION("load") {
         REQUIRE(format->parser.pattern() == "^(?<level>[DEW])/(?<app>[^:]*): (?<message>.*)");
-        REQUIRE(format->highlights[0].conditionDefinition == "level == E");
-        REQUIRE(format->highlights[0].rowBgColor->toString() == "#ff0000");
+        auto it = format->highlights.begin();
+        auto end = format->highlights.end();
+        REQUIRE(it != end);
+        REQUIRE(it->conditionDefinition == "level == E");
+        REQUIRE(it->scope == Highlight::Row);
+        REQUIRE(it->bgColor->toString() == "#ff0000");
 
-        REQUIRE(format->highlights[1].conditionDefinition == "level == W");
-        REQUIRE(format->highlights[1].rowFgColor->toString() == "#ff8800");
+        ++it;
+        REQUIRE(it != end);
+        REQUIRE(it->conditionDefinition == "level == W");
+        REQUIRE(it->scope == Highlight::Row);
+        REQUIRE(it->fgColor->toString() == "#ff8800");
 
-        REQUIRE(format->highlights[2].conditionDefinition == "message ~ start.*");
-        REQUIRE(format->highlights[2].bgColor->toString() == "auto");
+        ++it;
+        REQUIRE(it != end);
+        REQUIRE(it->conditionDefinition == "message ~ start.*");
+        REQUIRE(it->scope == Highlight::Cell);
+        REQUIRE(it->bgColor->toString() == "auto");
 
-        REQUIRE(format->highlights[3].conditionDefinition == "message contains bob");
-        REQUIRE(format->highlights[3].fgColor->toString() == "#00ff00");
+        ++it;
+        REQUIRE(it != end);
+        REQUIRE(it->conditionDefinition == "message contains bob");
+        REQUIRE(it->scope == Highlight::Cell);
+        REQUIRE(it->fgColor->toString() == "#00ff00");
+
+        ++it;
+        REQUIRE(it == end);
     }
 
     SECTION("save") {

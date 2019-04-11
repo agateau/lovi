@@ -5,18 +5,22 @@
     "highlights": [
         {
             "condition": "level == E",
-            "rowBgColor": "#ff0000"
+            "scope": "row",
+            "bgColor": "#ff0000"
         },
         {
             "condition": "level == W",
-            "rowFgColor": "#ff8800"
+            "scope": "row",
+            "fgColor": "#ff8800"
         },
         {
             "condition": "message ~ start.*",
+            "scope": "cell",
             "bgColor": "auto"
         },
         {
             "condition": "message contains bob",
+            "scope": "cell",
             "fgColor": "#00ff00"
         }
     ]
