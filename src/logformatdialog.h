@@ -19,8 +19,8 @@
 #ifndef LOGFORMATDIALOG_H
 #define LOGFORMATDIALOG_H
 
+#include <QAbstractListModel>
 #include <QDialog>
-#include <QFileSystemModel>
 
 #include <memory>
 
@@ -30,25 +30,30 @@ class LogFormatDialog;
 
 class HighlightModel;
 class LogFormat;
+class LogFormatStore;
 
-class LogFormatModel : public QFileSystemModel {
+class LogFormatModel : public QAbstractListModel {
     Q_OBJECT
 public:
-    LogFormatModel(QObject* parent = nullptr);
+    LogFormatModel(LogFormatStore* store, QObject* parent = nullptr);
     ~LogFormatModel();
+
+    int rowCount(const QModelIndex& parent = {}) const override;
 
     QVariant data(const QModelIndex& index, int role = Qt::DisplayRole) const override;
 
     std::shared_ptr<LogFormat> logFormatForIndex(const QModelIndex& index) const;
 
 private:
-    QString nameForIndex(const QModelIndex& index) const;
+    LogFormatStore* const mStore;
 };
 
 class LogFormatDialog : public QDialog {
     Q_OBJECT
 public:
-    explicit LogFormatDialog(const QString& logFormatName, QWidget* parent = nullptr);
+    explicit LogFormatDialog(LogFormatStore* store,
+                             const std::shared_ptr<LogFormat>& currentLogFormat,
+                             QWidget* parent = nullptr);
     ~LogFormatDialog();
 
     QString logFormatName() const;
@@ -57,20 +62,17 @@ signals:
     void logFormatChanged(const std::shared_ptr<LogFormat>& logFormat);
 
 private:
-    void setupSideBar();
+    void setupSideBar(const std::shared_ptr<LogFormat>& currentLogFormat);
     void setupEditor();
 
     void onCurrentChanged(const QModelIndex& index);
     void onCurrentHighlightChanged(const QModelIndex& index);
     void onHighlightEdited();
-    void onRowsInserted(const QModelIndex& parent, int first, int last);
     void applyChanges();
 
     const std::unique_ptr<Ui::LogFormatDialog> ui;
     const std::unique_ptr<LogFormatModel> mModel;
     const std::unique_ptr<HighlightModel> mHighlightModel;
-
-    QString mInitialLogFormatPath;
 };
 
 #endif // LOGFORMATDIALOG_H

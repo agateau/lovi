@@ -22,6 +22,7 @@
 #include "highlightmodel.h"
 #include "logformat.h"
 #include "logformatio.h"
+#include "logformatstore.h"
 #include "ui_logformatdialog.h"
 
 #include <QPushButton>
@@ -30,56 +31,62 @@
 using std::shared_ptr;
 
 //- LogFormatModel -----------------------------
-LogFormatModel::LogFormatModel(QObject* parent) : QFileSystemModel(parent) {
+LogFormatModel::LogFormatModel(LogFormatStore* store, QObject* parent)
+        : QAbstractListModel(parent), mStore(store) {
 }
 
 LogFormatModel::~LogFormatModel() {
 }
 
+int LogFormatModel::rowCount(const QModelIndex& parent) const {
+    return parent.isValid() ? 0 : mStore->count();
+}
+
 QVariant LogFormatModel::data(const QModelIndex& index, int role) const {
-    if (role == Qt::DecorationRole) {
+    int row = index.row();
+    if (row < 0 || row >= mStore->count()) {
         return {};
     }
     if (role == Qt::DisplayRole) {
-        return nameForIndex(index);
+        return mStore->nameAt(row);
     }
     return {};
 }
 
 shared_ptr<LogFormat> LogFormatModel::logFormatForIndex(const QModelIndex& index) const {
-    QString name = nameForIndex(index);
-    return LogFormatIO::load(name);
-}
-
-QString LogFormatModel::nameForIndex(const QModelIndex& index) const {
-    QVariant value = QFileSystemModel::data(index, Qt::DisplayRole);
-    QString name = value.toString();
-    return QFileInfo(name).baseName();
+    return mStore->at(index.row());
 }
 
 //- LogFormatDialog ----------------------------
-LogFormatDialog::LogFormatDialog(const QString& logFormatPath, QWidget* parent)
+LogFormatDialog::LogFormatDialog(LogFormatStore* store,
+                                 const std::shared_ptr<LogFormat>& currentLogFormat,
+                                 QWidget* parent)
         : QDialog(parent)
         , ui(std::make_unique<Ui::LogFormatDialog>())
-        , mModel(std::make_unique<LogFormatModel>())
-        , mHighlightModel(std::make_unique<HighlightModel>())
-        , mInitialLogFormatPath(logFormatPath) {
+        , mModel(std::make_unique<LogFormatModel>(store))
+        , mHighlightModel(std::make_unique<HighlightModel>()) {
     ui->setupUi(this);
-    setupSideBar();
+    setupSideBar(currentLogFormat);
     setupEditor();
+    onCurrentChanged(ui->listView->currentIndex());
 }
 
 LogFormatDialog::~LogFormatDialog() {
 }
 
-void LogFormatDialog::setupSideBar() {
-    mModel->setFilter(QDir::Files);
-    mModel->sort(0);
-    connect(
-        mModel.get(), &QAbstractItemModel::rowsInserted, this, &LogFormatDialog::onRowsInserted);
+void LogFormatDialog::setupSideBar(const std::shared_ptr<LogFormat>& currentLogFormat) {
     ui->listView->setModel(mModel.get());
-    QString dirPath = LogFormatIO::logFormatsDirPath();
-    ui->listView->setRootIndex(mModel->setRootPath(dirPath));
+
+    if (!currentLogFormat->name.isEmpty()) {
+        for (int row = 0; row < ui->listView->model()->rowCount(); ++row) {
+            auto index = ui->listView->model()->index(row, 0);
+            if (index.data().toString() == currentLogFormat->name) {
+                ui->listView->setCurrentIndex(index);
+                break;
+            }
+        }
+    }
+
     connect(ui->listView->selectionModel(),
             &QItemSelectionModel::currentChanged,
             this,
@@ -155,23 +162,6 @@ void LogFormatDialog::onHighlightEdited() {
 
     LogFormatIO::save(logFormat);
     logFormatChanged(logFormat);
-}
-
-void LogFormatDialog::onRowsInserted(const QModelIndex& parent, int first, int last) {
-    auto selectInitialLogFormat = [this, parent, first, last]() {
-        for (int row = first; row <= last; ++row) {
-            auto index = mModel->index(row, 0, parent);
-            if (index.data(QFileSystemModel::FilePathRole).toString() == mInitialLogFormatPath) {
-                ui->listView->setCurrentIndex(index);
-                mInitialLogFormatPath.clear();
-                return;
-            }
-        }
-    };
-
-    if (!mInitialLogFormatPath.isEmpty()) {
-        selectInitialLogFormat();
-    }
 }
 
 void LogFormatDialog::applyChanges() {

@@ -22,7 +22,7 @@
 #include "filelineprovider.h"
 #include "logformat.h"
 #include "logformatdialog.h"
-#include "logformatio.h"
+#include "logformatstore.h"
 #include "logmodel.h"
 #include "stdinlineprovider.h"
 
@@ -39,9 +39,10 @@
 
 static const int MAX_RECENT_FILES = 10;
 
-MainWindow::MainWindow(Config* config, QWidget* parent)
+MainWindow::MainWindow(Config* config, LogFormatStore* store, QWidget* parent)
         : QMainWindow(parent)
         , mConfig(config)
+        , mLogFormatStore(store)
         , mOpenLogAction(new QAction(this))
         , mSelectLogFormatAction(new QAction(this))
         , mAutoScrollAction(new QAction(this))
@@ -57,7 +58,12 @@ MainWindow::~MainWindow() {
 }
 
 void MainWindow::loadLogFormat(const QString& logFormatName) {
-    setLogFormat(LogFormatIO::load(logFormatName));
+    auto logFormat = mLogFormatStore->byName(logFormatName);
+    if (!logFormat) {
+        qWarning() << "No log format named" << logFormatName;
+        return;
+    }
+    setLogFormat(logFormat);
 }
 
 void MainWindow::loadLog(const QString& filePath) {
@@ -187,7 +193,7 @@ void MainWindow::showLogFormatDialog() {
         mLogFormatDialog->activateWindow();
         return;
     }
-    mLogFormatDialog = new LogFormatDialog(mLogFormat->name, this);
+    mLogFormatDialog = new LogFormatDialog(mLogFormatStore, mLogFormat, this);
     connect(mLogFormatDialog.data(),
             &LogFormatDialog::logFormatChanged,
             this,

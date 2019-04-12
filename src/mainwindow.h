@@ -28,6 +28,7 @@
 class Config;
 class LineProvider;
 class LogFormatDialog;
+class LogFormatStore;
 class LogFormat;
 class LogModel;
 
@@ -36,7 +37,7 @@ class QTreeView;
 class MainWindow : public QMainWindow {
     Q_OBJECT
 public:
-    explicit MainWindow(Config* config, QWidget* parent = nullptr);
+    explicit MainWindow(Config* config, LogFormatStore* store, QWidget* parent = nullptr);
     ~MainWindow();
 
     void loadLogFormat(const QString& filePath);
@@ -57,6 +58,7 @@ private:
     void setLogFormat(const std::shared_ptr<LogFormat>& logFormat);
 
     Config* const mConfig;
+    LogFormatStore* const mLogFormatStore;
 
     std::unique_ptr<LineProvider> mLineProvider;
     std::unique_ptr<LogModel> mLogModel;

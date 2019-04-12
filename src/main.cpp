@@ -19,6 +19,8 @@
 #include "mainwindow.h"
 
 #include "config.h"
+#include "logformatio.h"
+#include "logformatstore.h"
 
 #include <QApplication>
 #include <QCommandLineParser>
@@ -59,7 +61,8 @@ int main(int argc, char* argv[]) {
     parser->process(app);
 
     Config config(getConfigPath());
-    MainWindow window(&config);
+    LogFormatStore store(LogFormatIO::logFormatsDirPath());
+    MainWindow window(&config, &store);
     if (parser->isSet("format")) {
         window.loadLogFormat(parser->value("format"));
     }
