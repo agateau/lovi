@@ -22,7 +22,7 @@
 
 #include <QDebug>
 
-using std::shared_ptr;
+using std::unique_ptr;
 
 void LogFormat::setParserPattern(const QString& pattern) {
     mParser.setPattern(pattern);
@@ -49,8 +49,13 @@ ColumnHash LogFormat::columnHash() const {
     return mColumnHash;
 }
 
-std::shared_ptr<LogFormat> LogFormat::createEmpty() {
-    shared_ptr<LogFormat> logFormat = std::make_shared<LogFormat>();
+LogFormat* LogFormat::getEmpty() {
+    static auto instance = createEmpty();
+    return instance.get();
+}
+
+unique_ptr<LogFormat> LogFormat::createEmpty() {
+    unique_ptr<LogFormat> logFormat = std::make_unique<LogFormat>();
     logFormat->setParserPattern("(?<line>.*)");
     return logFormat;
 }

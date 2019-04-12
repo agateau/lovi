@@ -18,10 +18,13 @@
  */
 #include "logformatstore.h"
 
+#include "logformat.h"
 #include "logformatio.h"
 
 #include <QDir>
 #include <QFileInfo>
+
+using std::unique_ptr;
 
 LogFormatStore::LogFormatStore(const QString& dirPath, QObject* parent)
         : QObject(parent), mDirPath(dirPath) {
@@ -31,7 +34,7 @@ LogFormatStore::LogFormatStore(const QString& dirPath, QObject* parent)
 LogFormatStore::~LogFormatStore() {
 }
 
-std::shared_ptr<LogFormat> LogFormatStore::byName(const QString& name) const {
+LogFormat* LogFormatStore::byName(const QString& name) const {
     auto it = std::find(mLogFormatNames.begin(), mLogFormatNames.end(), name);
     if (it == mLogFormatNames.end()) {
         return {};
@@ -43,12 +46,13 @@ QString LogFormatStore::nameAt(int idx) const {
     return mLogFormatNames.at(idx);
 }
 
-std::shared_ptr<LogFormat> LogFormatStore::at(int idx) const {
-    auto logFormat = mLogFormats.at(idx);
+LogFormat* LogFormatStore::at(int idx) const {
+    LogFormat* logFormat = mLogFormats.at(idx).get();
     if (!logFormat) {
         auto path = QString("%1/%2.json").arg(mDirPath, mLogFormatNames.at(idx));
-        logFormat = LogFormatIO::loadFromPath(path);
-        mLogFormats[idx] = logFormat;
+        unique_ptr<LogFormat> newLogFormat = LogFormatIO::loadFromPath(path);
+        logFormat = newLogFormat.get();
+        mLogFormats[idx] = std::move(newLogFormat);
     }
     return logFormat;
 }

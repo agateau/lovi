@@ -52,14 +52,14 @@ static std::optional<HighlightColor> initColor(const QString& text) {
     return HighlightColor(text);
 }
 
-static shared_ptr<LogFormat> loadLogFormat(const QJsonDocument& doc) {
+static unique_ptr<LogFormat> loadLogFormat(const QJsonDocument& doc) {
     auto regex = doc.object().value("parser").toObject().value("regex").toString();
     if (regex.isEmpty()) {
         qWarning() << "No regex found";
         return {};
     }
 
-    shared_ptr<LogFormat> logFormat = std::make_shared<LogFormat>();
+    unique_ptr<LogFormat> logFormat = std::make_unique<LogFormat>();
     logFormat->setParserPattern(regex);
     if (!logFormat->parser().isValid()) {
         qWarning() << "Invalid parser regex:" << logFormat->parser().errorString();
@@ -114,7 +114,7 @@ static QJsonObject saveHighlight(const Highlight& highlight) {
     return root;
 }
 
-static QJsonDocument saveToJson(const shared_ptr<LogFormat>& logFormat) {
+static QJsonDocument saveToJson(LogFormat* logFormat) {
     QJsonObject root;
     {
         QJsonObject parser;
@@ -136,12 +136,12 @@ static QJsonDocument saveToJson(const shared_ptr<LogFormat>& logFormat) {
 
 namespace LogFormatIO {
 
-shared_ptr<LogFormat> load(const QString& name) {
+unique_ptr<LogFormat> load(const QString& name) {
     QString filePath = LogFormatIO::pathForLogFormat(name);
     return loadFromPath(filePath);
 }
 
-shared_ptr<LogFormat> loadFromPath(const QString& filePath) {
+unique_ptr<LogFormat> loadFromPath(const QString& filePath) {
     optional<QByteArray> json = readFile(filePath);
     if (!json.has_value()) {
         return LogFormat::createEmpty();
@@ -170,12 +170,12 @@ QString pathForLogFormat(const QString& name) {
     return QString("%1/%2.json").arg(logFormatsDirPath(), name);
 }
 
-bool save(std::shared_ptr<LogFormat>& logFormat) {
+bool save(LogFormat* logFormat) {
     QString filePath = LogFormatIO::pathForLogFormat(logFormat->name);
     return saveToPath(logFormat, filePath);
 }
 
-bool saveToPath(std::shared_ptr<LogFormat>& logFormat, const QString& filePath) {
+bool saveToPath(LogFormat* logFormat, const QString& filePath) {
     QSaveFile file(filePath);
     if (!file.open(QIODevice::WriteOnly)) {
         qWarning() << "Failed to open" << filePath << "for writing. Error:" << file.errorString();

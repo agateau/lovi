@@ -9,7 +9,7 @@
 
 #include <catch2/catch.hpp>
 
-using std::shared_ptr;
+using std::unique_ptr;
 
 struct Fixture {
     QString input;
@@ -30,7 +30,7 @@ void checkLogFormatEquality(const LogFormat& f1, const LogFormat& f2) {
 
 TEST_CASE("logformatio") {
     QString testFile = QString(TEST_DATA_DIR) + "/logformatiotest-load.json";
-    shared_ptr<LogFormat> format = LogFormatIO::loadFromPath(testFile);
+    unique_ptr<LogFormat> format = LogFormatIO::loadFromPath(testFile);
 
     SECTION("load") {
         REQUIRE(format->parserPattern() == "^(?<level>[DEW])/(?<app>[^:]*): (?<message>.*)");
@@ -66,9 +66,9 @@ TEST_CASE("logformatio") {
     SECTION("save") {
         QTemporaryDir tempDir;
         QString tempPath = tempDir.path() + "/" + format->name + ".json";
-        REQUIRE(LogFormatIO::saveToPath(format, tempPath));
+        REQUIRE(LogFormatIO::saveToPath(format.get(), tempPath));
 
-        shared_ptr<LogFormat> format2 = LogFormatIO::loadFromPath(tempPath);
+        unique_ptr<LogFormat> format2 = LogFormatIO::loadFromPath(tempPath);
         checkLogFormatEquality(*format, *format2);
     }
 }

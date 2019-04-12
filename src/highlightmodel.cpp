@@ -23,7 +23,7 @@
 HighlightModel::HighlightModel(QObject* parent) : QAbstractListModel(parent) {
 }
 
-void HighlightModel::setLogFormat(const std::shared_ptr<LogFormat>& logFormat) {
+void HighlightModel::setLogFormat(LogFormat* logFormat) {
     if (mLogFormat == logFormat) {
         return;
     }
@@ -32,7 +32,7 @@ void HighlightModel::setLogFormat(const std::shared_ptr<LogFormat>& logFormat) {
     endResetModel();
 }
 
-std::shared_ptr<LogFormat> HighlightModel::logFormat() const {
+LogFormat* HighlightModel::logFormat() const {
     return mLogFormat;
 }
 

@@ -55,7 +55,7 @@ private:
     void addLogToRecentFiles();
     void fillRecentFilesMenu();
     void createLineProvider();
-    void setLogFormat(const std::shared_ptr<LogFormat>& logFormat);
+    void setLogFormat(LogFormat* logFormat);
 
     Config* const mConfig;
     LogFormatStore* const mLogFormatStore;
@@ -74,7 +74,7 @@ private:
     QPointer<LogFormatDialog> mLogFormatDialog;
 
     QString mLogPath;
-    std::shared_ptr<LogFormat> mLogFormat;
+    LogFormat* mLogFormat = nullptr;
 };
 
 #endif // MAINWINDOW_H

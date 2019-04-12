@@ -39,7 +39,9 @@ public:
 
     std::vector<Highlight> highlights;
 
-    static std::shared_ptr<LogFormat> createEmpty();
+    static LogFormat* getEmpty();
+
+    static std::unique_ptr<LogFormat> createEmpty();
 
 private:
     QRegularExpression mParser;

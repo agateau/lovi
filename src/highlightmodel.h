@@ -30,9 +30,9 @@ class HighlightModel : public QAbstractListModel {
 public:
     HighlightModel(QObject* parent = nullptr);
 
-    void setLogFormat(const std::shared_ptr<LogFormat>& logFormat);
+    void setLogFormat(LogFormat* logFormat);
 
-    std::shared_ptr<LogFormat> logFormat() const;
+    LogFormat* logFormat() const;
 
     int rowCount(const QModelIndex& parent = {}) const override;
 
@@ -41,7 +41,7 @@ public:
     void notifyHighlightChanged(const QModelIndex& index);
 
 private:
-    std::shared_ptr<LogFormat> mLogFormat;
+    LogFormat* mLogFormat = nullptr;
 };
 
 #endif // HIGHLIGHTMODEL_H

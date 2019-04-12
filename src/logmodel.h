@@ -58,11 +58,11 @@ public:
 
     QStringList columns() const;
 
-    void setLogFormat(const std::shared_ptr<LogFormat>& logFormat);
+    void setLogFormat(LogFormat* logFormat);
 
 private:
-    std::shared_ptr<LogFormat> mEmptyLogFormat;
-    std::shared_ptr<LogFormat> mLogFormat;
+    LogFormat* mEmptyLogFormat;
+    LogFormat* mLogFormat;
     const LineProvider* mLineProvider = nullptr;
     QStringList mColumns;
     mutable QHash<int, LogLine> mLogLineCache;

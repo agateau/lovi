@@ -42,7 +42,7 @@ public:
 
     QVariant data(const QModelIndex& index, int role = Qt::DisplayRole) const override;
 
-    std::shared_ptr<LogFormat> logFormatForIndex(const QModelIndex& index) const;
+    LogFormat* logFormatForIndex(const QModelIndex& index) const;
 
 private:
     LogFormatStore* const mStore;
@@ -52,17 +52,17 @@ class LogFormatDialog : public QDialog {
     Q_OBJECT
 public:
     explicit LogFormatDialog(LogFormatStore* store,
-                             const std::shared_ptr<LogFormat>& currentLogFormat,
+                             LogFormat* currentLogFormat,
                              QWidget* parent = nullptr);
     ~LogFormatDialog();
 
     QString logFormatName() const;
 
 signals:
-    void logFormatChanged(const std::shared_ptr<LogFormat>& logFormat);
+    void logFormatChanged(LogFormat* logFormat);
 
 private:
-    void setupSideBar(const std::shared_ptr<LogFormat>& currentLogFormat);
+    void setupSideBar(LogFormat* currentLogFormat);
     void setupEditor();
 
     void onCurrentChanged(const QModelIndex& index);

@@ -53,13 +53,13 @@ QVariant LogFormatModel::data(const QModelIndex& index, int role) const {
     return {};
 }
 
-shared_ptr<LogFormat> LogFormatModel::logFormatForIndex(const QModelIndex& index) const {
+LogFormat* LogFormatModel::logFormatForIndex(const QModelIndex& index) const {
     return mStore->at(index.row());
 }
 
 //- LogFormatDialog ----------------------------
 LogFormatDialog::LogFormatDialog(LogFormatStore* store,
-                                 const std::shared_ptr<LogFormat>& currentLogFormat,
+                                 LogFormat* currentLogFormat,
                                  QWidget* parent)
         : QDialog(parent)
         , ui(std::make_unique<Ui::LogFormatDialog>())
@@ -74,7 +74,7 @@ LogFormatDialog::LogFormatDialog(LogFormatStore* store,
 LogFormatDialog::~LogFormatDialog() {
 }
 
-void LogFormatDialog::setupSideBar(const std::shared_ptr<LogFormat>& currentLogFormat) {
+void LogFormatDialog::setupSideBar(LogFormat* currentLogFormat) {
     ui->listView->setModel(mModel.get());
 
     if (!currentLogFormat->name.isEmpty()) {
@@ -133,7 +133,7 @@ void LogFormatDialog::onCurrentChanged(const QModelIndex& index) {
         return;
     }
 
-    shared_ptr<LogFormat> logFormat = mModel->logFormatForIndex(index);
+    LogFormat* logFormat = mModel->logFormatForIndex(index);
     ui->parserLineEdit->setText(logFormat->parserPattern());
     mHighlightModel->setLogFormat(logFormat);
 
@@ -169,7 +169,7 @@ void LogFormatDialog::applyChanges() {
     if (!index.isValid()) {
         return;
     }
-    shared_ptr<LogFormat> logFormat = mModel->logFormatForIndex(index);
+    LogFormat* logFormat = mModel->logFormatForIndex(index);
     logFormat->setParserPattern(ui->parserLineEdit->text());
     LogFormatIO::save(logFormat);
     logFormatChanged(logFormat);

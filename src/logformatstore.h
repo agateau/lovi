@@ -32,10 +32,10 @@ public:
     explicit LogFormatStore(const QString& dirPath, QObject* parent = nullptr);
     ~LogFormatStore();
 
-    std::shared_ptr<LogFormat> byName(const QString& name) const;
+    LogFormat* byName(const QString& name) const;
 
     QString nameAt(int idx) const;
-    std::shared_ptr<LogFormat> at(int idx) const;
+    LogFormat* at(int idx) const;
 
     int count() const;
 
@@ -44,7 +44,7 @@ private:
 
     QString mDirPath;
     std::vector<QString> mLogFormatNames;
-    mutable std::vector<std::shared_ptr<LogFormat>> mLogFormats;
+    mutable std::vector<std::unique_ptr<LogFormat>> mLogFormats;
 };
 
 #endif // LOGFORMATSTORE_H

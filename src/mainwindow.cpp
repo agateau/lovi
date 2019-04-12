@@ -238,7 +238,7 @@ void MainWindow::createLineProvider() {
     }
 }
 
-void MainWindow::setLogFormat(const std::shared_ptr<LogFormat>& logFormat) {
+void MainWindow::setLogFormat(LogFormat* logFormat) {
     mLogFormat = logFormat;
     mLogModel->setLogFormat(mLogFormat);
     if (!mLogPath.isEmpty() && !mLogFormat->name.isEmpty()) {
