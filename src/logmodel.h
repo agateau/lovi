@@ -61,17 +61,18 @@ public:
     void setLogFormat(LogFormat* logFormat);
 
 private:
+    LogLine processLine(const QString& line) const;
+    void applyHighlights(LogLine* logLine, LogCell* logCell, int column) const;
+    void onLineCountChanged(int newCount, int oldCount);
+    void resetAllState();
+    void onLogFormatChanged();
+
     LogFormat* mEmptyLogFormat;
     LogFormat* mLogFormat;
     const LineProvider* mLineProvider = nullptr;
+
     QStringList mColumns;
     mutable QHash<int, LogLine> mLogLineCache;
-
-    LogLine processLine(const QString& line) const;
-
-    void applyHighlights(LogLine* logLine, LogCell* logCell, int column) const;
-
-    void onLineCountChanged(int newCount, int oldCount);
 };
 
 #endif // LOGMODEL_H

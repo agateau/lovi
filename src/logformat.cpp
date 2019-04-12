@@ -24,6 +24,9 @@
 
 using std::unique_ptr;
 
+LogFormat::LogFormat(QObject* parent) : QObject(parent) {
+}
+
 void LogFormat::setParserPattern(const QString& pattern) {
     mParser.setPattern(pattern);
     mParser.optimize();
@@ -35,6 +38,8 @@ void LogFormat::setParserPattern(const QString& pattern) {
             mColumnHash[name] = role++;
         }
     }
+
+    changed();
 }
 
 QString LogFormat::parserPattern() const {

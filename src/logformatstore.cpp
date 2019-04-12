@@ -52,6 +52,9 @@ LogFormat* LogFormatStore::at(int idx) const {
         auto path = QString("%1/%2.json").arg(mDirPath, mLogFormatNames.at(idx));
         unique_ptr<LogFormat> newLogFormat = LogFormatIO::loadFromPath(path);
         logFormat = newLogFormat.get();
+        connect(logFormat, &LogFormat::changed, logFormat, [logFormat, path] {
+            LogFormatIO::saveToPath(logFormat, path);
+        });
         mLogFormats[idx] = std::move(newLogFormat);
     }
     return logFormat;

@@ -101,14 +101,16 @@ QStringList LogModel::columns() const {
 
 void LogModel::setLogFormat(LogFormat* logFormat) {
     beginResetModel();
+    if (mLogFormat) {
+        mLogFormat->disconnect(this);
+    }
     if (logFormat) {
         mLogFormat = logFormat;
     } else {
         mLogFormat = mEmptyLogFormat;
     }
-    mColumns = mLogFormat->parser().namedCaptureGroups();
-    mColumns.removeFirst();
-    mLogLineCache.clear();
+    connect(mLogFormat, &LogFormat::changed, this, &LogModel::onLogFormatChanged);
+    resetAllState();
     endResetModel();
 }
 
@@ -159,4 +161,16 @@ void LogModel::onLineCountChanged(int newCount, int oldCount) {
     // Assume append
     beginInsertRows({}, oldCount, newCount - 1);
     endInsertRows();
+}
+
+void LogModel::resetAllState() {
+    mColumns = mLogFormat->parser().namedCaptureGroups();
+    mColumns.removeFirst();
+    mLogLineCache.clear();
+}
+
+void LogModel::onLogFormatChanged() {
+    beginResetModel();
+    resetAllState();
+    endResetModel();
 }

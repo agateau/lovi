@@ -159,9 +159,8 @@ void LogFormatDialog::onHighlightEdited() {
     auto highlight = ui->highlightWidget->highlight();
     highlight->condition =
         ConditionIO::parse(highlight->conditionDefinition, logFormat->columnHash());
-
-    LogFormatIO::save(logFormat);
-    logFormatChanged(logFormat);
+    // TODO Move this?
+    logFormat->changed();
 }
 
 void LogFormatDialog::applyChanges() {
@@ -171,6 +170,4 @@ void LogFormatDialog::applyChanges() {
     }
     LogFormat* logFormat = mModel->logFormatForIndex(index);
     logFormat->setParserPattern(ui->parserLineEdit->text());
-    LogFormatIO::save(logFormat);
-    logFormatChanged(logFormat);
 }

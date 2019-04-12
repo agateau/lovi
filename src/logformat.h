@@ -21,6 +21,7 @@
 
 #include "highlight.h"
 
+#include <QObject>
 #include <QRegularExpression>
 
 #include <memory>
@@ -28,8 +29,11 @@
 
 using ColumnHash = QHash<QString, int>;
 
-class LogFormat {
+class LogFormat : public QObject {
+    Q_OBJECT
 public:
+    LogFormat(QObject* parent = nullptr);
+
     QString name;
     void setParserPattern(const QString& pattern);
     QString parserPattern() const;
@@ -42,6 +46,9 @@ public:
     static LogFormat* getEmpty();
 
     static std::unique_ptr<LogFormat> createEmpty();
+
+signals:
+    void changed();
 
 private:
     QRegularExpression mParser;
