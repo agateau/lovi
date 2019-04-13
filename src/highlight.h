@@ -50,7 +50,7 @@ using OptionalHighlightColor = std::optional<HighlightColor>;
 
 class Highlight {
 public:
-    enum ColorScope { Cell, Row };
+    enum Scope { Cell, Row };
     explicit Highlight(LogFormat* logFormat);
 
     void setConditionDefinition(const QString& definition);
@@ -58,8 +58,8 @@ public:
 
     std::unique_ptr<Condition> condition;
 
-    void setScope(ColorScope scope);
-    ColorScope scope() const {
+    void setScope(Scope scope);
+    Scope scope() const {
         return mScope;
     }
 
@@ -79,7 +79,7 @@ private:
     LogFormat* const mLogFormat;
     QString mConditionDefinition;
 
-    ColorScope mScope = Cell;
+    Scope mScope = Cell;
 
     OptionalHighlightColor mBgColor;
     OptionalHighlightColor mFgColor;

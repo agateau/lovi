@@ -70,7 +70,7 @@ void HighlightWidget::setupUi() {
             [this](const OptionalHighlightColor& color) { mHighlight->setFgColor(color); });
 
     connect(ui->scopeComboBox, qOverload<int>(&QComboBox::activated), this, [this](int index) {
-        auto scope = static_cast<Highlight::ColorScope>(index);
+        auto scope = static_cast<Highlight::Scope>(index);
         mHighlight->setScope(scope);
     });
 }

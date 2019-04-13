@@ -83,7 +83,7 @@ QString Highlight::conditionDefinition() const {
     return mConditionDefinition;
 }
 
-void Highlight::setScope(Highlight::ColorScope scope) {
+void Highlight::setScope(Highlight::Scope scope) {
     if (mScope == scope) {
         return;
     }
