@@ -139,7 +139,7 @@ void LogModel::applyHighlights(LogLine* line, LogCell* cell, int column) const {
     for (const Highlight& highlight : mLogFormat->highlights) {
         const auto& condition = highlight.condition;
         if (condition && condition->column() == column && condition->eval(cell->text)) {
-            if (highlight.scope == Highlight::Row) {
+            if (highlight.scope() == Highlight::Row) {
                 line->bgColor = getColor(highlight.bgColor(), cell->text);
                 line->fgColor = getColor(highlight.fgColor(), cell->text);
             } else {

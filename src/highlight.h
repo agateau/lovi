@@ -57,7 +57,11 @@ public:
     QString conditionDefinition() const;
 
     std::unique_ptr<Condition> condition;
-    ColorScope scope;
+
+    void setScope(ColorScope scope);
+    ColorScope scope() const {
+        return mScope;
+    }
 
     void setBgColor(const OptionalHighlightColor& color);
 
@@ -74,6 +78,8 @@ public:
 private:
     LogFormat* const mLogFormat;
     QString mConditionDefinition;
+
+    ColorScope mScope = Cell;
 
     OptionalHighlightColor mBgColor;
     OptionalHighlightColor mFgColor;

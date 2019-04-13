@@ -38,25 +38,25 @@ TEST_CASE("logformatio") {
         auto end = format->highlights.end();
         REQUIRE(it != end);
         REQUIRE(it->conditionDefinition() == "level == E");
-        REQUIRE(it->scope == Highlight::Row);
+        REQUIRE(it->scope() == Highlight::Row);
         REQUIRE(it->bgColor()->toString() == "#ff0000");
 
         ++it;
         REQUIRE(it != end);
         REQUIRE(it->conditionDefinition() == "level == W");
-        REQUIRE(it->scope == Highlight::Row);
+        REQUIRE(it->scope() == Highlight::Row);
         REQUIRE(it->fgColor()->toString() == "#ff8800");
 
         ++it;
         REQUIRE(it != end);
         REQUIRE(it->conditionDefinition() == "message ~ start.*");
-        REQUIRE(it->scope == Highlight::Cell);
+        REQUIRE(it->scope() == Highlight::Cell);
         REQUIRE(it->bgColor()->toString() == "auto");
 
         ++it;
         REQUIRE(it != end);
         REQUIRE(it->conditionDefinition() == "message contains bob");
-        REQUIRE(it->scope == Highlight::Cell);
+        REQUIRE(it->scope() == Highlight::Cell);
         REQUIRE(it->fgColor()->toString() == "#00ff00");
 
         ++it;
