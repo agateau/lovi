@@ -5,6 +5,7 @@ set(CMAKE_AUTOUIC ON)
 
 # Lib
 add_library(lovilib STATIC
+    color.cpp
     colorwidget.cpp
     conditions.cpp
     conditionio.cpp

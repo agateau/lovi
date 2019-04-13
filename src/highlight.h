@@ -19,34 +19,15 @@
 #ifndef HIGHLIGHT_H
 #define HIGHLIGHT_H
 
+#include "color.h"
 #include "conditions.h"
 
 #include <QColor>
 #include <QString>
 
 #include <memory>
-#include <optional>
 
 class LogFormat;
-
-class Color {
-public:
-    explicit Color(const QColor& color);
-    explicit Color(const QString& text);
-
-    QColor toColor(const QString& matchingText) const;
-    QString toString() const;
-    bool isAuto() const;
-
-    static Color createAuto();
-
-private:
-    Color();
-    bool mIsAuto = false;
-    QColor mColor;
-};
-
-using OptionalColor = std::optional<Color>;
 
 class Highlight {
 public:
