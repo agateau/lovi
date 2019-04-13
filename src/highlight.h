@@ -37,11 +37,13 @@ public:
     void setConditionDefinition(const QString& definition);
     QString conditionDefinition() const;
 
-    std::unique_ptr<Condition> condition;
-
     void setScope(Scope scope);
     Scope scope() const {
         return mScope;
+    }
+
+    Condition* condition() const {
+        return mCondition.get();
     }
 
     void setBgColor(const OptionalColor& color);
@@ -58,7 +60,10 @@ public:
 
 private:
     LogFormat* const mLogFormat;
+
     QString mConditionDefinition;
+
+    std::unique_ptr<Condition> mCondition;
 
     Scope mScope = Cell;
 

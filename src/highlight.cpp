@@ -27,7 +27,7 @@ Highlight::Highlight(LogFormat* logFormat) : mLogFormat(logFormat) {
 void Highlight::setConditionDefinition(const QString& definition) {
     mConditionDefinition = definition;
 
-    condition = ConditionIO::parse(definition, mLogFormat->columnHash());
+    mCondition = ConditionIO::parse(definition, mLogFormat->columnHash());
     mLogFormat->emitHighlightChanged(this);
 }
 
