@@ -34,6 +34,8 @@ class LogFormat : public QObject {
 public:
     LogFormat(QObject* parent = nullptr);
 
+    void emitHighlightChanged(Highlight* highlight);
+
     QString name;
     void setParserPattern(const QString& pattern);
     QString parserPattern() const;
@@ -48,6 +50,7 @@ public:
     static std::unique_ptr<LogFormat> createEmpty();
 
 signals:
+    void highlightChanged(int row);
     void changed();
 
 private:

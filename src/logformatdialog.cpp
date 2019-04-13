@@ -111,11 +111,6 @@ void LogFormatDialog::setupEditor() {
 
     connect(ui->parserLineEdit, &QLineEdit::editingFinished, this, &LogFormatDialog::applyChanges);
 
-    connect(ui->highlightWidget,
-            &HighlightWidget::highlightChanged,
-            this,
-            &LogFormatDialog::onHighlightEdited);
-
     // Do not close the dialog when the user presses Enter
     ui->buttonBox->button(QDialogButtonBox::Close)->setAutoDefault(false);
 }
@@ -148,12 +143,6 @@ void LogFormatDialog::onCurrentHighlightChanged(const QModelIndex& index) {
     int row = index.row();
     auto logFormat = mHighlightModel->logFormat();
     ui->highlightWidget->setHighlight(&logFormat->highlights.at(row));
-}
-
-void LogFormatDialog::onHighlightEdited() {
-    auto index = ui->highlightListView->currentIndex();
-    Q_ASSERT(index.isValid());
-    mHighlightModel->notifyHighlightChanged(index);
 }
 
 void LogFormatDialog::applyChanges() {

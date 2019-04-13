@@ -67,7 +67,6 @@ private:
 
     void onCurrentChanged(const QModelIndex& index);
     void onCurrentHighlightChanged(const QModelIndex& index);
-    void onHighlightEdited();
     void applyChanges();
 
     const std::unique_ptr<Ui::LogFormatDialog> ui;

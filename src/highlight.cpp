@@ -60,7 +60,7 @@ void Highlight::setConditionDefinition(const QString& definition) {
     mConditionDefinition = definition;
 
     condition = ConditionIO::parse(definition, mLogFormat->columnHash());
-    mLogFormat->changed();
+    mLogFormat->emitHighlightChanged(this);
 }
 
 QString Highlight::conditionDefinition() const {

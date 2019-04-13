@@ -28,7 +28,14 @@ void HighlightModel::setLogFormat(LogFormat* logFormat) {
         return;
     }
     beginResetModel();
+    if (mLogFormat) {
+        mLogFormat->disconnect(this);
+    }
     mLogFormat = logFormat;
+    if (mLogFormat) {
+        connect(
+            mLogFormat, &LogFormat::highlightChanged, this, &HighlightModel::onHighlightChanged);
+    }
     endResetModel();
 }
 
@@ -66,6 +73,8 @@ QVariant HighlightModel::data(const QModelIndex& index, int role) const {
     return {};
 }
 
-void HighlightModel::notifyHighlightChanged(const QModelIndex& index) {
-    dataChanged(index, index);
+void HighlightModel::onHighlightChanged(int row) {
+    Q_ASSERT(row >= 0 && row < mLogFormat->highlights.size());
+    auto idx = index(row, 0);
+    dataChanged(idx, idx);
 }

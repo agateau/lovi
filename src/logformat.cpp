@@ -27,6 +27,17 @@ using std::unique_ptr;
 LogFormat::LogFormat(QObject* parent) : QObject(parent) {
 }
 
+void LogFormat::emitHighlightChanged(Highlight* highlight) {
+    for (std::size_t row = 0; row < highlights.size(); ++row) {
+        if (&highlights.at(row) == highlight) {
+            highlightChanged(row);
+            changed();
+            return;
+        }
+    }
+    Q_UNREACHABLE();
+}
+
 void LogFormat::setParserPattern(const QString& pattern) {
     mParser.setPattern(pattern);
     mParser.optimize();

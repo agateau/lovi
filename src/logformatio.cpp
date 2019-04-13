@@ -68,7 +68,8 @@ static unique_ptr<LogFormat> loadLogFormat(const QJsonDocument& doc) {
     for (QJsonValue jsonValue : doc.object().value("highlights").toArray()) {
         QJsonObject highlightObj = jsonValue.toObject();
 
-        Highlight highlight(logFormat.get());
+        logFormat->highlights.push_back(Highlight(logFormat.get()));
+        Highlight& highlight = *(logFormat->highlights.end() - 1);
         highlight.setConditionDefinition(highlightObj.value("condition").toString());
 
         auto rowBgColor = highlightObj.value("rowBgColor").toString();
@@ -86,7 +87,6 @@ static unique_ptr<LogFormat> loadLogFormat(const QJsonDocument& doc) {
         }
         highlight.bgColor = initColor(bgColor);
         highlight.fgColor = initColor(fgColor);
-        logFormat->highlights.push_back(std::move(highlight));
     }
 
     return logFormat;

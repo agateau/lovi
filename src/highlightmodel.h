@@ -38,9 +38,8 @@ public:
 
     QVariant data(const QModelIndex& index, int role = Qt::DisplayRole) const override;
 
-    void notifyHighlightChanged(const QModelIndex& index);
-
 private:
+    void onHighlightChanged(int row);
     LogFormat* mLogFormat = nullptr;
 };
 
