@@ -66,3 +66,13 @@ void Highlight::setConditionDefinition(const QString& definition) {
 QString Highlight::conditionDefinition() const {
     return mConditionDefinition;
 }
+
+void Highlight::setBgColor(const OptionalHighlightColor& color) {
+    mBgColor = color;
+    mLogFormat->emitHighlightChanged(this);
+}
+
+void Highlight::setFgColor(const OptionalHighlightColor& color) {
+    mFgColor = color;
+    mLogFormat->emitHighlightChanged(this);
+}

@@ -85,8 +85,8 @@ static unique_ptr<LogFormat> loadLogFormat(const QJsonDocument& doc) {
             qWarning() << "Invalid scope value:" << scope;
             continue;
         }
-        highlight.bgColor = initColor(bgColor);
-        highlight.fgColor = initColor(fgColor);
+        highlight.setBgColor(initColor(bgColor));
+        highlight.setFgColor(initColor(fgColor));
     }
 
     return logFormat;
@@ -105,8 +105,8 @@ static QJsonObject saveHighlight(const Highlight& highlight) {
     QJsonObject root;
     root["condition"] = highlight.conditionDefinition();
     root["scope"] = highlight.scope == Highlight::Row ? "row" : "cell";
-    saveColor(&root, "bgColor", highlight.bgColor);
-    saveColor(&root, "fgColor", highlight.fgColor);
+    saveColor(&root, "bgColor", highlight.bgColor());
+    saveColor(&root, "fgColor", highlight.fgColor());
     return root;
 }
 

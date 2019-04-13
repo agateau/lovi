@@ -41,6 +41,8 @@ private:
     QColor mColor;
 };
 
+using OptionalHighlightColor = std::optional<HighlightColor>;
+
 class Highlight {
 public:
     enum ColorScope { Row, Cell };
@@ -51,12 +53,25 @@ public:
 
     std::unique_ptr<Condition> condition;
     ColorScope scope;
-    std::optional<HighlightColor> bgColor;
-    std::optional<HighlightColor> fgColor;
+
+    void setBgColor(const OptionalHighlightColor& color);
+
+    OptionalHighlightColor bgColor() const {
+        return mBgColor;
+    }
+
+    void setFgColor(const OptionalHighlightColor& color);
+
+    OptionalHighlightColor fgColor() const {
+        return mFgColor;
+    }
 
 private:
     LogFormat* const mLogFormat;
     QString mConditionDefinition;
+
+    OptionalHighlightColor mBgColor;
+    OptionalHighlightColor mFgColor;
 };
 
 #endif // HIGHLIGHT_H
