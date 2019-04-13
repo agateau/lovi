@@ -53,14 +53,14 @@ QVariant HighlightModel::data(const QModelIndex& index, int role) const {
     }
     const auto& highlight = mLogFormat->highlights.at(row);
     if (role == Qt::DisplayRole) {
-        return highlight.conditionDefinition;
+        return highlight.conditionDefinition();
     } else if (role == Qt::BackgroundRole) {
         if (highlight.bgColor.has_value()) {
-            return highlight.bgColor->toColor(highlight.conditionDefinition);
+            return highlight.bgColor->toColor(highlight.conditionDefinition());
         }
     } else if (role == Qt::ForegroundRole) {
         if (highlight.fgColor.has_value()) {
-            return highlight.fgColor->toColor(highlight.conditionDefinition);
+            return highlight.fgColor->toColor(highlight.conditionDefinition());
         }
     }
     return {};

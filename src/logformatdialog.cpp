@@ -154,13 +154,6 @@ void LogFormatDialog::onHighlightEdited() {
     auto index = ui->highlightListView->currentIndex();
     Q_ASSERT(index.isValid());
     mHighlightModel->notifyHighlightChanged(index);
-
-    auto logFormat = mHighlightModel->logFormat();
-    auto highlight = ui->highlightWidget->highlight();
-    highlight->condition =
-        ConditionIO::parse(highlight->conditionDefinition, logFormat->columnHash());
-    // TODO Move this?
-    logFormat->changed();
 }
 
 void LogFormatDialog::applyChanges() {

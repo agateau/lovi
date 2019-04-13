@@ -27,6 +27,8 @@
 #include <memory>
 #include <optional>
 
+class LogFormat;
+
 class HighlightColor {
 public:
     explicit HighlightColor(const QString& text);
@@ -42,11 +44,19 @@ private:
 class Highlight {
 public:
     enum ColorScope { Row, Cell };
-    QString conditionDefinition;
+    explicit Highlight(LogFormat* logFormat);
+
+    void setConditionDefinition(const QString& definition);
+    QString conditionDefinition() const;
+
     std::unique_ptr<Condition> condition;
     ColorScope scope;
     std::optional<HighlightColor> bgColor;
     std::optional<HighlightColor> fgColor;
+
+private:
+    LogFormat* const mLogFormat;
+    QString mConditionDefinition;
 };
 
 #endif // HIGHLIGHT_H

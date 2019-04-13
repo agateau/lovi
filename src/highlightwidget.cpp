@@ -41,7 +41,7 @@ void HighlightWidget::setHighlight(Highlight* highlight) {
     }
     setEnabled(true);
 
-    ui->conditionLineEdit->setText(highlight->conditionDefinition);
+    ui->conditionLineEdit->setText(highlight->conditionDefinition());
 }
 
 Highlight* HighlightWidget::highlight() const {
@@ -53,7 +53,7 @@ void HighlightWidget::setupUi() {
     layout()->setMargin(0);
 
     connect(ui->conditionLineEdit, &QLineEdit::editingFinished, this, [this] {
-        mHighlight->conditionDefinition = ui->conditionLineEdit->text();
+        mHighlight->setConditionDefinition(ui->conditionLineEdit->text());
         highlightChanged();
     });
 }

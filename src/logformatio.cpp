@@ -18,7 +18,6 @@
  */
 #include "logformatio.h"
 
-#include "conditionio.h"
 #include "conditions.h"
 #include "logformat.h"
 
@@ -69,11 +68,8 @@ static unique_ptr<LogFormat> loadLogFormat(const QJsonDocument& doc) {
     for (QJsonValue jsonValue : doc.object().value("highlights").toArray()) {
         QJsonObject highlightObj = jsonValue.toObject();
 
-        Highlight highlight;
-        highlight.conditionDefinition = highlightObj.value("condition").toString();
-
-        highlight.condition =
-            ConditionIO::parse(highlight.conditionDefinition, logFormat->columnHash());
+        Highlight highlight(logFormat.get());
+        highlight.setConditionDefinition(highlightObj.value("condition").toString());
 
         auto rowBgColor = highlightObj.value("rowBgColor").toString();
         auto rowFgColor = highlightObj.value("rowFgColor").toString();
@@ -107,7 +103,7 @@ saveColor(QJsonObject* root, const QString& key, const optional<HighlightColor>&
 
 static QJsonObject saveHighlight(const Highlight& highlight) {
     QJsonObject root;
-    root["condition"] = highlight.conditionDefinition;
+    root["condition"] = highlight.conditionDefinition();
     root["scope"] = highlight.scope == Highlight::Row ? "row" : "cell";
     saveColor(&root, "bgColor", highlight.bgColor);
     saveColor(&root, "fgColor", highlight.fgColor);

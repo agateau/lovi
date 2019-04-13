@@ -24,7 +24,7 @@ void checkLogFormatEquality(const LogFormat& f1, const LogFormat& f2) {
         REQUIRE(idx < f2.highlights.size());
         const auto& hl1 = f1.highlights.at(idx);
         const auto& hl2 = f2.highlights.at(idx);
-        REQUIRE(hl1.conditionDefinition == hl2.conditionDefinition);
+        REQUIRE(hl1.conditionDefinition() == hl2.conditionDefinition());
     }
 }
 
@@ -37,25 +37,25 @@ TEST_CASE("logformatio") {
         auto it = format->highlights.begin();
         auto end = format->highlights.end();
         REQUIRE(it != end);
-        REQUIRE(it->conditionDefinition == "level == E");
+        REQUIRE(it->conditionDefinition() == "level == E");
         REQUIRE(it->scope == Highlight::Row);
         REQUIRE(it->bgColor->toString() == "#ff0000");
 
         ++it;
         REQUIRE(it != end);
-        REQUIRE(it->conditionDefinition == "level == W");
+        REQUIRE(it->conditionDefinition() == "level == W");
         REQUIRE(it->scope == Highlight::Row);
         REQUIRE(it->fgColor->toString() == "#ff8800");
 
         ++it;
         REQUIRE(it != end);
-        REQUIRE(it->conditionDefinition == "message ~ start.*");
+        REQUIRE(it->conditionDefinition() == "message ~ start.*");
         REQUIRE(it->scope == Highlight::Cell);
         REQUIRE(it->bgColor->toString() == "auto");
 
         ++it;
         REQUIRE(it != end);
-        REQUIRE(it->conditionDefinition == "message contains bob");
+        REQUIRE(it->conditionDefinition() == "message contains bob");
         REQUIRE(it->scope == Highlight::Cell);
         REQUIRE(it->fgColor->toString() == "#00ff00");
 

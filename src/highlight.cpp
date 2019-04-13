@@ -18,6 +18,8 @@
  */
 #include "highlight.h"
 
+#include "conditionio.h"
+
 HighlightColor::HighlightColor(const QString& text) {
     if (text == "auto") {
         mIsAuto = true;
@@ -48,4 +50,19 @@ QColor HighlightColor::toColor(const QString& matchingText) const {
 
 QString HighlightColor::toString() const {
     return mIsAuto ? "auto" : mColor.name();
+}
+
+Highlight::Highlight(LogFormat* logFormat) : mLogFormat(logFormat) {
+    Q_ASSERT(mLogFormat);
+}
+
+void Highlight::setConditionDefinition(const QString& definition) {
+    mConditionDefinition = definition;
+
+    condition = ConditionIO::parse(definition, mLogFormat->columnHash());
+    mLogFormat->changed();
+}
+
+QString Highlight::conditionDefinition() const {
+    return mConditionDefinition;
 }
