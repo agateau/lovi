@@ -38,9 +38,6 @@ public:
     void setHighlight(Highlight* highlight);
     Highlight* highlight() const;
 
-signals:
-    void highlightChanged();
-
 private:
     void setupUi();
     const std::unique_ptr<Ui::HighlightWidget> ui;

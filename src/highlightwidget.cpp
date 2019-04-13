@@ -54,6 +54,5 @@ void HighlightWidget::setupUi() {
 
     connect(ui->conditionLineEdit, &QLineEdit::editingFinished, this, [this] {
         mHighlight->setConditionDefinition(ui->conditionLineEdit->text());
-        highlightChanged();
     });
 }
