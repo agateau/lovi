@@ -31,12 +31,17 @@ class LogFormat;
 
 class HighlightColor {
 public:
+    explicit HighlightColor(const QColor& color);
     explicit HighlightColor(const QString& text);
 
     QColor toColor(const QString& matchingText) const;
     QString toString() const;
+    bool isAuto() const;
+
+    static HighlightColor createAuto();
 
 private:
+    HighlightColor();
     bool mIsAuto = false;
     QColor mColor;
 };

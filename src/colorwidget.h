@@ -19,17 +19,25 @@
 #ifndef COLORWIDGET_H
 #define COLORWIDGET_H
 
+#include "highlight.h"
+
 #include <QComboBox>
 
-#include <memory>
-
-class HighlightColor;
-
 class ColorWidget : public QComboBox {
+    Q_OBJECT
 public:
     ColorWidget(QWidget* parent = nullptr);
 
-    std::optional<HighlightColor> color() const;
+    void setColor(const OptionalHighlightColor& color);
+    OptionalHighlightColor color() const;
+
+signals:
+    void colorChanged(const OptionalHighlightColor& color);
+
+private:
+    void onActivated(int index);
+
+    OptionalHighlightColor mColor;
 };
 
 #endif // COLORWIDGET_H

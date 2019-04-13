@@ -20,9 +20,54 @@
 
 #include "highlight.h"
 
+#include <QColorDialog>
+
+enum { NONE_IDX = 0, AUTO_IDX, CUSTOM_IDX };
+
 ColorWidget::ColorWidget(QWidget* parent) : QComboBox(parent) {
+    setEditable(false);
+    addItem(tr("None"));
+    addItem(tr("Auto"));
+    addItem(tr("Custom..."));
+
+    connect(this, qOverload<int>(&QComboBox::activated), this, &ColorWidget::onActivated);
+}
+
+void ColorWidget::setColor(const OptionalHighlightColor& color) {
+    mColor = color;
+    if (mColor.has_value()) {
+        setCurrentIndex(mColor.value().isAuto() ? AUTO_IDX : CUSTOM_IDX);
+    } else {
+        setCurrentIndex(NONE_IDX);
+    }
+}
+
+void ColorWidget::onActivated(int index) {
+    if (index == NONE_IDX) {
+        mColor = {};
+        colorChanged(mColor);
+        return;
+    }
+
+    if (index == AUTO_IDX) {
+        mColor = HighlightColor::createAuto();
+        colorChanged(mColor);
+        return;
+    }
+
+    QColorDialog dialog(this);
+    if (mColor.has_value()) {
+        auto color = mColor.value();
+        if (!color.isAuto()) {
+            dialog.setCurrentColor(color.toColor({}));
+        }
+    }
+    if (dialog.exec()) {
+        mColor = HighlightColor(dialog.currentColor());
+        colorChanged(mColor);
+    }
 }
 
 std::optional<HighlightColor> ColorWidget::color() const {
-    return {};
+    return mColor;
 }

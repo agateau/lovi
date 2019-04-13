@@ -42,6 +42,8 @@ void HighlightWidget::setHighlight(Highlight* highlight) {
     setEnabled(true);
 
     ui->conditionLineEdit->setText(highlight->conditionDefinition());
+    ui->bgColorWidget->setColor(highlight->bgColor());
+    ui->fgColorWidget->setColor(highlight->fgColor());
 }
 
 Highlight* HighlightWidget::highlight() const {
@@ -55,4 +57,14 @@ void HighlightWidget::setupUi() {
     connect(ui->conditionLineEdit, &QLineEdit::editingFinished, this, [this] {
         mHighlight->setConditionDefinition(ui->conditionLineEdit->text());
     });
+
+    connect(ui->bgColorWidget,
+            &ColorWidget::colorChanged,
+            this,
+            [this](const OptionalHighlightColor& color) { mHighlight->setBgColor(color); });
+
+    connect(ui->fgColorWidget,
+            &ColorWidget::colorChanged,
+            this,
+            [this](const OptionalHighlightColor& color) { mHighlight->setFgColor(color); });
 }

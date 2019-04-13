@@ -20,6 +20,9 @@
 
 #include "conditionio.h"
 
+HighlightColor::HighlightColor(const QColor& color) : mIsAuto(false), mColor(color) {
+}
+
 HighlightColor::HighlightColor(const QString& text) {
     if (text == "auto") {
         mIsAuto = true;
@@ -50,6 +53,19 @@ QColor HighlightColor::toColor(const QString& matchingText) const {
 
 QString HighlightColor::toString() const {
     return mIsAuto ? "auto" : mColor.name();
+}
+
+bool HighlightColor::isAuto() const {
+    return mIsAuto;
+}
+
+HighlightColor HighlightColor::createAuto() {
+    HighlightColor color;
+    color.mIsAuto = true;
+    return color;
+}
+
+HighlightColor::HighlightColor() {
 }
 
 Highlight::Highlight(LogFormat* logFormat) : mLogFormat(logFormat) {
