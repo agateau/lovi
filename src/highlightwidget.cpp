@@ -44,6 +44,7 @@ void HighlightWidget::setHighlight(Highlight* highlight) {
     ui->conditionLineEdit->setText(highlight->conditionDefinition());
     ui->bgColorWidget->setColor(highlight->bgColor());
     ui->fgColorWidget->setColor(highlight->fgColor());
+    ui->scopeComboBox->setCurrentIndex(static_cast<int>(highlight->scope()));
 }
 
 Highlight* HighlightWidget::highlight() const {
@@ -67,4 +68,9 @@ void HighlightWidget::setupUi() {
             &ColorWidget::colorChanged,
             this,
             [this](const OptionalHighlightColor& color) { mHighlight->setFgColor(color); });
+
+    connect(ui->scopeComboBox, qOverload<int>(&QComboBox::activated), this, [this](int index) {
+        auto scope = static_cast<Highlight::ColorScope>(index);
+        mHighlight->setScope(scope);
+    });
 }
