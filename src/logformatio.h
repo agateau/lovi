@@ -27,16 +27,8 @@ class LogFormat;
 
 namespace LogFormatIO {
 
-std::unique_ptr<LogFormat> load(const QString& name);
-bool save(LogFormat* logFormat);
-
-// For unit-testing
 std::unique_ptr<LogFormat> loadFromPath(const QString& path);
 bool saveToPath(LogFormat* logFormat, const QString& path);
-
-QString logFormatsDirPath();
-
-QString pathForLogFormat(const QString& name);
 
 }; // namespace LogFormatIO
 

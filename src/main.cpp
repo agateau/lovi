@@ -19,7 +19,6 @@
 #include "mainwindow.h"
 
 #include "config.h"
-#include "logformatio.h"
 #include "logformatstore.h"
 
 #include <QApplication>
@@ -54,6 +53,10 @@ static QString getConfigPath() {
     return configDir + "/config.json";
 }
 
+static QString logFormatsDirPath() {
+    return QStandardPaths::writableLocation(QStandardPaths::AppLocalDataLocation) + "/logformats";
+}
+
 int main(int argc, char* argv[]) {
     QApplication app(argc, argv);
 
@@ -61,7 +64,7 @@ int main(int argc, char* argv[]) {
     parser->process(app);
 
     Config config(getConfigPath());
-    LogFormatStore store(LogFormatIO::logFormatsDirPath());
+    LogFormatStore store(logFormatsDirPath());
     MainWindow window(&config, &store);
     if (parser->isSet("format")) {
         window.loadLogFormat(parser->value("format"));

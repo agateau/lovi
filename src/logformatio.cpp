@@ -132,11 +132,6 @@ static QJsonDocument saveToJson(LogFormat* logFormat) {
 
 namespace LogFormatIO {
 
-unique_ptr<LogFormat> load(const QString& name) {
-    QString filePath = LogFormatIO::pathForLogFormat(name);
-    return loadFromPath(filePath);
-}
-
 unique_ptr<LogFormat> loadFromPath(const QString& filePath) {
     optional<QByteArray> json = readFile(filePath);
     if (!json.has_value()) {
@@ -156,19 +151,6 @@ unique_ptr<LogFormat> loadFromPath(const QString& filePath) {
     }
     logFormat->name = QFileInfo(filePath).baseName();
     return logFormat;
-}
-
-QString logFormatsDirPath() {
-    return QStandardPaths::writableLocation(QStandardPaths::AppLocalDataLocation) + "/logformats";
-}
-
-QString pathForLogFormat(const QString& name) {
-    return QString("%1/%2.json").arg(logFormatsDirPath(), name);
-}
-
-bool save(LogFormat* logFormat) {
-    QString filePath = LogFormatIO::pathForLogFormat(logFormat->name);
-    return saveToPath(logFormat, filePath);
 }
 
 bool saveToPath(LogFormat* logFormat, const QString& filePath) {
