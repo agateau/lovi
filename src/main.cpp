@@ -45,7 +45,7 @@ unique_ptr<QCommandLineParser> createParser() {
     return parser;
 }
 
-static QString getConfigPath() {
+static QString configPath() {
     QString configDir = QStandardPaths::writableLocation(QStandardPaths::AppConfigLocation);
     if (!QDir(configDir).mkpath(".")) {
         qWarning() << "Could not create dir" << configDir;
@@ -63,7 +63,7 @@ int main(int argc, char* argv[]) {
     unique_ptr<QCommandLineParser> parser = createParser();
     parser->process(app);
 
-    Config config(getConfigPath());
+    Config config(configPath());
     LogFormatStore store(logFormatsDirPath());
     MainWindow window(&config, &store);
     if (parser->isSet("format")) {
