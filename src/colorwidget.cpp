@@ -33,7 +33,7 @@ ColorWidget::ColorWidget(QWidget* parent) : QComboBox(parent) {
     connect(this, qOverload<int>(&QComboBox::activated), this, &ColorWidget::onActivated);
 }
 
-void ColorWidget::setColor(const OptionalHighlightColor& color) {
+void ColorWidget::setColor(const OptionalColor& color) {
     mColor = color;
     if (mColor.has_value()) {
         setCurrentIndex(mColor.value().isAuto() ? AUTO_IDX : CUSTOM_IDX);
@@ -50,7 +50,7 @@ void ColorWidget::onActivated(int index) {
     }
 
     if (index == AUTO_IDX) {
-        mColor = HighlightColor::createAuto();
+        mColor = Color::createAuto();
         colorChanged(mColor);
         return;
     }
@@ -63,11 +63,11 @@ void ColorWidget::onActivated(int index) {
         }
     }
     if (dialog.exec()) {
-        mColor = HighlightColor(dialog.currentColor());
+        mColor = Color(dialog.currentColor());
         colorChanged(mColor);
     }
 }
 
-std::optional<HighlightColor> ColorWidget::color() const {
+std::optional<Color> ColorWidget::color() const {
     return mColor;
 }

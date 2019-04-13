@@ -62,12 +62,12 @@ void HighlightWidget::setupUi() {
     connect(ui->bgColorWidget,
             &ColorWidget::colorChanged,
             this,
-            [this](const OptionalHighlightColor& color) { mHighlight->setBgColor(color); });
+            [this](const OptionalColor& color) { mHighlight->setBgColor(color); });
 
     connect(ui->fgColorWidget,
             &ColorWidget::colorChanged,
             this,
-            [this](const OptionalHighlightColor& color) { mHighlight->setFgColor(color); });
+            [this](const OptionalColor& color) { mHighlight->setFgColor(color); });
 
     connect(ui->scopeComboBox, qOverload<int>(&QComboBox::activated), this, [this](int index) {
         auto scope = static_cast<Highlight::Scope>(index);

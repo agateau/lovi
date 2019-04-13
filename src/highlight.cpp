@@ -20,10 +20,10 @@
 
 #include "conditionio.h"
 
-HighlightColor::HighlightColor(const QColor& color) : mIsAuto(false), mColor(color) {
+Color::Color(const QColor& color) : mIsAuto(false), mColor(color) {
 }
 
-HighlightColor::HighlightColor(const QString& text) {
+Color::Color(const QString& text) {
     if (text == "auto") {
         mIsAuto = true;
         return;
@@ -39,7 +39,7 @@ static std::vector<QColor> generateAutoColorVector() {
     return colors;
 }
 
-QColor HighlightColor::toColor(const QString& matchingText) const {
+QColor Color::toColor(const QString& matchingText) const {
     if (!mIsAuto) {
         return mColor;
     }
@@ -51,21 +51,21 @@ QColor HighlightColor::toColor(const QString& matchingText) const {
     return autoColors.at(sum % autoColors.size());
 }
 
-QString HighlightColor::toString() const {
+QString Color::toString() const {
     return mIsAuto ? "auto" : mColor.name();
 }
 
-bool HighlightColor::isAuto() const {
+bool Color::isAuto() const {
     return mIsAuto;
 }
 
-HighlightColor HighlightColor::createAuto() {
-    HighlightColor color;
+Color Color::createAuto() {
+    Color color;
     color.mIsAuto = true;
     return color;
 }
 
-HighlightColor::HighlightColor() {
+Color::Color() {
 }
 
 Highlight::Highlight(LogFormat* logFormat) : mLogFormat(logFormat) {
@@ -91,12 +91,12 @@ void Highlight::setScope(Highlight::Scope scope) {
     mLogFormat->emitHighlightChanged(this);
 }
 
-void Highlight::setBgColor(const OptionalHighlightColor& color) {
+void Highlight::setBgColor(const OptionalColor& color) {
     mBgColor = color;
     mLogFormat->emitHighlightChanged(this);
 }
 
-void Highlight::setFgColor(const OptionalHighlightColor& color) {
+void Highlight::setFgColor(const OptionalColor& color) {
     mFgColor = color;
     mLogFormat->emitHighlightChanged(this);
 }

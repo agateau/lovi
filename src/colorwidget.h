@@ -28,16 +28,16 @@ class ColorWidget : public QComboBox {
 public:
     ColorWidget(QWidget* parent = nullptr);
 
-    void setColor(const OptionalHighlightColor& color);
-    OptionalHighlightColor color() const;
+    void setColor(const OptionalColor& color);
+    OptionalColor color() const;
 
 signals:
-    void colorChanged(const OptionalHighlightColor& color);
+    void colorChanged(const OptionalColor& color);
 
 private:
     void onActivated(int index);
 
-    OptionalHighlightColor mColor;
+    OptionalColor mColor;
 };
 
 #endif // COLORWIDGET_H

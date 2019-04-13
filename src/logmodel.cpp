@@ -131,7 +131,7 @@ LogLine LogModel::processLine(const QString& line) const {
     return logLine;
 }
 
-static QColor getColor(const OptionalHighlightColor& color, const QString& text) {
+static QColor getColor(const OptionalColor& color, const QString& text) {
     return color.has_value() ? color.value().toColor(text) : QColor();
 }
 

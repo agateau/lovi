@@ -29,24 +29,24 @@
 
 class LogFormat;
 
-class HighlightColor {
+class Color {
 public:
-    explicit HighlightColor(const QColor& color);
-    explicit HighlightColor(const QString& text);
+    explicit Color(const QColor& color);
+    explicit Color(const QString& text);
 
     QColor toColor(const QString& matchingText) const;
     QString toString() const;
     bool isAuto() const;
 
-    static HighlightColor createAuto();
+    static Color createAuto();
 
 private:
-    HighlightColor();
+    Color();
     bool mIsAuto = false;
     QColor mColor;
 };
 
-using OptionalHighlightColor = std::optional<HighlightColor>;
+using OptionalColor = std::optional<Color>;
 
 class Highlight {
 public:
@@ -63,15 +63,15 @@ public:
         return mScope;
     }
 
-    void setBgColor(const OptionalHighlightColor& color);
+    void setBgColor(const OptionalColor& color);
 
-    OptionalHighlightColor bgColor() const {
+    OptionalColor bgColor() const {
         return mBgColor;
     }
 
-    void setFgColor(const OptionalHighlightColor& color);
+    void setFgColor(const OptionalColor& color);
 
-    OptionalHighlightColor fgColor() const {
+    OptionalColor fgColor() const {
         return mFgColor;
     }
 
@@ -81,8 +81,8 @@ private:
 
     Scope mScope = Cell;
 
-    OptionalHighlightColor mBgColor;
-    OptionalHighlightColor mFgColor;
+    OptionalColor mBgColor;
+    OptionalColor mFgColor;
 };
 
 #endif // HIGHLIGHT_H
