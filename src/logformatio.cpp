@@ -72,8 +72,6 @@ static unique_ptr<LogFormat> loadLogFormat(const QJsonDocument& doc) {
         Highlight& highlight = *(logFormat->highlights.end() - 1);
         highlight.setConditionDefinition(highlightObj.value("condition").toString());
 
-        auto rowBgColor = highlightObj.value("rowBgColor").toString();
-        auto rowFgColor = highlightObj.value("rowFgColor").toString();
         auto bgColor = highlightObj.value("bgColor").toString();
         auto fgColor = highlightObj.value("fgColor").toString();
         QString scope = highlightObj.value("scope").toString();
