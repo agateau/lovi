@@ -68,6 +68,6 @@ void ColorWidget::onActivated(int index) {
     }
 }
 
-std::optional<Color> ColorWidget::color() const {
+OptionalColor ColorWidget::color() const {
     return mColor;
 }

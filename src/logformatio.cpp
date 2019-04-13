@@ -44,7 +44,7 @@ static optional<QByteArray> readFile(const QString& filePath) {
     return file.readAll();
 }
 
-static std::optional<Color> initColor(const QString& text) {
+static OptionalColor initColor(const QString& text) {
     if (text.isEmpty()) {
         return {};
     }
@@ -91,7 +91,7 @@ static unique_ptr<LogFormat> loadLogFormat(const QJsonDocument& doc) {
 }
 
 //- Save --------------------------------
-static void saveColor(QJsonObject* root, const QString& key, const optional<Color>& color) {
+static void saveColor(QJsonObject* root, const QString& key, const OptionalColor& color) {
     if (!color.has_value()) {
         return;
     }
