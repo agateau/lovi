@@ -86,11 +86,6 @@ Highlight* LogFormat::editableHighlightAt(int row) {
     return &mHighlights[row];
 }
 
-LogFormat* LogFormat::getEmpty() {
-    static auto instance = createEmpty();
-    return instance.get();
-}
-
 unique_ptr<LogFormat> LogFormat::createEmpty() {
     unique_ptr<LogFormat> logFormat = std::make_unique<LogFormat>();
     logFormat->setParserPattern("(?<line>.*)");

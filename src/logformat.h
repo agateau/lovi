@@ -49,8 +49,6 @@ public:
     Highlight* addHighlight();
     Highlight* editableHighlightAt(int row);
 
-    static LogFormat* getEmpty();
-
     static std::unique_ptr<LogFormat> createEmpty();
 
 signals:

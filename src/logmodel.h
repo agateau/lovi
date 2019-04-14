@@ -67,9 +67,10 @@ private:
     void resetAllState();
     void onLogFormatChanged();
 
-    LogFormat* mEmptyLogFormat;
-    LogFormat* mLogFormat;
-    const LineProvider* mLineProvider = nullptr;
+    const LineProvider* const mLineProvider;
+    const std::unique_ptr<LogFormat> mEmptyLogFormat;
+
+    LogFormat* mLogFormat = nullptr;
 
     QStringList mColumns;
     mutable QHash<int, LogLine> mLogLineCache;
