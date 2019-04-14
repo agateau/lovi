@@ -102,6 +102,8 @@ void LogFormatDialog::setupSideBar(LogFormat* currentLogFormat) {
 void LogFormatDialog::setupEditor() {
     ui->containerWidget->layout()->setMargin(0);
 
+    connect(ui->parserLineEdit, &QLineEdit::editingFinished, this, &LogFormatDialog::applyChanges);
+
     ui->highlightListView->setModel(mHighlightModel.get());
 
     connect(ui->highlightListView->selectionModel(),
@@ -109,7 +111,9 @@ void LogFormatDialog::setupEditor() {
             this,
             &LogFormatDialog::onCurrentHighlightChanged);
 
-    connect(ui->parserLineEdit, &QLineEdit::editingFinished, this, &LogFormatDialog::applyChanges);
+    connect(ui->addHighlightButton, &QToolButton::pressed, this, [this] {
+        mHighlightModel->logFormat()->addHighlight();
+    });
 
     // Do not close the dialog when the user presses Enter
     ui->buttonBox->button(QDialogButtonBox::Close)->setAutoDefault(false);

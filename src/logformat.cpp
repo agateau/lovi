@@ -79,6 +79,8 @@ const std::vector<Highlight>& LogFormat::highlights() const {
 
 Highlight* LogFormat::addHighlight() {
     mHighlights.emplace_back(this);
+    highlightAdded();
+    changed();
     return &mHighlights.back();
 }
 

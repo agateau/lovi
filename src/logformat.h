@@ -53,6 +53,7 @@ public:
 
 signals:
     void highlightChanged(int row);
+    void highlightAdded();
     void changed();
 
 private:

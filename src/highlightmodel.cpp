@@ -35,6 +35,7 @@ void HighlightModel::setLogFormat(LogFormat* logFormat) {
     if (mLogFormat) {
         connect(
             mLogFormat, &LogFormat::highlightChanged, this, &HighlightModel::onHighlightChanged);
+        connect(mLogFormat, &LogFormat::highlightAdded, this, &HighlightModel::onHighlightAdded);
     }
     endResetModel();
 }
@@ -78,4 +79,10 @@ void HighlightModel::onHighlightChanged(int row) {
     Q_ASSERT(row >= 0 && row < mLogFormat->highlights().size());
     auto idx = index(row, 0);
     dataChanged(idx, idx);
+}
+
+void HighlightModel::onHighlightAdded() {
+    int row = mLogFormat->highlights().size() - 1;
+    beginInsertRows({}, row, row);
+    endInsertRows();
 }
