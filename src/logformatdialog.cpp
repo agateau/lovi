@@ -142,7 +142,7 @@ void LogFormatDialog::onCurrentHighlightChanged(const QModelIndex& index) {
     }
     int row = index.row();
     auto logFormat = mHighlightModel->logFormat();
-    ui->highlightWidget->setHighlight(&logFormat->highlights.at(row));
+    ui->highlightWidget->setHighlight(logFormat->editableHighlightAt(row));
 }
 
 void LogFormatDialog::applyChanges() {

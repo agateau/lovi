@@ -45,7 +45,9 @@ public:
     const QRegularExpression& parser() const;
     ColumnHash columnHash() const;
 
-    std::vector<Highlight> highlights;
+    const std::vector<Highlight>& highlights() const;
+    Highlight* addHighlight();
+    Highlight* editableHighlightAt(int row);
 
     static LogFormat* getEmpty();
 
@@ -59,6 +61,7 @@ private:
     QString mName;
     QRegularExpression mParser;
     ColumnHash mColumnHash;
+    std::vector<Highlight> mHighlights;
 };
 
 #endif // LOGFORMAT_H

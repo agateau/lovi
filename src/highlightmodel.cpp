@@ -47,7 +47,7 @@ int HighlightModel::rowCount(const QModelIndex& parent) const {
     if (parent.isValid() || !mLogFormat) {
         return 0;
     }
-    return mLogFormat->highlights.size();
+    return mLogFormat->highlights().size();
 }
 
 QVariant HighlightModel::data(const QModelIndex& index, int role) const {
@@ -55,10 +55,10 @@ QVariant HighlightModel::data(const QModelIndex& index, int role) const {
         return {};
     }
     int row = index.row();
-    if (row < 0 || row >= mLogFormat->highlights.size()) {
+    if (row < 0 || row >= mLogFormat->highlights().size()) {
         return {};
     }
-    const auto& highlight = mLogFormat->highlights.at(row);
+    const auto& highlight = mLogFormat->highlights().at(row);
     if (role == Qt::DisplayRole) {
         return highlight.conditionDefinition();
     } else if (role == Qt::BackgroundRole) {
@@ -74,7 +74,7 @@ QVariant HighlightModel::data(const QModelIndex& index, int role) const {
 }
 
 void HighlightModel::onHighlightChanged(int row) {
-    Q_ASSERT(row >= 0 && row < mLogFormat->highlights.size());
+    Q_ASSERT(row >= 0 && row < mLogFormat->highlights().size());
     auto idx = index(row, 0);
     dataChanged(idx, idx);
 }

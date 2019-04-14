@@ -68,23 +68,23 @@ static unique_ptr<LogFormat> loadLogFormat(const QJsonDocument& doc) {
     for (QJsonValue jsonValue : doc.object().value("highlights").toArray()) {
         QJsonObject highlightObj = jsonValue.toObject();
 
-        logFormat->highlights.push_back(Highlight(logFormat.get()));
-        Highlight& highlight = *(logFormat->highlights.end() - 1);
-        highlight.setConditionDefinition(highlightObj.value("condition").toString());
+        Highlight* highlight = logFormat->addHighlight();
+
+        highlight->setConditionDefinition(highlightObj.value("condition").toString());
 
         QString scope = highlightObj.value("scope").toString();
         if (scope == "row") {
-            highlight.setScope(Highlight::Row);
+            highlight->setScope(Highlight::Row);
         } else if (scope == "cell") {
-            highlight.setScope(Highlight::Cell);
+            highlight->setScope(Highlight::Cell);
         } else {
             qWarning() << "Invalid scope value:" << scope;
         }
 
         auto bgColor = highlightObj.value("bgColor").toString();
         auto fgColor = highlightObj.value("fgColor").toString();
-        highlight.setBgColor(initColor(bgColor));
-        highlight.setFgColor(initColor(fgColor));
+        highlight->setBgColor(initColor(bgColor));
+        highlight->setFgColor(initColor(fgColor));
     }
 
     return logFormat;
@@ -116,7 +116,7 @@ static QJsonDocument saveToJson(LogFormat* logFormat) {
     }
 
     QJsonArray highlightsArray;
-    for (const auto& highlight : logFormat->highlights) {
+    for (const auto& highlight : logFormat->highlights()) {
         QJsonObject highlightObj = saveHighlight(highlight);
         highlightsArray.append(highlightObj);
     }

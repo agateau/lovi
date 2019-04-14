@@ -20,10 +20,10 @@ void checkLogFormatEquality(const LogFormat& f1, const LogFormat& f2) {
     REQUIRE(f1.name() == f2.name());
     REQUIRE(f1.parserPattern() == f2.parserPattern());
 
-    for (size_t idx = 0; idx < f1.highlights.size(); ++idx) {
-        REQUIRE(idx < f2.highlights.size());
-        const auto& hl1 = f1.highlights.at(idx);
-        const auto& hl2 = f2.highlights.at(idx);
+    for (size_t idx = 0; idx < f1.highlights().size(); ++idx) {
+        REQUIRE(idx < f2.highlights().size());
+        const auto& hl1 = f1.highlights().at(idx);
+        const auto& hl2 = f2.highlights().at(idx);
         REQUIRE(hl1.conditionDefinition() == hl2.conditionDefinition());
     }
 }
@@ -34,8 +34,8 @@ TEST_CASE("logformatio") {
 
     SECTION("load") {
         REQUIRE(format->parserPattern() == "^(?<level>[DEW])/(?<app>[^:]*): (?<message>.*)");
-        auto it = format->highlights.begin();
-        auto end = format->highlights.end();
+        auto it = format->highlights().begin();
+        auto end = format->highlights().end();
         REQUIRE(it != end);
         REQUIRE(it->conditionDefinition() == "level == E");
         REQUIRE(it->scope() == Highlight::Row);

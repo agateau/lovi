@@ -28,8 +28,8 @@ LogFormat::LogFormat(QObject* parent) : QObject(parent) {
 }
 
 void LogFormat::emitHighlightChanged(Highlight* highlight) {
-    for (std::size_t row = 0; row < highlights.size(); ++row) {
-        if (&highlights.at(row) == highlight) {
+    for (std::size_t row = 0; row < mHighlights.size(); ++row) {
+        if (&mHighlights.at(row) == highlight) {
             highlightChanged(row);
             changed();
             return;
@@ -71,6 +71,19 @@ const QRegularExpression& LogFormat::parser() const {
 
 ColumnHash LogFormat::columnHash() const {
     return mColumnHash;
+}
+
+const std::vector<Highlight>& LogFormat::highlights() const {
+    return mHighlights;
+}
+
+Highlight* LogFormat::addHighlight() {
+    mHighlights.emplace_back(this);
+    return &mHighlights.back();
+}
+
+Highlight* LogFormat::editableHighlightAt(int row) {
+    return &mHighlights[row];
 }
 
 LogFormat* LogFormat::getEmpty() {
