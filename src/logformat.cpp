@@ -38,6 +38,14 @@ void LogFormat::emitHighlightChanged(Highlight* highlight) {
     Q_UNREACHABLE();
 }
 
+void LogFormat::setName(const QString& name) {
+    mName = name;
+}
+
+QString LogFormat::name() const {
+    return mName;
+}
+
 void LogFormat::setParserPattern(const QString& pattern) {
     mParser.setPattern(pattern);
     mParser.optimize();

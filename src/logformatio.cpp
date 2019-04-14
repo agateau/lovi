@@ -146,7 +146,7 @@ unique_ptr<LogFormat> loadFromPath(const QString& filePath) {
     if (!logFormat) {
         return LogFormat::createEmpty();
     }
-    logFormat->name = QFileInfo(filePath).baseName();
+    logFormat->setName(QFileInfo(filePath).baseName());
     return logFormat;
 }
 

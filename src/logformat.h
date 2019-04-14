@@ -36,7 +36,9 @@ public:
 
     void emitHighlightChanged(Highlight* highlight);
 
-    QString name;
+    void setName(const QString& name);
+    QString name() const;
+
     void setParserPattern(const QString& pattern);
     QString parserPattern() const;
 
@@ -54,6 +56,7 @@ signals:
     void changed();
 
 private:
+    QString mName;
     QRegularExpression mParser;
     ColumnHash mColumnHash;
 };

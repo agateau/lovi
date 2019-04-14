@@ -241,7 +241,7 @@ void MainWindow::createLineProvider() {
 void MainWindow::setLogFormat(LogFormat* logFormat) {
     mLogFormat = logFormat;
     mLogModel->setLogFormat(mLogFormat);
-    if (!mLogPath.isEmpty() && !mLogFormat->name.isEmpty()) {
-        mConfig->setLogFormatForFile(mLogPath, mLogFormat->name);
+    if (!mLogPath.isEmpty() && !mLogFormat->name().isEmpty()) {
+        mConfig->setLogFormatForFile(mLogPath, mLogFormat->name());
     }
 }

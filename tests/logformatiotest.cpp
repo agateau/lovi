@@ -17,7 +17,7 @@ struct Fixture {
 };
 
 void checkLogFormatEquality(const LogFormat& f1, const LogFormat& f2) {
-    REQUIRE(f1.name == f2.name);
+    REQUIRE(f1.name() == f2.name());
     REQUIRE(f1.parserPattern() == f2.parserPattern());
 
     for (size_t idx = 0; idx < f1.highlights.size(); ++idx) {
@@ -65,7 +65,7 @@ TEST_CASE("logformatio") {
 
     SECTION("save") {
         QTemporaryDir tempDir;
-        QString tempPath = tempDir.path() + "/" + format->name + ".json";
+        QString tempPath = tempDir.path() + "/" + format->name() + ".json";
         REQUIRE(LogFormatIO::saveToPath(format.get(), tempPath));
 
         unique_ptr<LogFormat> format2 = LogFormatIO::loadFromPath(tempPath);

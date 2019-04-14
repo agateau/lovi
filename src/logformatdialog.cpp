@@ -77,10 +77,10 @@ LogFormatDialog::~LogFormatDialog() {
 void LogFormatDialog::setupSideBar(LogFormat* currentLogFormat) {
     ui->listView->setModel(mModel.get());
 
-    if (!currentLogFormat->name.isEmpty()) {
+    if (!currentLogFormat->name().isEmpty()) {
         for (int row = 0; row < ui->listView->model()->rowCount(); ++row) {
             auto index = ui->listView->model()->index(row, 0);
-            if (index.data().toString() == currentLogFormat->name) {
+            if (index.data().toString() == currentLogFormat->name()) {
                 ui->listView->setCurrentIndex(index);
                 break;
             }
