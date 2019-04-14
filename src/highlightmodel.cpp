@@ -60,7 +60,8 @@ QVariant HighlightModel::data(const QModelIndex& index, int role) const {
     }
     const auto& highlight = mLogFormat->highlights().at(row);
     if (role == Qt::DisplayRole) {
-        return highlight.conditionDefinition();
+        QString definition = highlight.conditionDefinition();
+        return definition.isEmpty() ? tr("<empty>") : definition;
     } else if (role == Qt::BackgroundRole) {
         if (highlight.bgColor().has_value()) {
             return highlight.bgColor()->toColor(highlight.conditionDefinition());
