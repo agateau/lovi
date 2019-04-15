@@ -21,6 +21,7 @@
 
 #include <QAbstractTableModel>
 #include <QColor>
+#include <QVector>
 
 #include <memory>
 
@@ -36,7 +37,7 @@ struct LogCell {
 struct LogLine {
     QColor bgColor;
     QColor fgColor;
-    std::vector<LogCell> cells;
+    QVector<LogCell> cells;
 
     bool isValid() const {
         return !cells.empty();
