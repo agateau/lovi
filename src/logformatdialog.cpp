@@ -26,6 +26,7 @@
 #include "ui_logformatdialog.h"
 
 #include <QInputDialog>
+#include <QMessageBox>
 #include <QPushButton>
 #include <QStandardPaths>
 
@@ -182,5 +183,14 @@ void LogFormatDialog::onAddFormatClicked() {
     if (name.isEmpty()) {
         return;
     }
-    mLogFormatStore->addLogFormat(name);
+    auto error = mLogFormatStore->addLogFormat(name);
+    if (!error.has_value()) {
+        return;
+    }
+    QString message = error.value();
+    QMessageBox box(this);
+    box.setIcon(QMessageBox::Warning);
+    box.setText(tr("Could not add format."));
+    box.setInformativeText(message);
+    box.exec();
 }

@@ -39,7 +39,11 @@ public:
 
     int count() const;
 
-    void addLogFormat(const QString& name);
+    /**
+     * Try to add a new log format
+     * Returns an error message in case of failure
+     */
+    std::optional<QString> addLogFormat(const QString& name);
 
 signals:
     void logFormatAdded();

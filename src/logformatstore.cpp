@@ -25,6 +25,7 @@
 #include <QDir>
 #include <QFileInfo>
 
+using std::optional;
 using std::unique_ptr;
 
 LogFormatStore::LogFormatStore(const QString& dirPath, QObject* parent)
@@ -65,23 +66,24 @@ int LogFormatStore::count() const {
     return mLogFormatNames.size();
 }
 
-void LogFormatStore::addLogFormat(const QString& name) {
+optional<QString> LogFormatStore::addLogFormat(const QString& name) {
     auto it = std::find(mLogFormatNames.begin(), mLogFormatNames.end(), name);
     if (it != mLogFormatNames.end()) {
-        qWarning() << "There is already a log format with name" << name;
-        return;
+        return tr("There is already a log format named '%1'.").arg(name);
     }
 
     // Store an empty file, to ensure it can be created
     unique_ptr<LogFormat> logFormat = LogFormat::createEmpty();
-    if (!LogFormatIO::saveToPath(logFormat.get(), pathForName(name))) {
-        return;
+    QString path = pathForName(name);
+    if (!LogFormatIO::saveToPath(logFormat.get(), path)) {
+        return tr("Could not create file '%1'.").arg(path);
     }
 
     mLogFormatNames.push_back(name);
     mLogFormats.push_back({});
 
     logFormatAdded();
+    return {};
 }
 
 void LogFormatStore::load() {
