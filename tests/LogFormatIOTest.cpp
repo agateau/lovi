@@ -20,8 +20,8 @@
 
 #include "LogFormat.h"
 
-#include "testconfig.h"
 #include "TestUtils.h"
+#include "testconfig.h"
 
 #include <QTemporaryDir>
 
