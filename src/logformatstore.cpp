@@ -21,6 +21,7 @@
 #include "logformat.h"
 #include "logformatio.h"
 
+#include <QDebug>
 #include <QDir>
 #include <QFileInfo>
 
@@ -49,7 +50,7 @@ QString LogFormatStore::nameAt(int idx) const {
 LogFormat* LogFormatStore::at(int idx) const {
     LogFormat* logFormat = mLogFormats.at(idx).get();
     if (!logFormat) {
-        auto path = QString("%1/%2.json").arg(mDirPath, mLogFormatNames.at(idx));
+        auto path = pathForName(mLogFormatNames.at(idx));
         unique_ptr<LogFormat> newLogFormat = LogFormatIO::loadFromPath(path);
         logFormat = newLogFormat.get();
         connect(logFormat, &LogFormat::changed, logFormat, [logFormat, path] {
@@ -64,6 +65,25 @@ int LogFormatStore::count() const {
     return mLogFormatNames.size();
 }
 
+void LogFormatStore::addLogFormat(const QString& name) {
+    auto it = std::find(mLogFormatNames.begin(), mLogFormatNames.end(), name);
+    if (it != mLogFormatNames.end()) {
+        qWarning() << "There is already a log format with name" << name;
+        return;
+    }
+
+    // Store an empty file, to ensure it can be created
+    unique_ptr<LogFormat> logFormat = LogFormat::createEmpty();
+    if (!LogFormatIO::saveToPath(logFormat.get(), pathForName(name))) {
+        return;
+    }
+
+    mLogFormatNames.push_back(name);
+    mLogFormats.push_back({});
+
+    logFormatAdded();
+}
+
 void LogFormatStore::load() {
     QDir dir(mDirPath);
     mLogFormatNames.clear();
@@ -72,4 +92,8 @@ void LogFormatStore::load() {
     }
     mLogFormats.clear();
     mLogFormats.resize(mLogFormatNames.size());
+}
+
+QString LogFormatStore::pathForName(const QString& name) const {
+    return QString("%1/%2.json").arg(mDirPath, name);
 }

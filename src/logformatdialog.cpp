@@ -25,6 +25,7 @@
 #include "logformatstore.h"
 #include "ui_logformatdialog.h"
 
+#include <QInputDialog>
 #include <QPushButton>
 #include <QStandardPaths>
 
@@ -33,6 +34,7 @@ using std::shared_ptr;
 //- LogFormatModel -----------------------------
 LogFormatModel::LogFormatModel(LogFormatStore* store, QObject* parent)
         : QAbstractListModel(parent), mStore(store) {
+    connect(mStore, &LogFormatStore::logFormatAdded, this, &LogFormatModel::onLogFormatAdded);
 }
 
 LogFormatModel::~LogFormatModel() {
@@ -57,6 +59,12 @@ LogFormat* LogFormatModel::logFormatForIndex(const QModelIndex& index) const {
     return mStore->at(index.row());
 }
 
+void LogFormatModel::onLogFormatAdded() {
+    int row = mStore->count() - 1;
+    beginInsertRows({}, row, row);
+    endInsertRows();
+}
+
 //- LogFormatDialog ----------------------------
 LogFormatDialog::LogFormatDialog(LogFormatStore* store,
                                  LogFormat* currentLogFormat,
@@ -64,7 +72,8 @@ LogFormatDialog::LogFormatDialog(LogFormatStore* store,
         : QDialog(parent)
         , ui(std::make_unique<Ui::LogFormatDialog>())
         , mModel(std::make_unique<LogFormatModel>(store))
-        , mHighlightModel(std::make_unique<HighlightModel>()) {
+        , mHighlightModel(std::make_unique<HighlightModel>())
+        , mLogFormatStore(store) {
     ui->setupUi(this);
     setupSideBar(currentLogFormat);
     setupEditor();
@@ -97,6 +106,7 @@ void LogFormatDialog::setupSideBar(LogFormat* currentLogFormat) {
                 accept();
             }
         });
+    connect(ui->addFormatButton, &QToolButton::clicked, this, &LogFormatDialog::onAddFormatClicked);
 }
 
 void LogFormatDialog::setupEditor() {
@@ -164,4 +174,13 @@ void LogFormatDialog::applyChanges() {
     }
     LogFormat* logFormat = mModel->logFormatForIndex(index);
     logFormat->setParserPattern(ui->parserLineEdit->text());
+}
+
+void LogFormatDialog::onAddFormatClicked() {
+    QString name = QInputDialog::getText(
+        this, tr("Log format name"), tr("Enter a name for the new log format"));
+    if (name.isEmpty()) {
+        return;
+    }
+    mLogFormatStore->addLogFormat(name);
 }

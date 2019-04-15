@@ -39,8 +39,14 @@ public:
 
     int count() const;
 
+    void addLogFormat(const QString& name);
+
+signals:
+    void logFormatAdded();
+
 private:
     void load();
+    QString pathForName(const QString& name) const;
 
     QString mDirPath;
     std::vector<QString> mLogFormatNames;

@@ -45,6 +45,7 @@ public:
     LogFormat* logFormatForIndex(const QModelIndex& index) const;
 
 private:
+    void onLogFormatAdded();
     LogFormatStore* const mStore;
 };
 
@@ -68,10 +69,12 @@ private:
     void onCurrentChanged(const QModelIndex& index);
     void onCurrentHighlightChanged(const QModelIndex& index);
     void applyChanges();
+    void onAddFormatClicked();
 
     const std::unique_ptr<Ui::LogFormatDialog> ui;
     const std::unique_ptr<LogFormatModel> mModel;
     const std::unique_ptr<HighlightModel> mHighlightModel;
+    LogFormatStore* const mLogFormatStore;
 };
 
 #endif // LOGFORMATDIALOG_H
