@@ -39,6 +39,8 @@ LogFormatDialog::LogFormatDialog(LogFormatStore* store,
         , mModel(std::make_unique<LogFormatModel>(store))
         , mHighlightModel(std::make_unique<HighlightModel>())
         , mLogFormatStore(store) {
+    Q_ASSERT(store);
+    Q_ASSERT(currentLogFormat);
     ui->setupUi(this);
     setupSideBar(currentLogFormat);
     setupEditor();

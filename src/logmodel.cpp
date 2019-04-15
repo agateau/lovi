@@ -115,6 +115,10 @@ void LogModel::setLogFormat(LogFormat* logFormat) {
     endResetModel();
 }
 
+LogFormat* LogModel::logFormat() const {
+    return mLogFormat;
+}
+
 LogLine LogModel::processLine(const QString& line) const {
     auto match = mLogFormat->parser().match(line);
     if (!match.hasMatch()) {

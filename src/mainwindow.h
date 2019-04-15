@@ -74,7 +74,6 @@ private:
     QPointer<LogFormatDialog> mLogFormatDialog;
 
     QString mLogPath;
-    LogFormat* mLogFormat = nullptr;
 };
 
 #endif // MAINWINDOW_H

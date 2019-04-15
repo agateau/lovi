@@ -193,7 +193,7 @@ void MainWindow::showLogFormatDialog() {
         mLogFormatDialog->activateWindow();
         return;
     }
-    mLogFormatDialog = new LogFormatDialog(mLogFormatStore, mLogFormat, this);
+    mLogFormatDialog = new LogFormatDialog(mLogFormatStore, mLogModel->logFormat(), this);
     connect(mLogFormatDialog.data(),
             &LogFormatDialog::logFormatChanged,
             this,
@@ -239,9 +239,8 @@ void MainWindow::createLineProvider() {
 }
 
 void MainWindow::setLogFormat(LogFormat* logFormat) {
-    mLogFormat = logFormat;
-    mLogModel->setLogFormat(mLogFormat);
-    if (!mLogPath.isEmpty() && !mLogFormat->name().isEmpty()) {
-        mConfig->setLogFormatForFile(mLogPath, mLogFormat->name());
+    mLogModel->setLogFormat(logFormat);
+    if (!mLogPath.isEmpty() && !logFormat->name().isEmpty()) {
+        mConfig->setLogFormatForFile(mLogPath, logFormat->name());
     }
 }

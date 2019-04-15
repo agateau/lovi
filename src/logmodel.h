@@ -61,6 +61,8 @@ public:
 
     void setLogFormat(LogFormat* logFormat);
 
+    LogFormat* logFormat() const;
+
 private:
     LogLine processLine(const QString& line) const;
     void applyHighlights(LogLine* logLine, LogCell* logCell, int column) const;
