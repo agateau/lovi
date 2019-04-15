@@ -16,42 +16,20 @@
  * You should have received a copy of the GNU General Public License along with
  * this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-#ifndef LOGFORMATLOADER_H
-#define LOGFORMATLOADER_H
+#ifndef LOGFORMATIO_H
+#define LOGFORMATIO_H
 
-#include <QObject>
+#include <QString>
 
 #include <memory>
 
-class FileWatcher;
 class LogFormat;
 
-class QTimer;
+namespace LogFormatIO {
 
-class LogFormatLoader : public QObject {
-    Q_OBJECT
-public:
-    explicit LogFormatLoader(QObject* parent = nullptr);
-    ~LogFormatLoader();
+std::unique_ptr<LogFormat> loadFromPath(const QString& path);
+bool saveToPath(LogFormat* logFormat, const QString& path);
 
-    void load(const QString& name);
+}; // namespace LogFormatIO
 
-    LogFormat* logFormat() const;
-
-    static QString logFormatsDirPath();
-
-    static QString pathForLogFormat(const QString& name);
-
-signals:
-    void logFormatChanged(LogFormat* logFormat);
-
-private:
-    void reload();
-
-    const std::unique_ptr<FileWatcher> mWatcher;
-    const std::unique_ptr<QTimer> mReloadTimer;
-    QString mLogFormatName;
-    std::unique_ptr<LogFormat> mLogFormat;
-};
-
-#endif // LOGFORMATLOADER_H
+#endif // LOGFORMATIO_H

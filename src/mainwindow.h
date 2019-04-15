@@ -21,12 +21,15 @@
 
 #include <QMainWindow>
 #include <QObject>
+#include <QPointer>
 
 #include <memory>
 
 class Config;
 class LineProvider;
-class LogFormatLoader;
+class LogFormatDialog;
+class LogFormatStore;
+class LogFormat;
 class LogModel;
 
 class QTreeView;
@@ -34,7 +37,7 @@ class QTreeView;
 class MainWindow : public QMainWindow {
     Q_OBJECT
 public:
-    explicit MainWindow(Config* config, QWidget* parent = nullptr);
+    explicit MainWindow(Config* config, LogFormatStore* store, QWidget* parent = nullptr);
     ~MainWindow();
 
     void loadLogFormat(const QString& filePath);
@@ -52,10 +55,11 @@ private:
     void addLogToRecentFiles();
     void fillRecentFilesMenu();
     void createLineProvider();
+    void setLogFormat(LogFormat* logFormat);
 
     Config* const mConfig;
+    LogFormatStore* const mLogFormatStore;
 
-    const std::unique_ptr<LogFormatLoader> mLogFormatLoader;
     std::unique_ptr<LineProvider> mLineProvider;
     std::unique_ptr<LogModel> mLogModel;
 
@@ -67,9 +71,9 @@ private:
     QMenu* const mRecentFilesMenu;
     QToolBar* const mToolBar;
     QTreeView* const mTreeView;
+    QPointer<LogFormatDialog> mLogFormatDialog;
 
     QString mLogPath;
-    QString mLogFormatName;
 };
 
 #endif // MAINWINDOW_H

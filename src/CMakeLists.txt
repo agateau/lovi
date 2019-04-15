@@ -5,16 +5,24 @@ set(CMAKE_AUTOUIC ON)
 
 # Lib
 add_library(lovilib STATIC
+    color.cpp
+    colorwidget.cpp
     conditions.cpp
+    conditionio.cpp
     config.cpp
     filelineprovider.cpp
     filewatcher.cpp
     highlight.cpp
+    highlightmodel.cpp
+    highlightwidget.cpp
+    highlightwidget.ui
     lineprovider.cpp
     logformat.cpp
     logformatdialog.cpp
     logformatdialog.ui
-    logformatloader.cpp
+    logformatio.cpp
+    logformatmodel.cpp
+    logformatstore.cpp
     logmodel.cpp
     mainwindow.cpp
     stdinlineprovider.cpp

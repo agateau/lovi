@@ -1,0 +1,6 @@
+#ifndef TESTCONFIG_H_IN
+#define TESTCONFIG_H_IN
+
+#cmakedefine TEST_DATA_DIR "@CMAKE_CURRENT_SOURCE_DIR@"
+
+#endif // TESTCONFIG_H_IN

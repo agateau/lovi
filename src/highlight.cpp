@@ -18,30 +18,37 @@
  */
 #include "highlight.h"
 
-HighlightColor::HighlightColor(const QString& text) {
-    if (text == "auto") {
-        mIsAuto = true;
+#include "conditionio.h"
+
+Highlight::Highlight(LogFormat* logFormat) : mLogFormat(logFormat) {
+    Q_ASSERT(mLogFormat);
+}
+
+void Highlight::setConditionDefinition(const QString& definition) {
+    mConditionDefinition = definition;
+
+    mCondition = ConditionIO::parse(definition, mLogFormat->columnHash());
+    mLogFormat->emitHighlightChanged(this);
+}
+
+QString Highlight::conditionDefinition() const {
+    return mConditionDefinition;
+}
+
+void Highlight::setScope(Highlight::Scope scope) {
+    if (mScope == scope) {
         return;
     }
-    mColor = text;
+    mScope = scope;
+    mLogFormat->emitHighlightChanged(this);
 }
 
-static std::vector<QColor> generateAutoColorVector() {
-    std::vector<QColor> colors;
-    for (qreal hue = 0; hue < 1; hue += 1.0 / 20) {
-        colors.push_back(QColor::fromHsvF(hue, 0.5, 0.9));
-    }
-    return colors;
+void Highlight::setBgColor(const OptionalColor& color) {
+    mBgColor = color;
+    mLogFormat->emitHighlightChanged(this);
 }
 
-QColor HighlightColor::toColor(const QString& matchingText) const {
-    if (!mIsAuto) {
-        return mColor;
-    }
-    static std::vector<QColor> autoColors = generateAutoColorVector();
-    int sum = std::accumulate(
-        matchingText.begin(), matchingText.end(), 0, [](int currentSum, const QChar& ch) {
-            return currentSum + ch.toLatin1();
-        });
-    return autoColors.at(sum % autoColors.size());
+void Highlight::setFgColor(const OptionalColor& color) {
+    mFgColor = color;
+    mLogFormat->emitHighlightChanged(this);
 }

@@ -27,9 +27,10 @@
 using std::optional;
 
 LogModel::LogModel(const LineProvider* lineProvider, QObject* parent)
-        : QAbstractTableModel(parent), mLineProvider(lineProvider) {
-    mEmptyLogFormat = LogFormat::createEmpty();
-    setLogFormat(mEmptyLogFormat.get());
+        : QAbstractTableModel(parent)
+        , mLineProvider(lineProvider)
+        , mEmptyLogFormat(LogFormat::createEmpty()) {
+    setLogFormat(nullptr);
     connect(mLineProvider, &LineProvider::lineCountChanged, this, &LogModel::onLineCountChanged);
 }
 
@@ -99,21 +100,27 @@ QStringList LogModel::columns() const {
     return mColumns;
 }
 
-void LogModel::setLogFormat(const LogFormat* logFormat) {
+void LogModel::setLogFormat(LogFormat* logFormat) {
     beginResetModel();
+    if (mLogFormat) {
+        mLogFormat->disconnect(this);
+    }
     if (logFormat) {
         mLogFormat = logFormat;
     } else {
         mLogFormat = mEmptyLogFormat.get();
     }
-    mColumns = mLogFormat->parser.namedCaptureGroups();
-    mColumns.removeFirst();
-    mLogLineCache.clear();
+    connect(mLogFormat, &LogFormat::changed, this, &LogModel::onLogFormatChanged);
+    resetAllState();
     endResetModel();
 }
 
+LogFormat* LogModel::logFormat() const {
+    return mLogFormat;
+}
+
 LogLine LogModel::processLine(const QString& line) const {
-    auto match = mLogFormat->parser.match(line);
+    auto match = mLogFormat->parser().match(line);
     if (!match.hasMatch()) {
         return {};
     }
@@ -129,21 +136,21 @@ LogLine LogModel::processLine(const QString& line) const {
     return logLine;
 }
 
-static QColor getColor(const optional<HighlightColor>& color, const QString& text) {
+static QColor getColor(const OptionalColor& color, const QString& text) {
     return color.has_value() ? color.value().toColor(text) : QColor();
 }
 
 void LogModel::applyHighlights(LogLine* line, LogCell* cell, int column) const {
-    for (const Highlight& highlight : mLogFormat->highlights) {
-        if (highlight.condition->column() == column && highlight.condition->eval(cell->text)) {
-            if (highlight.rowBgColor.has_value()) {
-                line->bgColor = highlight.rowBgColor.value().toColor(cell->text);
+    for (const auto& highlight : mLogFormat->highlights()) {
+        const Condition* condition = highlight->condition();
+        if (condition && condition->column() == column && condition->eval(cell->text)) {
+            if (highlight->scope() == Highlight::Row) {
+                line->bgColor = getColor(highlight->bgColor(), cell->text);
+                line->fgColor = getColor(highlight->fgColor(), cell->text);
+            } else {
+                cell->bgColor = getColor(highlight->bgColor(), cell->text);
+                cell->fgColor = getColor(highlight->fgColor(), cell->text);
             }
-            if (highlight.rowFgColor.has_value()) {
-                line->fgColor = highlight.rowFgColor.value().toColor(cell->text);
-            }
-            cell->bgColor = getColor(highlight.bgColor, cell->text);
-            cell->fgColor = getColor(highlight.fgColor, cell->text);
         }
     }
 }
@@ -159,4 +166,16 @@ void LogModel::onLineCountChanged(int newCount, int oldCount) {
     // Assume append
     beginInsertRows({}, oldCount, newCount - 1);
     endInsertRows();
+}
+
+void LogModel::resetAllState() {
+    mColumns = mLogFormat->parser().namedCaptureGroups();
+    mColumns.removeFirst();
+    mLogLineCache.clear();
+}
+
+void LogModel::onLogFormatChanged() {
+    beginResetModel();
+    resetAllState();
+    endResetModel();
 }

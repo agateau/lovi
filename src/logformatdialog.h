@@ -23,26 +23,41 @@
 
 #include <memory>
 
-class QFileSystemModel;
-
 namespace Ui {
 class LogFormatDialog;
 }
 
+class HighlightModel;
+class LogFormat;
+class LogFormatModel;
+class LogFormatStore;
+
 class LogFormatDialog : public QDialog {
     Q_OBJECT
 public:
-    explicit LogFormatDialog(const QString& logFormatName, QWidget* parent = nullptr);
+    explicit LogFormatDialog(LogFormatStore* store,
+                             LogFormat* currentLogFormat,
+                             QWidget* parent = nullptr);
     ~LogFormatDialog();
 
     QString logFormatName() const;
 
-private:
-    void onRowsInserted(const QModelIndex& parent, int first, int last);
-    const std::unique_ptr<Ui::LogFormatDialog> ui;
-    const std::unique_ptr<QFileSystemModel> mModel;
+signals:
+    void logFormatChanged(LogFormat* logFormat);
 
-    QString mInitialLogFormatPath;
+private:
+    void setupSideBar(LogFormat* currentLogFormat);
+    void setupEditor();
+
+    void onCurrentChanged(const QModelIndex& index);
+    void onCurrentHighlightChanged(const QModelIndex& index);
+    void applyChanges();
+    void onAddFormatClicked();
+
+    const std::unique_ptr<Ui::LogFormatDialog> ui;
+    const std::unique_ptr<LogFormatModel> mModel;
+    const std::unique_ptr<HighlightModel> mHighlightModel;
+    LogFormatStore* const mLogFormatStore;
 };
 
 #endif // LOGFORMATDIALOG_H

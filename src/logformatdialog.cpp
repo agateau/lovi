@@ -18,57 +18,90 @@
  */
 #include "logformatdialog.h"
 
-#include "logformatloader.h"
+#include "conditionio.h"
+#include "highlightmodel.h"
+#include "logformat.h"
+#include "logformatio.h"
+#include "logformatmodel.h"
+#include "logformatstore.h"
 #include "ui_logformatdialog.h"
 
-#include <QFileSystemModel>
+#include <QInputDialog>
+#include <QMessageBox>
+#include <QPushButton>
 #include <QStandardPaths>
 
-/**
- * Override QFileSystemModel to hide the icon and the filename extension
- * Faster to write and use than using a proxy model
- */
-class MyModel : public QFileSystemModel {
-public:
-    MyModel(QObject* parent = nullptr) : QFileSystemModel(parent) {
-    }
-
-    QVariant data(const QModelIndex& index, int role = Qt::DisplayRole) const override {
-        if (role == Qt::DecorationRole) {
-            return {};
-        }
-        auto value = QFileSystemModel::data(index, role);
-        if (role == Qt::DisplayRole) {
-            QString name = value.toString();
-            return QFileInfo(name).baseName();
-        }
-        return value;
-    }
-};
-
-LogFormatDialog::LogFormatDialog(const QString& logFormatPath, QWidget* parent)
+LogFormatDialog::LogFormatDialog(LogFormatStore* store,
+                                 LogFormat* currentLogFormat,
+                                 QWidget* parent)
         : QDialog(parent)
         , ui(std::make_unique<Ui::LogFormatDialog>())
-        , mModel(std::make_unique<MyModel>())
-        , mInitialLogFormatPath(logFormatPath) {
+        , mModel(std::make_unique<LogFormatModel>(store))
+        , mHighlightModel(std::make_unique<HighlightModel>())
+        , mLogFormatStore(store) {
+    Q_ASSERT(store);
+    Q_ASSERT(currentLogFormat);
     ui->setupUi(this);
+    setupSideBar(currentLogFormat);
+    setupEditor();
+    onCurrentChanged(ui->listView->currentIndex());
+}
 
-    mModel->setFilter(QDir::Files);
-    mModel->sort(0);
-    connect(
-        mModel.get(), &QAbstractItemModel::rowsInserted, this, &LogFormatDialog::onRowsInserted);
+LogFormatDialog::~LogFormatDialog() {
+}
+
+void LogFormatDialog::setupSideBar(LogFormat* currentLogFormat) {
     ui->listView->setModel(mModel.get());
-    QString dirPath = LogFormatLoader::logFormatsDirPath();
-    ui->listView->setRootIndex(mModel->setRootPath(dirPath));
+
+    if (!currentLogFormat->name().isEmpty()) {
+        for (int row = 0; row < ui->listView->model()->rowCount(); ++row) {
+            auto index = ui->listView->model()->index(row, 0);
+            if (index.data().toString() == currentLogFormat->name()) {
+                ui->listView->setCurrentIndex(index);
+                break;
+            }
+        }
+    }
+
+    connect(ui->listView->selectionModel(),
+            &QItemSelectionModel::currentChanged,
+            this,
+            &LogFormatDialog::onCurrentChanged);
     connect(
         ui->listView, &QAbstractItemView::doubleClicked, this, [this](const QModelIndex& index) {
             if (index.isValid()) {
                 accept();
             }
         });
+    connect(ui->addFormatButton, &QToolButton::clicked, this, &LogFormatDialog::onAddFormatClicked);
 }
 
-LogFormatDialog::~LogFormatDialog() {
+void LogFormatDialog::setupEditor() {
+    ui->containerWidget->layout()->setMargin(0);
+
+    connect(ui->parserLineEdit, &QLineEdit::editingFinished, this, &LogFormatDialog::applyChanges);
+
+    ui->highlightListView->setModel(mHighlightModel.get());
+
+    connect(ui->highlightListView->selectionModel(),
+            &QItemSelectionModel::currentChanged,
+            this,
+            &LogFormatDialog::onCurrentHighlightChanged);
+
+    connect(ui->addHighlightButton, &QToolButton::pressed, this, [this] {
+        mHighlightModel->logFormat()->addHighlight();
+    });
+
+    connect(ui->removeHighlightButton, &QToolButton::pressed, this, [this] {
+        auto index = ui->highlightListView->currentIndex();
+        if (!index.isValid()) {
+            return;
+        }
+        mHighlightModel->logFormat()->removeHighlightAt(index.row());
+    });
+
+    // Do not close the dialog when the user presses Enter
+    ui->buttonBox->button(QDialogButtonBox::Close)->setAutoDefault(false);
 }
 
 QString LogFormatDialog::logFormatName() const {
@@ -79,19 +112,51 @@ QString LogFormatDialog::logFormatName() const {
     return index.data().toString();
 }
 
-void LogFormatDialog::onRowsInserted(const QModelIndex& parent, int first, int last) {
-    auto selectInitialLogFormat = [this, parent, first, last]() {
-        for (int row = first; row <= last; ++row) {
-            auto index = mModel->index(row, 0, parent);
-            if (index.data(QFileSystemModel::FilePathRole).toString() == mInitialLogFormatPath) {
-                ui->listView->setCurrentIndex(index);
-                mInitialLogFormatPath.clear();
-                return;
-            }
-        }
-    };
-
-    if (!mInitialLogFormatPath.isEmpty()) {
-        selectInitialLogFormat();
+void LogFormatDialog::onCurrentChanged(const QModelIndex& index) {
+    if (!index.isValid()) {
+        return;
     }
+
+    LogFormat* logFormat = mModel->logFormatForIndex(index);
+    ui->parserLineEdit->setText(logFormat->parserPattern());
+    mHighlightModel->setLogFormat(logFormat);
+
+    logFormatChanged(logFormat);
+}
+
+void LogFormatDialog::onCurrentHighlightChanged(const QModelIndex& index) {
+    if (!index.isValid()) {
+        ui->highlightWidget->setHighlight(nullptr);
+        return;
+    }
+    int row = index.row();
+    auto logFormat = mHighlightModel->logFormat();
+    ui->highlightWidget->setHighlight(logFormat->editableHighlightAt(row));
+}
+
+void LogFormatDialog::applyChanges() {
+    auto index = ui->listView->currentIndex();
+    if (!index.isValid()) {
+        return;
+    }
+    LogFormat* logFormat = mModel->logFormatForIndex(index);
+    logFormat->setParserPattern(ui->parserLineEdit->text());
+}
+
+void LogFormatDialog::onAddFormatClicked() {
+    QString name = QInputDialog::getText(
+        this, tr("Log format name"), tr("Enter a name for the new log format"));
+    if (name.isEmpty()) {
+        return;
+    }
+    auto error = mLogFormatStore->addLogFormat(name);
+    if (!error.has_value()) {
+        return;
+    }
+    QString message = error.value();
+    QMessageBox box(this);
+    box.setIcon(QMessageBox::Warning);
+    box.setText(tr("Could not add format."));
+    box.setInformativeText(message);
+    box.exec();
 }

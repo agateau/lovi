@@ -21,6 +21,7 @@
 
 #include <QAbstractTableModel>
 #include <QColor>
+#include <QVector>
 
 #include <memory>
 
@@ -36,7 +37,7 @@ struct LogCell {
 struct LogLine {
     QColor bgColor;
     QColor fgColor;
-    std::vector<LogCell> cells;
+    QVector<LogCell> cells;
 
     bool isValid() const {
         return !cells.empty();
@@ -58,20 +59,24 @@ public:
 
     QStringList columns() const;
 
-    void setLogFormat(const LogFormat* logFormat);
+    void setLogFormat(LogFormat* logFormat);
+
+    LogFormat* logFormat() const;
 
 private:
-    std::unique_ptr<LogFormat> mEmptyLogFormat;
-    const LogFormat* mLogFormat = nullptr;
-    const LineProvider* mLineProvider = nullptr;
+    LogLine processLine(const QString& line) const;
+    void applyHighlights(LogLine* logLine, LogCell* logCell, int column) const;
+    void onLineCountChanged(int newCount, int oldCount);
+    void resetAllState();
+    void onLogFormatChanged();
+
+    const LineProvider* const mLineProvider;
+    const std::unique_ptr<LogFormat> mEmptyLogFormat;
+
+    LogFormat* mLogFormat = nullptr;
+
     QStringList mColumns;
     mutable QHash<int, LogLine> mLogLineCache;
-
-    LogLine processLine(const QString& line) const;
-
-    void applyHighlights(LogLine* logLine, LogCell* logCell, int column) const;
-
-    void onLineCountChanged(int newCount, int oldCount);
 };
 
 #endif // LOGMODEL_H

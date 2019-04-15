@@ -19,6 +19,7 @@
 #include "mainwindow.h"
 
 #include "config.h"
+#include "logformatstore.h"
 
 #include <QApplication>
 #include <QCommandLineParser>
@@ -44,12 +45,16 @@ unique_ptr<QCommandLineParser> createParser() {
     return parser;
 }
 
-static QString getConfigPath() {
+static QString configPath() {
     QString configDir = QStandardPaths::writableLocation(QStandardPaths::AppConfigLocation);
     if (!QDir(configDir).mkpath(".")) {
         qWarning() << "Could not create dir" << configDir;
     }
     return configDir + "/config.json";
+}
+
+static QString logFormatsDirPath() {
+    return QStandardPaths::writableLocation(QStandardPaths::AppLocalDataLocation) + "/logformats";
 }
 
 int main(int argc, char* argv[]) {
@@ -58,8 +63,9 @@ int main(int argc, char* argv[]) {
     unique_ptr<QCommandLineParser> parser = createParser();
     parser->process(app);
 
-    Config config(getConfigPath());
-    MainWindow window(&config);
+    Config config(configPath());
+    LogFormatStore store(logFormatsDirPath());
+    MainWindow window(&config, &store);
     if (parser->isSet("format")) {
         window.loadLogFormat(parser->value("format"));
     }

@@ -19,32 +19,56 @@
 #ifndef HIGHLIGHT_H
 #define HIGHLIGHT_H
 
+#include "color.h"
 #include "conditions.h"
 
 #include <QColor>
 #include <QString>
 
 #include <memory>
-#include <optional>
 
-class HighlightColor {
-public:
-    explicit HighlightColor(const QString& text);
-
-    QColor toColor(const QString& matchingText) const;
-
-private:
-    bool mIsAuto = false;
-    QColor mColor;
-};
+class LogFormat;
 
 class Highlight {
 public:
-    std::unique_ptr<Condition> condition;
-    std::optional<HighlightColor> rowBgColor;
-    std::optional<HighlightColor> rowFgColor;
-    std::optional<HighlightColor> bgColor;
-    std::optional<HighlightColor> fgColor;
+    enum Scope { Cell, Row };
+    explicit Highlight(LogFormat* logFormat);
+
+    void setConditionDefinition(const QString& definition);
+    QString conditionDefinition() const;
+
+    void setScope(Scope scope);
+    Scope scope() const {
+        return mScope;
+    }
+
+    Condition* condition() const {
+        return mCondition.get();
+    }
+
+    void setBgColor(const OptionalColor& color);
+
+    OptionalColor bgColor() const {
+        return mBgColor;
+    }
+
+    void setFgColor(const OptionalColor& color);
+
+    OptionalColor fgColor() const {
+        return mFgColor;
+    }
+
+private:
+    LogFormat* const mLogFormat;
+
+    QString mConditionDefinition;
+
+    std::unique_ptr<Condition> mCondition;
+
+    Scope mScope = Cell;
+
+    OptionalColor mBgColor;
+    OptionalColor mFgColor;
 };
 
 #endif // HIGHLIGHT_H

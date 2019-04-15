@@ -21,20 +21,48 @@
 
 #include "highlight.h"
 
+#include <QObject>
 #include <QRegularExpression>
 
 #include <memory>
 #include <vector>
 
-class QJsonDocument;
+using ColumnHash = QHash<QString, int>;
 
-class LogFormat {
+class LogFormat : public QObject {
+    Q_OBJECT
 public:
-    QRegularExpression parser;
-    std::vector<Highlight> highlights;
+    LogFormat(QObject* parent = nullptr);
 
-    static std::unique_ptr<LogFormat> fromJsonDocument(const QJsonDocument& doc);
+    void emitHighlightChanged(Highlight* highlight);
+
+    void setName(const QString& name);
+    QString name() const;
+
+    void setParserPattern(const QString& pattern);
+    QString parserPattern() const;
+
+    const QRegularExpression& parser() const;
+    ColumnHash columnHash() const;
+
+    const std::vector<std::unique_ptr<Highlight>>& highlights() const;
+    Highlight* addHighlight();
+    Highlight* editableHighlightAt(int row);
+    void removeHighlightAt(int row);
+
     static std::unique_ptr<LogFormat> createEmpty();
+
+signals:
+    void highlightChanged(int row);
+    void highlightAdded();
+    void highlightRemoved(int row);
+    void changed();
+
+private:
+    QString mName;
+    QRegularExpression mParser;
+    ColumnHash mColumnHash;
+    std::vector<std::unique_ptr<Highlight>> mHighlights;
 };
 
 #endif // LOGFORMAT_H
