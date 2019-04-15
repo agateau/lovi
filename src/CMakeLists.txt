@@ -5,27 +5,27 @@ set(CMAKE_AUTOUIC ON)
 
 # Lib
 add_library(lovilib STATIC
-    color.cpp
-    colorwidget.cpp
-    conditions.cpp
-    conditionio.cpp
-    config.cpp
-    filelineprovider.cpp
-    filewatcher.cpp
-    highlight.cpp
-    highlightmodel.cpp
-    highlightwidget.cpp
-    highlightwidget.ui
-    lineprovider.cpp
-    logformat.cpp
-    logformatdialog.cpp
-    logformatdialog.ui
-    logformatio.cpp
-    logformatmodel.cpp
-    logformatstore.cpp
-    logmodel.cpp
-    mainwindow.cpp
-    stdinlineprovider.cpp
+    Color.cpp
+    ColorWidget.cpp
+    Conditions.cpp
+    ConditionIO.cpp
+    Config.cpp
+    FileLineProvider.cpp
+    FileWatcher.cpp
+    Highlight.cpp
+    HighlightModel.cpp
+    HighlightWidget.cpp
+    HighlightWidget.ui
+    LineProvider.cpp
+    LogFormat.cpp
+    LogFormatDialog.cpp
+    LogFormatDialog.ui
+    LogFormatIO.cpp
+    LogFormatModel.cpp
+    LogFormatStore.cpp
+    LogModel.cpp
+    MainWindow.cpp
+    StdinLineProvider.cpp
     )
 
 target_include_directories(lovilib PUBLIC ${CMAKE_CURRENT_BINARY_DIR} ${CMAKE_CURRENT_SOURCE_DIR})

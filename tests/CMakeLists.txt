@@ -4,11 +4,11 @@ configure_file(
     ${CMAKE_CURRENT_BINARY_DIR}/testconfig.h)
 
 add_executable(tests
-    conditioniotest.cpp
-    filewatchertest.cpp
-    logformatiotest.cpp
+    ConditionIOTest.cpp
+    FileWatcherTest.cpp
+    LogFormatIOTest.cpp
     tests.cpp
-    testutils.cpp
+    TestUtils.cpp
 )
 
 target_include_directories(tests PUBLIC ${CMAKE_CURRENT_BINARY_DIR})
