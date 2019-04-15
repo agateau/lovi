@@ -19,7 +19,6 @@
 #ifndef LOGFORMATDIALOG_H
 #define LOGFORMATDIALOG_H
 
-#include <QAbstractListModel>
 #include <QDialog>
 
 #include <memory>
@@ -30,24 +29,8 @@ class LogFormatDialog;
 
 class HighlightModel;
 class LogFormat;
+class LogFormatModel;
 class LogFormatStore;
-
-class LogFormatModel : public QAbstractListModel {
-    Q_OBJECT
-public:
-    LogFormatModel(LogFormatStore* store, QObject* parent = nullptr);
-    ~LogFormatModel();
-
-    int rowCount(const QModelIndex& parent = {}) const override;
-
-    QVariant data(const QModelIndex& index, int role = Qt::DisplayRole) const override;
-
-    LogFormat* logFormatForIndex(const QModelIndex& index) const;
-
-private:
-    void onLogFormatAdded();
-    LogFormatStore* const mStore;
-};
 
 class LogFormatDialog : public QDialog {
     Q_OBJECT

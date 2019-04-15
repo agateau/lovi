@@ -22,6 +22,7 @@
 #include "highlightmodel.h"
 #include "logformat.h"
 #include "logformatio.h"
+#include "logformatmodel.h"
 #include "logformatstore.h"
 #include "ui_logformatdialog.h"
 
@@ -30,43 +31,6 @@
 #include <QPushButton>
 #include <QStandardPaths>
 
-using std::shared_ptr;
-
-//- LogFormatModel -----------------------------
-LogFormatModel::LogFormatModel(LogFormatStore* store, QObject* parent)
-        : QAbstractListModel(parent), mStore(store) {
-    connect(mStore, &LogFormatStore::logFormatAdded, this, &LogFormatModel::onLogFormatAdded);
-}
-
-LogFormatModel::~LogFormatModel() {
-}
-
-int LogFormatModel::rowCount(const QModelIndex& parent) const {
-    return parent.isValid() ? 0 : mStore->count();
-}
-
-QVariant LogFormatModel::data(const QModelIndex& index, int role) const {
-    int row = index.row();
-    if (row < 0 || row >= mStore->count()) {
-        return {};
-    }
-    if (role == Qt::DisplayRole) {
-        return mStore->nameAt(row);
-    }
-    return {};
-}
-
-LogFormat* LogFormatModel::logFormatForIndex(const QModelIndex& index) const {
-    return mStore->at(index.row());
-}
-
-void LogFormatModel::onLogFormatAdded() {
-    int row = mStore->count() - 1;
-    beginInsertRows({}, row, row);
-    endInsertRows();
-}
-
-//- LogFormatDialog ----------------------------
 LogFormatDialog::LogFormatDialog(LogFormatStore* store,
                                  LogFormat* currentLogFormat,
                                  QWidget* parent)
