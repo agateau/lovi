@@ -7,6 +7,7 @@ add_executable(tests
     ConditionIOTest.cpp
     FileWatcherTest.cpp
     LogFormatIOTest.cpp
+    LogFormatTest.cpp
     tests.cpp
     TestUtils.cpp
 )

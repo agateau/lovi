@@ -26,13 +26,16 @@ Highlight::Highlight(LogFormat* logFormat) : mLogFormat(logFormat) {
 
 void Highlight::setConditionDefinition(const QString& definition) {
     mConditionDefinition = definition;
-
-    mCondition = ConditionIO::parse(definition, mLogFormat->columnHash());
-    mLogFormat->emitHighlightChanged(this);
+    updateCondition();
 }
 
 QString Highlight::conditionDefinition() const {
     return mConditionDefinition;
+}
+
+void Highlight::updateCondition() {
+    mCondition = ConditionIO::parse(mConditionDefinition, mLogFormat->columnHash());
+    mLogFormat->emitHighlightChanged(this);
 }
 
 void Highlight::setScope(Highlight::Scope scope) {

@@ -57,6 +57,9 @@ void LogFormat::setParserPattern(const QString& pattern) {
             mColumnHash[name] = role++;
         }
     }
+    for (const auto& highlight : mHighlights) {
+        highlight->updateCondition();
+    }
 
     changed();
 }

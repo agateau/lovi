@@ -36,6 +36,7 @@ public:
 
     void setConditionDefinition(const QString& definition);
     QString conditionDefinition() const;
+    void updateCondition();
 
     void setScope(Scope scope);
     Scope scope() const {
