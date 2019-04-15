@@ -98,12 +98,12 @@ static void saveColor(QJsonObject* root, const QString& key, const OptionalColor
     root->insert(key, color.value().toString());
 }
 
-static QJsonObject saveHighlight(const Highlight& highlight) {
+static QJsonObject saveHighlight(const Highlight* highlight) {
     QJsonObject root;
-    root["condition"] = highlight.conditionDefinition();
-    root["scope"] = highlight.scope() == Highlight::Row ? "row" : "cell";
-    saveColor(&root, "bgColor", highlight.bgColor());
-    saveColor(&root, "fgColor", highlight.fgColor());
+    root["condition"] = highlight->conditionDefinition();
+    root["scope"] = highlight->scope() == Highlight::Row ? "row" : "cell";
+    saveColor(&root, "bgColor", highlight->bgColor());
+    saveColor(&root, "fgColor", highlight->fgColor());
     return root;
 }
 
@@ -117,7 +117,7 @@ static QJsonDocument saveToJson(LogFormat* logFormat) {
 
     QJsonArray highlightsArray;
     for (const auto& highlight : logFormat->highlights()) {
-        QJsonObject highlightObj = saveHighlight(highlight);
+        QJsonObject highlightObj = saveHighlight(highlight.get());
         highlightsArray.append(highlightObj);
     }
     root["highlights"] = highlightsArray;

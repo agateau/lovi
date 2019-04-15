@@ -59,17 +59,17 @@ QVariant HighlightModel::data(const QModelIndex& index, int role) const {
     if (row < 0 || row >= mLogFormat->highlights().size()) {
         return {};
     }
-    const auto& highlight = mLogFormat->highlights().at(row);
+    const Highlight* highlight = mLogFormat->highlights().at(row).get();
     if (role == Qt::DisplayRole) {
-        QString definition = highlight.conditionDefinition();
+        QString definition = highlight->conditionDefinition();
         return definition.isEmpty() ? tr("<empty>") : definition;
     } else if (role == Qt::BackgroundRole) {
-        if (highlight.bgColor().has_value()) {
-            return highlight.bgColor()->toColor(highlight.conditionDefinition());
+        if (highlight->bgColor().has_value()) {
+            return highlight->bgColor()->toColor(highlight->conditionDefinition());
         }
     } else if (role == Qt::ForegroundRole) {
-        if (highlight.fgColor().has_value()) {
-            return highlight.fgColor()->toColor(highlight.conditionDefinition());
+        if (highlight->fgColor().has_value()) {
+            return highlight->fgColor()->toColor(highlight->conditionDefinition());
         }
     }
     return {};
