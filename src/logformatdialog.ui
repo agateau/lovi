@@ -94,6 +94,13 @@
          </widget>
         </item>
         <item>
+         <widget class="QToolButton" name="removeHighlightButton">
+          <property name="text">
+           <string>-</string>
+          </property>
+         </widget>
+        </item>
+        <item>
          <spacer name="horizontalSpacer_2">
           <property name="orientation">
            <enum>Qt::Horizontal</enum>

@@ -115,6 +115,14 @@ void LogFormatDialog::setupEditor() {
         mHighlightModel->logFormat()->addHighlight();
     });
 
+    connect(ui->removeHighlightButton, &QToolButton::pressed, this, [this] {
+        auto index = ui->highlightListView->currentIndex();
+        if (!index.isValid()) {
+            return;
+        }
+        mHighlightModel->logFormat()->removeHighlightAt(index.row());
+    });
+
     // Do not close the dialog when the user presses Enter
     ui->buttonBox->button(QDialogButtonBox::Close)->setAutoDefault(false);
 }

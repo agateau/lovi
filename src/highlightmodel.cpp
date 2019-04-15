@@ -36,6 +36,8 @@ void HighlightModel::setLogFormat(LogFormat* logFormat) {
         connect(
             mLogFormat, &LogFormat::highlightChanged, this, &HighlightModel::onHighlightChanged);
         connect(mLogFormat, &LogFormat::highlightAdded, this, &HighlightModel::onHighlightAdded);
+        connect(
+            mLogFormat, &LogFormat::highlightRemoved, this, &HighlightModel::onHighlightRemoved);
     }
     endResetModel();
 }
@@ -85,4 +87,9 @@ void HighlightModel::onHighlightAdded() {
     int row = mLogFormat->highlights().size() - 1;
     beginInsertRows({}, row, row);
     endInsertRows();
+}
+
+void HighlightModel::onHighlightRemoved(int row) {
+    beginRemoveRows({}, row, row);
+    endRemoveRows();
 }

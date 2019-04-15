@@ -48,12 +48,14 @@ public:
     const std::vector<std::unique_ptr<Highlight>>& highlights() const;
     Highlight* addHighlight();
     Highlight* editableHighlightAt(int row);
+    void removeHighlightAt(int row);
 
     static std::unique_ptr<LogFormat> createEmpty();
 
 signals:
     void highlightChanged(int row);
     void highlightAdded();
+    void highlightRemoved(int row);
     void changed();
 
 private:

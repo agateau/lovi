@@ -41,6 +41,7 @@ public:
 private:
     void onHighlightChanged(int row);
     void onHighlightAdded();
+    void onHighlightRemoved(int row);
     LogFormat* mLogFormat = nullptr;
 };
 

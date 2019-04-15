@@ -88,6 +88,13 @@ Highlight* LogFormat::editableHighlightAt(int row) {
     return mHighlights[row].get();
 }
 
+void LogFormat::removeHighlightAt(int row) {
+    Q_ASSERT(row >= 0 && row < mHighlights.size());
+    mHighlights.erase(mHighlights.begin() + row);
+    highlightRemoved(row);
+    changed();
+}
+
 unique_ptr<LogFormat> LogFormat::createEmpty() {
     unique_ptr<LogFormat> logFormat = std::make_unique<LogFormat>();
     logFormat->setParserPattern("(?<line>.*)");
