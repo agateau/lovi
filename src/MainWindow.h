@@ -26,11 +26,10 @@
 #include <memory>
 
 class Config;
-class LineProvider;
 class LogFormatDialog;
 class LogFormatStore;
 class LogFormat;
-class LogModel;
+class MainController;
 
 class QTreeView;
 
@@ -40,7 +39,7 @@ public:
     explicit MainWindow(Config* config, LogFormatStore* store, QWidget* parent = nullptr);
     ~MainWindow();
 
-    void loadLogFormat(const QString& filePath);
+    void setLogFormat(LogFormat* logFormat);
     void loadLog(const QString& filePath);
 
 private:
@@ -52,16 +51,9 @@ private:
     void showOpenLogDialog();
     void showLogFormatDialog();
     void copySelectedLines();
-    void addLogToRecentFiles();
     void fillRecentFilesMenu();
-    void createLineProvider();
-    void setLogFormat(LogFormat* logFormat);
 
-    Config* const mConfig;
-    LogFormatStore* const mLogFormatStore;
-
-    std::unique_ptr<LineProvider> mLineProvider;
-    std::unique_ptr<LogModel> mLogModel;
+    std::unique_ptr<MainController> mController;
 
     QAction* const mOpenLogAction;
     QAction* const mSelectLogFormatAction;
@@ -72,8 +64,6 @@ private:
     QToolBar* const mToolBar;
     QTreeView* const mTreeView;
     QPointer<LogFormatDialog> mLogFormatDialog;
-
-    QString mLogPath;
 };
 
 #endif // MAINWINDOW_H

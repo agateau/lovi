@@ -67,7 +67,11 @@ int main(int argc, char* argv[]) {
     LogFormatStore store(logFormatsDirPath());
     MainWindow window(&config, &store);
     if (parser->isSet("format")) {
-        window.loadLogFormat(parser->value("format"));
+        QString formatName = parser->value("format");
+        LogFormat* logFormat = store.byName(formatName);
+        if (logFormat) {
+            window.setLogFormat(logFormat);
+        }
     }
     if (parser->positionalArguments().length() == 1) {
         window.loadLog(parser->positionalArguments().first());

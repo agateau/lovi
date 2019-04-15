@@ -46,7 +46,7 @@ struct LogLine {
 
 class LogModel : public QAbstractTableModel {
 public:
-    LogModel(const LineProvider* lineProvider, QObject* parent = nullptr);
+    LogModel(const LineProvider* lineProvider, LogFormat* logFormat, QObject* parent = nullptr);
 
     int rowCount(const QModelIndex& parent = {}) const override;
 
@@ -71,9 +71,8 @@ private:
     void onLogFormatChanged();
 
     const LineProvider* const mLineProvider;
-    const std::unique_ptr<LogFormat> mEmptyLogFormat;
 
-    LogFormat* mLogFormat = nullptr;
+    LogFormat* mLogFormat = nullptr; // Never null
 
     QStringList mColumns;
     mutable QHash<int, LogLine> mLogLineCache;

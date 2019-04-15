@@ -39,6 +39,7 @@ LogFormatStore::~LogFormatStore() {
 LogFormat* LogFormatStore::byName(const QString& name) const {
     auto it = std::find(mLogFormatNames.begin(), mLogFormatNames.end(), name);
     if (it == mLogFormatNames.end()) {
+        qWarning() << "No log format named" << name;
         return {};
     }
     return at(it - mLogFormatNames.begin());

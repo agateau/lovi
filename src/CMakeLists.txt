@@ -24,6 +24,7 @@ add_library(lovilib STATIC
     LogFormatModel.cpp
     LogFormatStore.cpp
     LogModel.cpp
+    MainController.cpp
     MainWindow.cpp
     StdinLineProvider.cpp
     )

@@ -19,12 +19,12 @@
 #include "MainWindow.h"
 
 #include "Config.h"
-#include "FileLineProvider.h"
+#include "LineProvider.h"
 #include "LogFormat.h"
 #include "LogFormatDialog.h"
 #include "LogFormatStore.h"
 #include "LogModel.h"
-#include "StdinLineProvider.h"
+#include "MainController.h"
 
 #include <QAction>
 #include <QApplication>
@@ -37,12 +37,9 @@
 #include <QToolBar>
 #include <QTreeView>
 
-static const int MAX_RECENT_FILES = 10;
-
 MainWindow::MainWindow(Config* config, LogFormatStore* store, QWidget* parent)
         : QMainWindow(parent)
-        , mConfig(config)
-        , mLogFormatStore(store)
+        , mController(std::make_unique<MainController>(config, store))
         , mOpenLogAction(new QAction(this))
         , mSelectLogFormatAction(new QAction(this))
         , mAutoScrollAction(new QAction(this))
@@ -57,39 +54,19 @@ MainWindow::MainWindow(Config* config, LogFormatStore* store, QWidget* parent)
 MainWindow::~MainWindow() {
 }
 
-void MainWindow::loadLogFormat(const QString& logFormatName) {
-    auto logFormat = mLogFormatStore->byName(logFormatName);
-    if (!logFormat) {
-        qWarning() << "No log format named" << logFormatName;
-        return;
-    }
-    setLogFormat(logFormat);
+void MainWindow::setLogFormat(LogFormat* logFormat) {
+    mController->setLogFormat(logFormat);
 }
 
 void MainWindow::loadLog(const QString& filePath) {
-    bool isStdin = filePath == "-";
+    mController->loadLog(filePath);
 
-    mLogPath = filePath;
-    QString titlePath = isStdin ? "<stdin>" : mLogPath;
+    QString titlePath = mController->isStdin() ? "<stdin>" : filePath;
     setWindowTitle(QString("%1 - Lovi").arg(titlePath));
-    if (!isStdin) {
-        addLogToRecentFiles();
-    }
 
-    createLineProvider();
-
-    mLogModel = std::make_unique<LogModel>(mLineProvider.get());
-
-    if (!isStdin) {
-        QString logFormatName = mConfig->logFormatForFile().value(mLogPath);
-        if (!logFormatName.isEmpty()) {
-            loadLogFormat(logFormatName);
-        }
-    }
-
-    connect(mLogModel.get(), &QAbstractItemModel::rowsInserted, this, &MainWindow::onRowsInserted);
-
-    mTreeView->setModel(mLogModel.get());
+    auto model = mController->logModel();
+    connect(model, &QAbstractItemModel::rowsInserted, this, &MainWindow::onRowsInserted);
+    mTreeView->setModel(model);
 
     // Must be done here because the selectionModel is (re)set by setModel()
     connect(mTreeView->selectionModel(),
@@ -177,8 +154,9 @@ void MainWindow::showOpenLogDialog() {
     dialog.setFileMode(QFileDialog::ExistingFile);
     dialog.setNameFilters({tr("Log files (*.log *.log.* *.txt)"), tr("All files (*)")});
     dialog.setWindowTitle(tr("Open log file"));
-    if (!mLogPath.isEmpty()) {
-        QString logDir = QFileInfo(mLogPath).absolutePath();
+    QString logPath = mController->logPath();
+    if (!logPath.isEmpty()) {
+        QString logDir = QFileInfo(logPath).absolutePath();
         dialog.setDirectory(logDir);
     }
     if (!dialog.exec()) {
@@ -193,11 +171,12 @@ void MainWindow::showLogFormatDialog() {
         mLogFormatDialog->activateWindow();
         return;
     }
-    mLogFormatDialog = new LogFormatDialog(mLogFormatStore, mLogModel->logFormat(), this);
+    mLogFormatDialog =
+        new LogFormatDialog(mController->logFormatStore(), mController->logFormat(), this);
     connect(mLogFormatDialog.data(),
             &LogFormatDialog::logFormatChanged,
-            this,
-            &MainWindow::setLogFormat);
+            mController.get(),
+            &MainController::setLogFormat);
     mLogFormatDialog->show();
 }
 
@@ -207,40 +186,16 @@ void MainWindow::copySelectedLines() {
         return;
     }
     QStringList list;
+    auto lineProvider = mController->lineProvider();
     for (const auto& index : selectedRows) {
-        list << mLineProvider->lineAt(index.row());
+        list << lineProvider->lineAt(index.row());
     }
     qApp->clipboard()->setText(list.join("\n"));
 }
 
-void MainWindow::addLogToRecentFiles() {
-    QStringList files = mConfig->recentLogFiles();
-    files.removeOne(mLogPath);
-    files.insert(0, mLogPath);
-    while (files.length() > MAX_RECENT_FILES) {
-        files.takeLast();
-    }
-    mConfig->setRecentLogFiles(files);
-}
-
 void MainWindow::fillRecentFilesMenu() {
     mRecentFilesMenu->clear();
-    for (const auto& filePath : mConfig->recentLogFiles()) {
+    for (const auto& filePath : mController->config()->recentLogFiles()) {
         mRecentFilesMenu->addAction(filePath, this, [this, filePath] { loadLog(filePath); });
-    }
-}
-
-void MainWindow::createLineProvider() {
-    if (mLogPath == "-") {
-        mLineProvider = std::make_unique<StdinLineProvider>();
-    } else {
-        mLineProvider = std::make_unique<FileLineProvider>(mLogPath);
-    }
-}
-
-void MainWindow::setLogFormat(LogFormat* logFormat) {
-    mLogModel->setLogFormat(logFormat);
-    if (!mLogPath.isEmpty() && !logFormat->name().isEmpty()) {
-        mConfig->setLogFormatForFile(mLogPath, logFormat->name());
     }
 }

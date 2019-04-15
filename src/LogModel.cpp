@@ -26,11 +26,9 @@
 
 using std::optional;
 
-LogModel::LogModel(const LineProvider* lineProvider, QObject* parent)
-        : QAbstractTableModel(parent)
-        , mLineProvider(lineProvider)
-        , mEmptyLogFormat(LogFormat::createEmpty()) {
-    setLogFormat(nullptr);
+LogModel::LogModel(const LineProvider* lineProvider, LogFormat* logFormat, QObject* parent)
+        : QAbstractTableModel(parent), mLineProvider(lineProvider) {
+    setLogFormat(logFormat);
     connect(mLineProvider, &LineProvider::lineCountChanged, this, &LogModel::onLineCountChanged);
 }
 
@@ -105,11 +103,8 @@ void LogModel::setLogFormat(LogFormat* logFormat) {
     if (mLogFormat) {
         mLogFormat->disconnect(this);
     }
-    if (logFormat) {
-        mLogFormat = logFormat;
-    } else {
-        mLogFormat = mEmptyLogFormat.get();
-    }
+    Q_ASSERT(logFormat);
+    mLogFormat = logFormat;
     connect(mLogFormat, &LogFormat::changed, this, &LogModel::onLogFormatChanged);
     resetAllState();
     endResetModel();
