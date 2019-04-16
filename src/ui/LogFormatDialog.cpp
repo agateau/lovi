@@ -24,6 +24,7 @@
 #include "LogFormatIO.h"
 #include "LogFormatModel.h"
 #include "LogFormatStore.h"
+#include "WidgetFloater.h"
 #include "ui_LogFormatDialog.h"
 
 #include <QInputDialog>
@@ -79,8 +80,10 @@ void LogFormatDialog::setupSideBar(LogFormat* currentLogFormat) {
 void LogFormatDialog::setupEditor() {
     ui->containerWidget->layout()->setMargin(0);
 
+    // Parser edit
     connect(ui->parserLineEdit, &QLineEdit::editingFinished, this, &LogFormatDialog::applyChanges);
 
+    // Highlight list
     ui->highlightListView->setModel(mHighlightModel.get());
 
     connect(ui->highlightListView->selectionModel(),
@@ -88,17 +91,28 @@ void LogFormatDialog::setupEditor() {
             this,
             &LogFormatDialog::onCurrentHighlightChanged);
 
-    connect(ui->addHighlightButton, &QToolButton::pressed, this, [this] {
-        mHighlightModel->logFormat()->addHighlight();
-    });
-
-    connect(ui->removeHighlightButton, &QToolButton::pressed, this, [this] {
+    // Highlight list context menu
+    auto removeHighlightAction = new QAction(tr("Remove Highlight"));
+    connect(removeHighlightAction, &QAction::triggered, this, [this] {
         auto index = ui->highlightListView->currentIndex();
         if (!index.isValid()) {
             return;
         }
         mHighlightModel->logFormat()->removeHighlightAt(index.row());
     });
+    ui->highlightListView->addAction(removeHighlightAction);
+    ui->highlightListView->setContextMenuPolicy(Qt::ActionsContextMenu);
+
+    // Highlight add button
+    auto addHighlightButton = new QToolButton;
+    addHighlightButton->setIcon(QIcon::fromTheme("list-add"));
+    connect(addHighlightButton, &QToolButton::pressed, this, [this] {
+        mHighlightModel->logFormat()->addHighlight();
+    });
+
+    auto floater = new WidgetFloater(ui->highlightListView);
+    floater->setAlignment(Qt::AlignRight | Qt::AlignBottom);
+    floater->setChildWidget(addHighlightButton);
 
     // Do not close the dialog when the user presses Enter
     ui->buttonBox->button(QDialogButtonBox::Close)->setAutoDefault(false);

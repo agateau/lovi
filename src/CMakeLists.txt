@@ -29,6 +29,7 @@ add_library(lovilib STATIC
     ui/LogFormatDialog.cpp
     ui/LogFormatDialog.ui
     ui/MainWindow.cpp
+    ui/WidgetFloater.cpp
     )
 
 target_include_directories(lovilib PUBLIC
