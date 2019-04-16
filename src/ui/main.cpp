@@ -59,6 +59,8 @@ static QString logFormatsDirPath() {
 
 int main(int argc, char* argv[]) {
     QApplication app(argc, argv);
+    Q_INIT_RESOURCE(lovi);
+    app.setWindowIcon(QIcon(":/icons/appicon.svg"));
 
     unique_ptr<QCommandLineParser> parser = createParser();
     parser->process(app);

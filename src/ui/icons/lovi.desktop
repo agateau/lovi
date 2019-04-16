@@ -1,0 +1,9 @@
+[Desktop Entry]
+Name=Lovi
+GenericName=Log viewer
+Comment=A tool to view and search through log files
+Type=Application
+Exec=lovi
+Icon=lovi
+Terminal=false
+Categories=Qt;Utility;Development;System;TextTools;Monitor;System;
