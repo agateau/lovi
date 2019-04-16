@@ -83,6 +83,8 @@ void MainWindow::setupUi() {
     mTreeView->setContextMenuPolicy(Qt::ActionsContextMenu);
     mTreeView->setSelectionMode(QAbstractItemView::ExtendedSelection);
     mTreeView->addAction(mCopyLinesAction);
+    // Make scrolling fast
+    mTreeView->setUniformRowHeights(true);
     setCentralWidget(mTreeView);
 
     mToolBar->addAction(mOpenLogAction);
