@@ -164,8 +164,12 @@ void LogModel::onLineCountChanged(int newCount, int oldCount) {
 }
 
 void LogModel::resetAllState() {
-    mColumns = mLogFormat->parser().namedCaptureGroups();
-    mColumns.removeFirst();
+    if (mLogFormat->parser().isValid()) {
+        mColumns = mLogFormat->parser().namedCaptureGroups();
+        mColumns.removeFirst();
+    } else {
+        mColumns.clear();
+    }
     mLogLineCache.clear();
 }
 
