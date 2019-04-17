@@ -52,17 +52,16 @@ static OptionalColor initColor(const QString& text) {
 }
 
 static unique_ptr<LogFormat> loadLogFormat(const QJsonDocument& doc) {
+    unique_ptr<LogFormat> logFormat = std::make_unique<LogFormat>();
+
     auto regex = doc.object().value("parser").toObject().value("regex").toString();
     if (regex.isEmpty()) {
         qWarning() << "No regex found";
-        return {};
-    }
-
-    unique_ptr<LogFormat> logFormat = std::make_unique<LogFormat>();
-    logFormat->setParserPattern(regex);
-    if (!logFormat->parser().isValid()) {
-        qWarning() << "Invalid parser regex:" << logFormat->parser().errorString();
-        return {};
+    } else {
+        logFormat->setParserPattern(regex);
+        if (!logFormat->parser().isValid()) {
+            qWarning() << "Invalid parser regex:" << logFormat->parser().errorString();
+        }
     }
 
     for (QJsonValue jsonValue : doc.object().value("highlights").toArray()) {
