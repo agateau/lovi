@@ -20,12 +20,13 @@
 
 #include "Conditions.h"
 
-#include <QDebug>
+#include <QCoreApplication>
 
 static const QChar QUOTE = '"';
 
 using std::optional;
 using std::unique_ptr;
+using std::variant;
 
 namespace ConditionIO {
 
@@ -77,18 +78,18 @@ optional<QStringList> tokenize(const QString& text) {
     return std::move(out);
 }
 
-unique_ptr<Condition> parse(const QString& text, const ColumnHash& columnHash) {
+variant<unique_ptr<Condition>, ParseError> parse(const QString& text,
+                                                 const ColumnHash& columnHash) {
     QStringList tokens;
     {
         optional<QStringList> maybeTokens = ConditionIO::tokenize(text);
         if (!maybeTokens.has_value()) {
-            return {};
+            return QCoreApplication::translate("ConditionIO", "Failed to parse '%1'").arg(text);
         }
         tokens = maybeTokens.value();
     }
     if (tokens.length() != 3) {
-        qWarning() << "Wrong number of tokens in" << text;
-        return {};
+        return QCoreApplication::translate("ConditionIO", "Expected 3 tokens in '%1'").arg(text);
     }
 
     auto columnName = tokens.at(0);
@@ -97,8 +98,7 @@ unique_ptr<Condition> parse(const QString& text, const ColumnHash& columnHash) {
 
     auto it = columnHash.find(columnName);
     if (it == columnHash.end()) {
-        qWarning() << "No column named" << columnName;
-        return {};
+        return QCoreApplication::translate("ConditionIO", "No column named '%1'").arg(columnName);
     }
     int column = *it;
 
@@ -109,13 +109,12 @@ unique_ptr<Condition> parse(const QString& text, const ColumnHash& columnHash) {
     } else if (op == "~") {
         QRegularExpression regex(value);
         if (!regex.isValid()) {
-            qWarning() << value << "is not a valid regex:" << regex.errorString();
-            return nullptr;
+            return QCoreApplication::translate("ConditionIO", "'%1' is not a valid regex: %2")
+                .arg(value, regex.errorString());
         }
         return std::make_unique<RegExCondition>(column, regex);
     } else {
-        qWarning() << "Invalid operator:" << op;
-        return nullptr;
+        return QCoreApplication::translate("ConditionIO", "Invalid operator '%1'").arg(op);
     }
 }
 

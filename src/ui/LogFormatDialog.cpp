@@ -20,6 +20,7 @@
 
 #include "ConditionIO.h"
 #include "HighlightModel.h"
+#include "LineEditChecker.h"
 #include "LogFormat.h"
 #include "LogFormatIO.h"
 #include "LogFormatModel.h"
@@ -82,6 +83,10 @@ void LogFormatDialog::setupEditor() {
 
     // Parser edit
     connect(ui->parserLineEdit, &QLineEdit::editingFinished, this, &LogFormatDialog::applyChanges);
+    new LineEditChecker(ui->parserLineEdit, [](const QString& text) -> QString {
+        QRegularExpression rx(text);
+        return rx.isValid() ? QString() : rx.errorString();
+    });
 
     // Highlight list
     ui->highlightListView->setModel(mHighlightModel.get());

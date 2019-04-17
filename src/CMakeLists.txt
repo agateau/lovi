@@ -28,6 +28,7 @@ add_library(lovilib STATIC
     ui/ColorWidget.cpp
     ui/HighlightWidget.cpp
     ui/HighlightWidget.ui
+    ui/LineEditChecker.cpp
     ui/LogFormatDialog.cpp
     ui/LogFormatDialog.ui
     ui/MainWindow.cpp

@@ -20,6 +20,8 @@
 
 #include "ConditionIO.h"
 
+using std::unique_ptr;
+
 Highlight::Highlight(LogFormat* logFormat) : mLogFormat(logFormat) {
     Q_ASSERT(mLogFormat);
 }
@@ -34,7 +36,11 @@ QString Highlight::conditionDefinition() const {
 }
 
 void Highlight::updateCondition() {
-    mCondition = ConditionIO::parse(mConditionDefinition, mLogFormat->columnHash());
+    using ConditionPtr = unique_ptr<Condition>;
+    auto condition = ConditionIO::parse(mConditionDefinition, mLogFormat->columnHash());
+    mCondition = std::holds_alternative<ConditionPtr>(condition)
+                     ? std::move(std::get<ConditionPtr>(condition))
+                     : nullptr;
     mLogFormat->emitHighlightChanged(this);
 }
 

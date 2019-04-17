@@ -18,6 +18,9 @@
  */
 #include "HighlightWidget.h"
 
+#include "ConditionIO.h"
+#include "LineEditChecker.h"
+#include "LogFormat.h"
 #include "ui_HighlightWidget.h"
 
 HighlightWidget::HighlightWidget(QWidget* parent)
@@ -57,6 +60,16 @@ void HighlightWidget::setupUi() {
 
     connect(ui->conditionLineEdit, &QLineEdit::editingFinished, this, [this] {
         mHighlight->setConditionDefinition(ui->conditionLineEdit->text());
+    });
+    new LineEditChecker(ui->conditionLineEdit, [this](const QString& text) -> QString {
+        if (!mHighlight) {
+            return {};
+        }
+        auto condition = ConditionIO::parse(text, mHighlight->logFormat()->columnHash());
+        if (std::holds_alternative<ConditionIO::ParseError>(condition)) {
+            return std::get<ConditionIO::ParseError>(condition);
+        }
+        return {};
     });
 
     connect(ui->bgColorWidget,

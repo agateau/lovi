@@ -59,6 +59,10 @@ public:
         return mFgColor;
     }
 
+    LogFormat* logFormat() const {
+        return mLogFormat;
+    }
+
 private:
     LogFormat* const mLogFormat;
 

@@ -16,29 +16,25 @@
  * You should have received a copy of the GNU General Public License along with
  * this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-#ifndef CONDITIONIO_H
-#define CONDITIONIO_H
+#ifndef LINEEDITCHECKER_H
+#define LINEEDITCHECKER_H
 
-#include "LogFormat.h"
+#include <QObject>
 
-#include <QHash>
-#include <QString>
-#include <QStringList>
+#include <functional>
 
-#include <memory>
-#include <optional>
-#include <variant>
+class QLineEdit;
 
-class Condition;
+using CheckFunction = std::function<QString(QString)>;
 
-namespace ConditionIO {
+class LineEditChecker : public QObject {
+public:
+    LineEditChecker(QLineEdit* lineEdit, const CheckFunction& validationFunction);
 
-using ParseError = QString;
+private:
+    void onChanged(const QString& text);
+    QLineEdit* const mLineEdit;
+    CheckFunction mCheckFunction;
+};
 
-std::optional<QStringList> tokenize(const QString& text);
-
-std::variant<std::unique_ptr<Condition>, ParseError> parse(const QString& text,
-                                                           const ColumnHash& columnHash);
-} // namespace ConditionIO
-
-#endif // CONDITIONIO_H
+#endif // LINEEDITCHECKER_H
