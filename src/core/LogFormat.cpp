@@ -28,7 +28,7 @@ LogFormat::LogFormat(QObject* parent) : QObject(parent) {
 }
 
 void LogFormat::emitHighlightChanged(Highlight* highlight) {
-    for (std::size_t row = 0; row < mHighlights.size(); ++row) {
+    for (int row = 0; row < mHighlights.size(); ++row) {
         if (mHighlights.at(row).get() == highlight) {
             highlightChanged(row);
             changed();
@@ -76,7 +76,7 @@ ColumnHash LogFormat::columnHash() const {
     return mColumnHash;
 }
 
-const std::vector<unique_ptr<Highlight>>& LogFormat::highlights() const {
+const stdq::Vector<unique_ptr<Highlight>>& LogFormat::highlights() const {
     return mHighlights;
 }
 

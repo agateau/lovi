@@ -19,10 +19,11 @@
 #ifndef LOGFORMATSTORE_H
 #define LOGFORMATSTORE_H
 
+#include "Vector.h"
+
 #include <QObject>
 
 #include <memory>
-#include <vector>
 
 class LogFormat;
 
@@ -53,8 +54,8 @@ private:
     QString pathForName(const QString& name) const;
 
     QString mDirPath;
-    std::vector<QString> mLogFormatNames;
-    mutable std::vector<std::unique_ptr<LogFormat>> mLogFormats;
+    stdq::Vector<QString> mLogFormatNames;
+    mutable stdq::Vector<std::unique_ptr<LogFormat>> mLogFormats;
 };
 
 #endif // LOGFORMATSTORE_H

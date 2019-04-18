@@ -20,12 +20,12 @@
 #define LOGFORMAT_H
 
 #include "Highlight.h"
+#include "Vector.h"
 
 #include <QObject>
 #include <QRegularExpression>
 
 #include <memory>
-#include <vector>
 
 using ColumnHash = QHash<QString, int>;
 
@@ -45,7 +45,7 @@ public:
     const QRegularExpression& parser() const;
     ColumnHash columnHash() const;
 
-    const std::vector<std::unique_ptr<Highlight>>& highlights() const;
+    const stdq::Vector<std::unique_ptr<Highlight>>& highlights() const;
     Highlight* addHighlight();
     Highlight* editableHighlightAt(int row);
     void removeHighlightAt(int row);
@@ -62,7 +62,7 @@ private:
     QString mName;
     QRegularExpression mParser;
     ColumnHash mColumnHash;
-    std::vector<std::unique_ptr<Highlight>> mHighlights;
+    stdq::Vector<std::unique_ptr<Highlight>> mHighlights;
 };
 
 #endif // LOGFORMAT_H

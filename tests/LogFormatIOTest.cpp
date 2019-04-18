@@ -38,7 +38,7 @@ void checkLogFormatEquality(const LogFormat& f1, const LogFormat& f2) {
     REQUIRE(f1.name() == f2.name());
     REQUIRE(f1.parserPattern() == f2.parserPattern());
 
-    for (size_t idx = 0; idx < f1.highlights().size(); ++idx) {
+    for (int idx = 0; idx < f1.highlights().size(); ++idx) {
         REQUIRE(idx < f2.highlights().size());
         const auto& hl1 = f1.highlights().at(idx);
         const auto& hl2 = f2.highlights().at(idx);

@@ -42,7 +42,8 @@ LogFormat* LogFormatStore::byName(const QString& name) const {
         qWarning() << "No log format named" << name;
         return {};
     }
-    return at(it - mLogFormatNames.begin());
+    auto idx = it - mLogFormatNames.begin();
+    return at(int(idx));
 }
 
 QString LogFormatStore::nameAt(int idx) const {
