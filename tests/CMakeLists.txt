@@ -5,6 +5,7 @@ configure_file(
 
 add_executable(tests
     ConditionIOTest.cpp
+    FileLineProviderTest.cpp
     FileWatcherTest.cpp
     LogFormatIOTest.cpp
     LogFormatTest.cpp
