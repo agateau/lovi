@@ -25,7 +25,7 @@ class LineProvider : public QObject {
     Q_OBJECT
 public:
     explicit LineProvider(QObject* parent = nullptr);
-    virtual QString lineAt(int row) const = 0;
+    virtual QStringRef lineAt(int row) const = 0;
     virtual int lineCount() const = 0;
 
 signals:

@@ -64,7 +64,7 @@ public:
     LogFormat* logFormat() const;
 
 private:
-    LogLine processLine(const QString& line) const;
+    LogLine processLine(const QStringRef& line) const;
     void applyHighlights(LogLine* logLine, LogCell* logCell, int column) const;
     void onLineCountChanged(int newCount, int oldCount);
     void resetAllState();

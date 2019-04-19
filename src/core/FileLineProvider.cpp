@@ -44,8 +44,8 @@ FileLineProvider::FileLineProvider(const QString& filePath, QObject* parent)
 FileLineProvider::~FileLineProvider() {
 }
 
-QString FileLineProvider::lineAt(int row) const {
-    return mLines.at(row).toString();
+QStringRef FileLineProvider::lineAt(int row) const {
+    return mLines.at(row);
 }
 
 int FileLineProvider::lineCount() const {

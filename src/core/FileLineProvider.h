@@ -34,7 +34,7 @@ public:
     explicit FileLineProvider(const QString& filePath, QObject* parent = nullptr);
     ~FileLineProvider();
 
-    QString lineAt(int row) const override;
+    QStringRef lineAt(int row) const override;
     int lineCount() const override;
 
 private:

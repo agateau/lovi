@@ -56,8 +56,8 @@ StdinLineProvider::~StdinLineProvider() {
     mThread->wait();
 }
 
-QString StdinLineProvider::lineAt(int row) const {
-    return mLines.at(row);
+QStringRef StdinLineProvider::lineAt(int row) const {
+    return QStringRef(&mLines.at(row));
 }
 
 int StdinLineProvider::lineCount() const {

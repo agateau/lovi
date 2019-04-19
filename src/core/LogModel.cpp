@@ -54,7 +54,7 @@ QVariant LogModel::data(const QModelIndex& index, int role) const {
     auto it = mLogLineCache.find(row);
     LogLine logLine;
     if (it == mLogLineCache.end()) {
-        const QString& line = mLineProvider->lineAt(row);
+        const QStringRef& line = mLineProvider->lineAt(row);
         logLine = processLine(line);
         mLogLineCache[row] = logLine;
         if (!logLine.isValid()) {
@@ -64,7 +64,7 @@ QVariant LogModel::data(const QModelIndex& index, int role) const {
         logLine = it.value();
     }
     if (!logLine.isValid()) {
-        const QString& line = mLineProvider->lineAt(row);
+        QString line = mLineProvider->lineAt(row).toString();
         return role == Qt::DisplayRole && index.column() == mColumns.count() - 1 ? QVariant(line)
                                                                                  : QVariant();
     }
@@ -114,7 +114,7 @@ LogFormat* LogModel::logFormat() const {
     return mLogFormat;
 }
 
-LogLine LogModel::processLine(const QString& line) const {
+LogLine LogModel::processLine(const QStringRef& line) const {
     auto match = mLogFormat->parser().match(line);
     if (!match.hasMatch()) {
         return {};
