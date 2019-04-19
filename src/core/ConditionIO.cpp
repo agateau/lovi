@@ -34,14 +34,14 @@ optional<QStringList> tokenize(const QString& text) {
     QStringList out;
     bool quoted = false;
     QString token;
+    auto nextCharIsQuote = [&text](int idx) {
+        return idx < text.length() - 1 && text.at(idx + 1) == QUOTE;
+    };
     for (int idx = 0; idx < text.length(); ++idx) {
         const QChar ch = text.at(idx);
-        auto nextCharIsQuote = [&text, idx] {
-            return idx < text.length() - 1 && text.at(idx + 1) == QUOTE;
-        };
         if (quoted) {
             if (ch == QUOTE) {
-                if (nextCharIsQuote()) {
+                if (nextCharIsQuote(idx)) {
                     token.append(QUOTE);
                     ++idx;
                 } else {
@@ -52,7 +52,7 @@ optional<QStringList> tokenize(const QString& text) {
             }
         } else {
             if (ch == QUOTE) {
-                if (nextCharIsQuote()) {
+                if (nextCharIsQuote(idx)) {
                     token.append(QUOTE);
                     ++idx;
                 } else {
