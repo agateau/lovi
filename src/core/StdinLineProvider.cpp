@@ -56,7 +56,7 @@ StdinLineProvider::~StdinLineProvider() {
     mThread->wait();
 }
 
-const QString& StdinLineProvider::lineAt(int row) const {
+QString StdinLineProvider::lineAt(int row) const {
     return mLines.at(row);
 }
 

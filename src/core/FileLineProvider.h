@@ -20,6 +20,7 @@
 #define FILELINEPROVIDER_H
 
 #include "LineProvider.h"
+#include "Vector.h"
 
 #include <memory>
 
@@ -33,7 +34,7 @@ public:
     explicit FileLineProvider(const QString& filePath, QObject* parent = nullptr);
     ~FileLineProvider();
 
-    const QString& lineAt(int row) const override;
+    QString lineAt(int row) const override;
     int lineCount() const override;
 
 private:
@@ -45,7 +46,9 @@ private:
     const QString mFilePath;
     const std::unique_ptr<FileWatcher> mWatcher;
     const std::unique_ptr<QFile> mFile;
-    QStringList mLines;
+    QString mContent;
+    stdq::Vector<QStringRef> mLines;
+    int mNextStart = 0;
     qint64 mFileSize = 0;
 };
 

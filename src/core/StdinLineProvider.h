@@ -39,7 +39,7 @@ public:
     StdinLineProvider(QObject* parent = nullptr);
     ~StdinLineProvider();
 
-    const QString& lineAt(int row) const override;
+    QString lineAt(int row) const override;
     int lineCount() const override;
 
 private:

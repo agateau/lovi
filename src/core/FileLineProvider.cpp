@@ -44,12 +44,12 @@ FileLineProvider::FileLineProvider(const QString& filePath, QObject* parent)
 FileLineProvider::~FileLineProvider() {
 }
 
-const QString& FileLineProvider::lineAt(int row) const {
-    return mLines.at(row);
+QString FileLineProvider::lineAt(int row) const {
+    return mLines.at(row).toString();
 }
 
 int FileLineProvider::lineCount() const {
-    return mLines.length();
+    return mLines.size();
 }
 
 void FileLineProvider::readFile() {
@@ -62,12 +62,19 @@ void FileLineProvider::readFile() {
     }
 
     mFileSize = fileSize;
-    QString data = QString::fromUtf8(mFile->readAll());
-    mLines.append(data.split('\n'));
-    if (mLines.last().isEmpty()) {
-        mLines.removeLast();
+    mContent.append(QString::fromUtf8(mFile->readAll()));
+    for (int idx = mNextStart, len = mContent.length(); idx < len; ++idx) {
+        if (mContent.at(idx) == '\n') {
+            QStringRef ref(&mContent, mNextStart, idx - mNextStart);
+            mLines.push_back(ref);
+            mNextStart = idx + 1;
+        }
     }
-    lineCountChanged(lineCount(), oldLineCount);
+
+    int newLineCount = lineCount();
+    if (newLineCount > oldLineCount) {
+        lineCountChanged(newLineCount, oldLineCount);
+    }
 }
 
 void FileLineProvider::reset() {
@@ -75,7 +82,9 @@ void FileLineProvider::reset() {
         mFile->seek(0);
     }
     mFileSize = 0;
+    mNextStart = 0;
     mLines.clear();
+    mContent.clear();
 }
 
 void FileLineProvider::onFileCreated() {

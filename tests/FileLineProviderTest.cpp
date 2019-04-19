@@ -36,6 +36,12 @@ static void appendLines(const QString& path, const QStringList& lines) {
     }
 }
 
+static void appendString(const QString& path, const QString& str) {
+    QFile file(path);
+    REQUIRE(file.open(QIODevice::Append));
+    file.write(str.toUtf8());
+}
+
 static void microWait() {
     QTest::qWait(1);
 }
@@ -51,7 +57,7 @@ TEST_CASE("FileLineProvider") {
     QString path = tempDir.filePath("test.txt");
 
     SECTION("existingFile") {
-        QStringList lines = {"line1", "line2"};
+        QStringList lines = {"liné1", "linè2"};
         appendLines(path, lines);
 
         FileLineProvider provider(path);
@@ -71,6 +77,31 @@ TEST_CASE("FileLineProvider") {
             REQUIRE(provider.lineCount() == 3);
             REQUIRE(provider.lineAt(2) == newLines.at(0));
             checkSignal(&spy, {3, 2});
+        }
+
+        SECTION("appendTruncatedLine") {
+            // GIVEN a file provider monitoring a file
+
+            // WHEN I write a string which does not end with \n to the file
+            QString part1 = "foo";
+            appendString(path, part1);
+
+            // THEN the file provider does not report a new line
+            microWait();
+            REQUIRE(provider.lineCount() == 2);
+            REQUIRE(spy.count() == 0);
+
+            SECTION("finishLine") {
+                // GIVEN a file provider with a truncated line
+                // WHEN I finish the line
+                QString part2 = "bar";
+                appendString(path, part2 + "\n");
+                // THEN  the file provider reports a new line
+                microWait();
+                REQUIRE(provider.lineCount() == 3);
+                REQUIRE(provider.lineAt(2) == part1 + part2);
+                checkSignal(&spy, {3, 2});
+            }
         }
     }
 }
