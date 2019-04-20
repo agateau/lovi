@@ -51,9 +51,12 @@ void MainController::loadLog(const QString& filePath) {
             format = mLogFormatStore->byName(name);
         }
     }
+    if (format) {
+        mLogFormat = format;
+    }
 
     createLineProvider();
-    mLogModel = std::make_unique<LogModel>(mLineProvider.get(), format ? format : mLogFormat);
+    mLogModel = std::make_unique<LogModel>(mLineProvider.get(), mLogFormat);
     updateLogFormatForFile();
 }
 
