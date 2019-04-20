@@ -46,41 +46,27 @@ LogFormatDialog::LogFormatDialog(LogFormatStore* store,
     ui->setupUi(this);
     setupSideBar(currentLogFormat);
     setupEditor();
-    onCurrentChanged(ui->listView->currentIndex());
+    onCurrentChanged(ui->logFormatComboBox->currentIndex());
 }
 
 LogFormatDialog::~LogFormatDialog() {
 }
 
 void LogFormatDialog::setupSideBar(LogFormat* currentLogFormat) {
-    ui->listView->setModel(mModel.get());
+    ui->logFormatComboBox->setModel(mModel.get());
 
     if (!currentLogFormat->name().isEmpty()) {
-        for (int row = 0; row < ui->listView->model()->rowCount(); ++row) {
-            auto index = ui->listView->model()->index(row, 0);
-            if (index.data().toString() == currentLogFormat->name()) {
-                ui->listView->setCurrentIndex(index);
-                break;
-            }
-        }
+        selectLogFormat(currentLogFormat->name());
     }
 
-    connect(ui->listView->selectionModel(),
-            &QItemSelectionModel::currentChanged,
+    connect(ui->logFormatComboBox,
+            qOverload<int>(&QComboBox::currentIndexChanged),
             this,
             &LogFormatDialog::onCurrentChanged);
-    connect(
-        ui->listView, &QAbstractItemView::doubleClicked, this, [this](const QModelIndex& index) {
-            if (index.isValid()) {
-                accept();
-            }
-        });
     connect(ui->addFormatButton, &QToolButton::clicked, this, &LogFormatDialog::onAddFormatClicked);
 }
 
 void LogFormatDialog::setupEditor() {
-    ui->containerWidget->layout()->setMargin(0);
-
     // Parser edit
     connect(ui->parserLineEdit, &QLineEdit::editingFinished, this, &LogFormatDialog::applyChanges);
     new LineEditChecker(ui->parserLineEdit, [](const QString& text) -> QString {
@@ -118,20 +104,10 @@ void LogFormatDialog::setupEditor() {
     auto floater = new WidgetFloater(ui->highlightListView);
     floater->setAlignment(Qt::AlignRight | Qt::AlignBottom);
     floater->setChildWidget(addHighlightButton);
-
-    // Do not close the dialog when the user presses Enter
-    ui->buttonBox->button(QDialogButtonBox::Close)->setAutoDefault(false);
 }
 
-QString LogFormatDialog::logFormatName() const {
-    auto index = ui->listView->currentIndex();
-    if (!index.isValid()) {
-        return {};
-    }
-    return index.data().toString();
-}
-
-void LogFormatDialog::onCurrentChanged(const QModelIndex& index) {
+void LogFormatDialog::onCurrentChanged(int row) {
+    QModelIndex index = mModel->index(row);
     if (!index.isValid()) {
         return;
     }
@@ -154,7 +130,8 @@ void LogFormatDialog::onCurrentHighlightChanged(const QModelIndex& index) {
 }
 
 void LogFormatDialog::applyChanges() {
-    auto index = ui->listView->currentIndex();
+    int row = ui->logFormatComboBox->currentIndex();
+    QModelIndex index = mModel->index(row, 0);
     if (!index.isValid()) {
         return;
     }
@@ -169,13 +146,23 @@ void LogFormatDialog::onAddFormatClicked() {
         return;
     }
     auto error = mLogFormatStore->addLogFormat(name);
-    if (!error.has_value()) {
+    if (error.has_value()) {
+        QString message = error.value();
+        QMessageBox box(this);
+        box.setIcon(QMessageBox::Warning);
+        box.setText(tr("Could not add format."));
+        box.setInformativeText(message);
+        box.exec();
         return;
     }
-    QString message = error.value();
-    QMessageBox box(this);
-    box.setIcon(QMessageBox::Warning);
-    box.setText(tr("Could not add format."));
-    box.setInformativeText(message);
-    box.exec();
+    selectLogFormat(name);
+}
+
+void LogFormatDialog::selectLogFormat(const QString& name) {
+    for (int row = 0; row < ui->logFormatComboBox->count(); ++row) {
+        if (ui->logFormatComboBox->itemText(row) == name) {
+            ui->logFormatComboBox->setCurrentIndex(row);
+            return;
+        }
+    }
 }

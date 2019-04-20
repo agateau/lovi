@@ -40,8 +40,6 @@ public:
                              QWidget* parent = nullptr);
     ~LogFormatDialog();
 
-    QString logFormatName() const;
-
 signals:
     void logFormatChanged(LogFormat* logFormat);
 
@@ -49,10 +47,11 @@ private:
     void setupSideBar(LogFormat* currentLogFormat);
     void setupEditor();
 
-    void onCurrentChanged(const QModelIndex& index);
+    void onCurrentChanged(int row);
     void onCurrentHighlightChanged(const QModelIndex& index);
     void applyChanges();
     void onAddFormatClicked();
+    void selectLogFormat(const QString& name);
 
     const std::unique_ptr<Ui::LogFormatDialog> ui;
     const std::unique_ptr<LogFormatModel> mModel;
