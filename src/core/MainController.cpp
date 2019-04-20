@@ -43,7 +43,7 @@ MainController::~MainController() {
 void MainController::loadLog(const QString& filePath) {
     mLogPath = filePath;
 
-    LogFormat* format = nullptr;
+    LogFormat* format = mLogFormat;
     if (!isStdin()) {
         addLogToRecentFiles();
         QString name = mConfig->logFormatForFile().value(filePath);
@@ -51,13 +51,14 @@ void MainController::loadLog(const QString& filePath) {
             format = mLogFormatStore->byName(name);
         }
     }
-    if (format) {
-        mLogFormat = format;
-    }
 
     createLineProvider();
-    mLogModel = std::make_unique<LogModel>(mLineProvider.get(), mLogFormat);
-    updateLogFormatForFile();
+    mLogModel = std::make_unique<LogModel>(mLineProvider.get(), format);
+    if (mLogFormat == format) {
+        updateLogFormatForFile();
+    } else {
+        setLogFormat(format);
+    }
 }
 
 Config* MainController::config() const {
@@ -85,11 +86,15 @@ bool MainController::isStdin() const {
 }
 
 void MainController::setLogFormat(LogFormat* format) {
+    if (mLogFormat == format) {
+        return;
+    }
     mLogFormat = format;
     if (mLogModel) {
-        mLogModel->setLogFormat(mLogFormat);
         updateLogFormatForFile();
+        mLogModel->setLogFormat(format);
     }
+    logFormatChanged(mLogFormat);
 }
 
 LogFormat* MainController::logFormat() const {

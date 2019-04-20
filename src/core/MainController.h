@@ -52,6 +52,9 @@ public:
     void setLogFormat(LogFormat* logFormat);
     LogFormat* logFormat() const;
 
+signals:
+    void logFormatChanged(LogFormat* logFormat);
+
 private:
     void updateLogFormatForFile();
     void createLineProvider();

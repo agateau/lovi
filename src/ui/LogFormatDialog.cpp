@@ -52,12 +52,14 @@ LogFormatDialog::LogFormatDialog(LogFormatStore* store,
 LogFormatDialog::~LogFormatDialog() {
 }
 
+void LogFormatDialog::setLogFormat(LogFormat* logFormat) {
+    Q_ASSERT(logFormat);
+    selectLogFormat(logFormat->name());
+}
+
 void LogFormatDialog::setupSideBar(LogFormat* currentLogFormat) {
     ui->logFormatComboBox->setModel(mModel.get());
-
-    if (!currentLogFormat->name().isEmpty()) {
-        selectLogFormat(currentLogFormat->name());
-    }
+    selectLogFormat(currentLogFormat->name());
 
     connect(ui->logFormatComboBox,
             qOverload<int>(&QComboBox::currentIndexChanged),

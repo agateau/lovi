@@ -169,6 +169,7 @@ void MainWindow::showOpenLogDialog() {
 
 void MainWindow::showLogFormatDialog() {
     if (mLogFormatDialog) {
+        mLogFormatDialog->setLogFormat(mController->logFormat());
         mLogFormatDialog->show();
         mLogFormatDialog->activateWindow();
         return;
@@ -179,6 +180,10 @@ void MainWindow::showLogFormatDialog() {
             &LogFormatDialog::logFormatChanged,
             mController.get(),
             &MainController::setLogFormat);
+    connect(mController.get(),
+            &MainController::logFormatChanged,
+            mLogFormatDialog.data(),
+            &LogFormatDialog::setLogFormat);
     mLogFormatDialog->show();
 }
 

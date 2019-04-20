@@ -40,6 +40,8 @@ public:
                              QWidget* parent = nullptr);
     ~LogFormatDialog();
 
+    void setLogFormat(LogFormat* logFormat);
+
 signals:
     void logFormatChanged(LogFormat* logFormat);
 
