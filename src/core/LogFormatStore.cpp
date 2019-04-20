@@ -74,6 +74,10 @@ optional<QString> LogFormatStore::addLogFormat(const QString& name) {
         return tr("There is already a log format named '%1'.").arg(name);
     }
 
+    if (!QDir(mDirPath).mkpath(".")) {
+        return tr("Could not create directory '%1' to store log format.").arg(mDirPath);
+    }
+
     // Store an empty file, to ensure it can be created
     unique_ptr<LogFormat> logFormat = LogFormat::createEmpty();
     QString path = pathForName(name);

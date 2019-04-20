@@ -8,6 +8,7 @@ add_executable(tests
     FileLineProviderTest.cpp
     FileWatcherTest.cpp
     LogFormatIOTest.cpp
+    LogFormatStoreTest.cpp
     LogFormatTest.cpp
     tests.cpp
     TestUtils.cpp
