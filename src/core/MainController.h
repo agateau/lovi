@@ -66,11 +66,13 @@ private:
     Config* const mConfig;
     LogFormatStore* const mLogFormatStore;
 
+    const std::unique_ptr<LogFormat> mEmptyLogFormat;
+
+    // Mutable state
     std::unique_ptr<LineProvider> mLineProvider;
     std::unique_ptr<LogModel> mLogModel;
 
     QString mLogPath;
-    const std::unique_ptr<LogFormat> mEmptyLogFormat;
     LogFormat* mLogFormat = nullptr; // Never null
     int mCurrentRow = -1;
 };
