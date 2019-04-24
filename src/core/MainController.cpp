@@ -23,6 +23,7 @@
 #include "LogFormat.h"
 #include "LogFormatStore.h"
 #include "LogModel.h"
+#include "Searcher.h"
 #include "StdinLineProvider.h"
 
 #include <QDebug>
@@ -33,8 +34,10 @@ MainController::MainController(Config* config, LogFormatStore* store, QObject* p
         : QObject(parent)
         , mConfig(config)
         , mLogFormatStore(store)
-        , mEmptyLogFormat(LogFormat::createEmpty()) {
+        , mEmptyLogFormat(LogFormat::createEmpty())
+        , mSearcher(std::make_unique<Searcher>()) {
     mLogFormat = mEmptyLogFormat.get();
+    connect(mSearcher.get(), &Searcher::finished, this, &MainController::onSearchFinished);
 }
 
 MainController::~MainController() {
@@ -67,6 +70,10 @@ Config* MainController::config() const {
 
 LogFormatStore* MainController::logFormatStore() const {
     return mLogFormatStore;
+}
+
+Searcher* MainController::searcher() const {
+    return mSearcher.get();
 }
 
 LineProvider* MainController::lineProvider() const {
@@ -102,11 +109,19 @@ LogFormat* MainController::logFormat() const {
 }
 
 void MainController::setCurrentRow(int row) {
+    if (mCurrentRow == row) {
+        return;
+    }
     mCurrentRow = row;
+    currentRowChanged(mCurrentRow);
 }
 
 int MainController::currentRow() const {
     return mCurrentRow;
+}
+
+void MainController::startSearch(std::unique_ptr<Condition> condition, SearchDirection direction) {
+    mSearcher->start(mLogModel.get(), std::move(condition), direction, mCurrentRow + 1);
 }
 
 void MainController::updateLogFormatForFile() {
@@ -131,4 +146,12 @@ void MainController::addLogToRecentFiles() {
         files.takeLast();
     }
     mConfig->setRecentLogFiles(files);
+}
+
+void MainController::onSearchFinished(const SearchResponse& response) {
+    if (response.result == SearchResponse::NoHit) {
+        return;
+    }
+    Q_ASSERT(response.row >= 0);
+    setCurrentRow(response.row);
 }

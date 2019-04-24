@@ -23,11 +23,15 @@
 
 #include <memory>
 
+enum class SearchDirection;
+class Condition;
 class Config;
 class LineProvider;
 class LogFormat;
 class LogFormatStore;
 class LogModel;
+class Searcher;
+class SearchResponse;
 
 class MainController : public QObject {
     Q_OBJECT
@@ -40,6 +44,8 @@ public:
     Config* config() const;
 
     LogFormatStore* logFormatStore() const;
+
+    Searcher* searcher() const;
 
     LineProvider* lineProvider() const;
 
@@ -55,18 +61,23 @@ public:
     void setCurrentRow(int row);
     int currentRow() const;
 
+    void startSearch(std::unique_ptr<Condition> condition, SearchDirection direction);
+
 signals:
     void logFormatChanged(LogFormat* logFormat);
+    void currentRowChanged(int row);
 
 private:
     void updateLogFormatForFile();
     void createLineProvider();
     void addLogToRecentFiles();
+    void onSearchFinished(const SearchResponse& response);
 
     Config* const mConfig;
     LogFormatStore* const mLogFormatStore;
 
     const std::unique_ptr<LogFormat> mEmptyLogFormat;
+    const std::unique_ptr<Searcher> mSearcher;
 
     // Mutable state
     std::unique_ptr<LineProvider> mLineProvider;

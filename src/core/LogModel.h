@@ -25,6 +25,7 @@
 
 #include <memory>
 
+class Condition;
 class LogFormat;
 class LineProvider;
 
@@ -63,8 +64,11 @@ public:
 
     LogFormat* logFormat() const;
 
+    bool lineMatches(int row, Condition* condition) const;
+
 private:
     LogLine processLine(const QStringRef& line) const;
+    const LogLine& lineAt(int row) const;
     void applyHighlights(LogLine* logLine, LogCell* logCell, int column) const;
     void onLineCountChanged(int newCount, int oldCount);
     void resetAllState();

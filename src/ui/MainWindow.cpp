@@ -25,6 +25,7 @@
 #include "LogFormatStore.h"
 #include "LogModel.h"
 #include "MainController.h"
+#include "SearchBar.h"
 
 #include <QAction>
 #include <QApplication>
@@ -36,6 +37,7 @@
 #include <QTimer>
 #include <QToolBar>
 #include <QTreeView>
+#include <QVBoxLayout>
 
 MainWindow::MainWindow(Config* config, LogFormatStore* store, QWidget* parent)
         : QMainWindow(parent)
@@ -46,7 +48,8 @@ MainWindow::MainWindow(Config* config, LogFormatStore* store, QWidget* parent)
         , mCopyLinesAction(new QAction(this))
         , mRecentFilesMenu(new QMenu(this))
         , mToolBar(addToolBar(tr("Toolbar")))
-        , mTreeView(new QTreeView(this)) {
+        , mTreeView(new QTreeView(this))
+        , mSearchBar(new SearchBar(this)) {
     setupActions();
     setupUi();
 }
@@ -79,13 +82,31 @@ void MainWindow::loadLog(const QString& filePath) {
 void MainWindow::setupUi() {
     setWindowTitle("Lovi");
 
+    connect(mController.get(), &MainController::currentRowChanged, this, [this](int row) {
+        if (row < 0) {
+            return;
+        }
+        auto index = mTreeView->model()->index(row, 0);
+        Q_ASSERT(index.isValid());
+        mTreeView->setCurrentIndex(index);
+    });
+
     mTreeView->setRootIsDecorated(false);
     mTreeView->setContextMenuPolicy(Qt::ActionsContextMenu);
     mTreeView->setSelectionMode(QAbstractItemView::ExtendedSelection);
     mTreeView->addAction(mCopyLinesAction);
     // Make scrolling fast
     mTreeView->setUniformRowHeights(true);
-    setCentralWidget(mTreeView);
+
+    mSearchBar->init(mController.get());
+
+    auto* container = new QWidget;
+    auto* layout = new QVBoxLayout(container);
+    layout->setMargin(0);
+    layout->setSpacing(0);
+    layout->addWidget(mTreeView);
+    layout->addWidget(mSearchBar);
+    setCentralWidget(container);
 
     mToolBar->addAction(mOpenLogAction);
     mToolBar->addAction(mSelectLogFormatAction);

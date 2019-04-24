@@ -23,6 +23,7 @@ add_library(lovilib STATIC
     core/LogFormatStore.cpp
     core/LogModel.cpp
     core/MainController.cpp
+    core/Searcher.cpp
     core/StdinLineProvider.cpp
     # ui
     ui/ColorWidget.cpp
@@ -34,6 +35,7 @@ add_library(lovilib STATIC
     ui/LogFormatDialog.ui
     ui/MainWindow.cpp
     ui/WidgetFloater.cpp
+    ui/SearchBar.cpp
     ${lovi_resources}
     )
 

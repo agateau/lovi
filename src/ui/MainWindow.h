@@ -30,6 +30,7 @@ class LogFormatDialog;
 class LogFormatStore;
 class LogFormat;
 class MainController;
+class SearchBar;
 
 class QTreeView;
 
@@ -63,6 +64,7 @@ private:
     QMenu* const mRecentFilesMenu;
     QToolBar* const mToolBar;
     QTreeView* const mTreeView;
+    SearchBar* const mSearchBar;
     QPointer<LogFormatDialog> mLogFormatDialog;
 };
 

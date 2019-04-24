@@ -51,18 +51,7 @@ QVariant LogModel::data(const QModelIndex& index, int role) const {
     if (row < 0 || row >= mLineProvider->lineCount()) {
         return {};
     }
-    auto it = mLogLineCache.find(row);
-    LogLine logLine;
-    if (it == mLogLineCache.end()) {
-        const QStringRef& line = mLineProvider->lineAt(row);
-        logLine = processLine(line);
-        mLogLineCache[row] = logLine;
-        if (!logLine.isValid()) {
-            qWarning() << "Line" << row + 1 << "does not match:" << line;
-        }
-    } else {
-        logLine = it.value();
-    }
+    LogLine logLine = lineAt(row);
     if (!logLine.isValid()) {
         QString line = mLineProvider->lineAt(row).toString();
         return role == Qt::DisplayRole && index.column() == mColumns.count() - 1 ? QVariant(line)
@@ -114,6 +103,16 @@ LogFormat* LogModel::logFormat() const {
     return mLogFormat;
 }
 
+bool LogModel::lineMatches(int row, Condition* condition) const {
+    const LogLine& line = lineAt(row);
+    int column = condition->column();
+    if (line.cells.count() <= column) {
+        return false;
+    }
+    const QString& text = line.cells.at(column).text;
+    return condition->eval(text);
+}
+
 LogLine LogModel::processLine(const QStringRef& line) const {
     auto match = mLogFormat->parser().match(line);
     if (!match.hasMatch()) {
@@ -129,6 +128,16 @@ LogLine LogModel::processLine(const QStringRef& line) const {
         applyHighlights(&logLine, &cell, column);
     }
     return logLine;
+}
+
+const LogLine& LogModel::lineAt(int row) const {
+    auto it = mLogLineCache.find(row);
+    if (it == mLogLineCache.end()) {
+        const QStringRef& line = mLineProvider->lineAt(row);
+        LogLine logLine = processLine(line);
+        it = mLogLineCache.insert(row, logLine);
+    }
+    return it.value();
 }
 
 static QColor getColor(const OptionalColor& color, const QString& text) {
