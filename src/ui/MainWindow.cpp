@@ -146,9 +146,13 @@ void MainWindow::onRowsInserted() {
 }
 
 void MainWindow::onSelectionChanged() {
-    int lineCount = mTreeView->selectionModel()->selectedRows().count();
+    auto selectionModel = mTreeView->selectionModel();
+    int lineCount = selectionModel->selectedRows().count();
     mCopyLinesAction->setEnabled(lineCount > 0);
     mCopyLinesAction->setText(tr("Copy %n line(s)", "", lineCount));
+
+    auto index = selectionModel->currentIndex();
+    mController->setCurrentRow(index.isValid() ? index.row() : -1);
 }
 
 void MainWindow::showOpenLogDialog() {

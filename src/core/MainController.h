@@ -52,6 +52,9 @@ public:
     void setLogFormat(LogFormat* logFormat);
     LogFormat* logFormat() const;
 
+    void setCurrentRow(int row);
+    int currentRow() const;
+
 signals:
     void logFormatChanged(LogFormat* logFormat);
 
@@ -69,6 +72,7 @@ private:
     QString mLogPath;
     const std::unique_ptr<LogFormat> mEmptyLogFormat;
     LogFormat* mLogFormat = nullptr; // Never null
+    int mCurrentRow = -1;
 };
 
 #endif // MAINCONTROLLER_H

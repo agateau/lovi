@@ -101,6 +101,14 @@ LogFormat* MainController::logFormat() const {
     return mLogFormat;
 }
 
+void MainController::setCurrentRow(int row) {
+    mCurrentRow = row;
+}
+
+int MainController::currentRow() const {
+    return mCurrentRow;
+}
+
 void MainController::updateLogFormatForFile() {
     if (!mLogPath.isEmpty() && !isStdin() && !mLogFormat->name().isEmpty()) {
         mConfig->setLogFormatForFile(mLogPath, mLogFormat->name());
