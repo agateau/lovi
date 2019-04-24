@@ -16,35 +16,25 @@
  * You should have received a copy of the GNU General Public License along with
  * this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-#ifndef HIGHLIGHTWIDGET_H
-#define HIGHLIGHTWIDGET_H
+#ifndef CONDITIONLINEEDITCHECKER_H
+#define CONDITIONLINEEDITCHECKER_H
 
-#include "Highlight.h"
+#include "LineEditChecker.h"
 
-#include <QWidget>
+class LogFormat;
 
-#include <memory>
-
-namespace Ui {
-class HighlightWidget;
-}
-
-class ConditionLineEditChecker;
-
-class HighlightWidget : public QWidget {
-    Q_OBJECT
+/**
+ * A LineEditChecker to check text is a valid Lovi condition definition
+ */
+class ConditionLineEditChecker : public LineEditChecker {
 public:
-    explicit HighlightWidget(QWidget* parent = nullptr);
-    ~HighlightWidget();
+    explicit ConditionLineEditChecker(QLineEdit* lineEdit);
 
-    void setHighlight(Highlight* highlight);
-    Highlight* highlight() const;
+    void setLogFormat(LogFormat* logFormat);
 
 private:
-    void setupUi();
-    const std::unique_ptr<Ui::HighlightWidget> ui;
-    const std::unique_ptr<ConditionLineEditChecker> mLineEditChecker;
-    Highlight* mHighlight = nullptr;
+    QString check(const QString& text) const;
+    LogFormat* mLogFormat = nullptr;
 };
 
-#endif // HIGHLIGHTWIDGET_H
+#endif // CONDITIONLINEEDITCHECKER_H

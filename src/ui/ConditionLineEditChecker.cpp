@@ -16,35 +16,26 @@
  * You should have received a copy of the GNU General Public License along with
  * this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-#ifndef HIGHLIGHTWIDGET_H
-#define HIGHLIGHTWIDGET_H
+#include "ConditionLineEditChecker.h"
 
-#include "Highlight.h"
+#include "ConditionIO.h"
 
-#include <QWidget>
-
-#include <memory>
-
-namespace Ui {
-class HighlightWidget;
+ConditionLineEditChecker::ConditionLineEditChecker(QLineEdit* lineEdit)
+        : LineEditChecker(lineEdit,
+                          [this](const QString& text) -> QString { return check(text); }) {
 }
 
-class ConditionLineEditChecker;
+void ConditionLineEditChecker::setLogFormat(LogFormat* logFormat) {
+    mLogFormat = logFormat;
+}
 
-class HighlightWidget : public QWidget {
-    Q_OBJECT
-public:
-    explicit HighlightWidget(QWidget* parent = nullptr);
-    ~HighlightWidget();
-
-    void setHighlight(Highlight* highlight);
-    Highlight* highlight() const;
-
-private:
-    void setupUi();
-    const std::unique_ptr<Ui::HighlightWidget> ui;
-    const std::unique_ptr<ConditionLineEditChecker> mLineEditChecker;
-    Highlight* mHighlight = nullptr;
-};
-
-#endif // HIGHLIGHTWIDGET_H
+QString ConditionLineEditChecker::check(const QString& text) const {
+    if (!mLogFormat) {
+        return {};
+    }
+    auto condition = ConditionIO::parse(text, mLogFormat->columnHash());
+    if (std::holds_alternative<ConditionIO::ParseError>(condition)) {
+        return std::get<ConditionIO::ParseError>(condition);
+    }
+    return {};
+}

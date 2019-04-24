@@ -18,15 +18,25 @@
  */
 #include "HighlightWidget.h"
 
-#include "ConditionIO.h"
-#include "LineEditChecker.h"
+#include "ConditionLineEditChecker.h"
 #include "LogFormat.h"
 #include "ui_HighlightWidget.h"
 
+using std::unique_ptr;
+
+// Helper function to init `ui` and create all its widgets so that mLineEditChecker can be called
+// with a valid QLineEdit instance
+static unique_ptr<Ui::HighlightWidget> initUi(QWidget* parent) {
+    auto ui = std::make_unique<Ui::HighlightWidget>();
+    ui->setupUi(parent);
+    return ui;
+}
+
 HighlightWidget::HighlightWidget(QWidget* parent)
-        : QWidget(parent), ui(std::make_unique<Ui::HighlightWidget>()) {
+        : QWidget(parent)
+        , ui(initUi(this))
+        , mLineEditChecker(std::make_unique<ConditionLineEditChecker>(ui->conditionLineEdit)) {
     setSizePolicy(QSizePolicy::Minimum, QSizePolicy::Fixed);
-    ui->setupUi(this);
     setupUi();
 }
 
@@ -44,6 +54,7 @@ void HighlightWidget::setHighlight(Highlight* highlight) {
     }
     setEnabled(true);
 
+    mLineEditChecker->setLogFormat(highlight->logFormat());
     ui->conditionLineEdit->setText(highlight->conditionDefinition());
     ui->bgColorWidget->setColor(highlight->bgColor());
     ui->fgColorWidget->setColor(highlight->fgColor());
@@ -60,16 +71,6 @@ void HighlightWidget::setupUi() {
 
     connect(ui->conditionLineEdit, &QLineEdit::editingFinished, this, [this] {
         mHighlight->setConditionDefinition(ui->conditionLineEdit->text());
-    });
-    new LineEditChecker(ui->conditionLineEdit, [this](const QString& text) -> QString {
-        if (!mHighlight) {
-            return {};
-        }
-        auto condition = ConditionIO::parse(text, mHighlight->logFormat()->columnHash());
-        if (std::holds_alternative<ConditionIO::ParseError>(condition)) {
-            return std::get<ConditionIO::ParseError>(condition);
-        }
-        return {};
     });
 
     connect(ui->bgColorWidget,

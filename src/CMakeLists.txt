@@ -26,6 +26,7 @@ add_library(lovilib STATIC
     core/StdinLineProvider.cpp
     # ui
     ui/ColorWidget.cpp
+    ui/ConditionLineEditChecker.cpp
     ui/HighlightWidget.cpp
     ui/HighlightWidget.ui
     ui/LineEditChecker.cpp
