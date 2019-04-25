@@ -10,6 +10,7 @@ add_executable(tests
     LogFormatIOTest.cpp
     LogFormatStoreTest.cpp
     LogFormatTest.cpp
+    SearcherTest.cpp
     tests.cpp
     TestUtils.cpp
 )
