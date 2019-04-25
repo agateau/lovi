@@ -26,6 +26,7 @@
 #include "LogModel.h"
 #include "MainController.h"
 #include "SearchBar.h"
+#include "ui_MainWindow.h"
 
 #include <QAction>
 #include <QApplication>
@@ -41,15 +42,15 @@
 
 MainWindow::MainWindow(Config* config, LogFormatStore* store, QWidget* parent)
         : QMainWindow(parent)
+        , ui(std::make_unique<Ui::MainWindow>())
         , mController(std::make_unique<MainController>(config, store))
         , mOpenLogAction(new QAction(this))
         , mSelectLogFormatAction(new QAction(this))
         , mAutoScrollAction(new QAction(this))
         , mCopyLinesAction(new QAction(this))
         , mRecentFilesMenu(new QMenu(this))
-        , mToolBar(addToolBar(tr("Toolbar")))
-        , mTreeView(new QTreeView(this))
-        , mSearchBar(new SearchBar(this)) {
+        , mToolBar(addToolBar(tr("Toolbar"))) {
+    ui->setupUi(this);
     setupActions();
     setupUi();
 }
@@ -69,10 +70,10 @@ void MainWindow::loadLog(const QString& filePath) {
 
     auto model = mController->logModel();
     connect(model, &QAbstractItemModel::rowsInserted, this, &MainWindow::onRowsInserted);
-    mTreeView->setModel(model);
+    ui->treeView->setModel(model);
 
     // Must be done here because the selectionModel is (re)set by setModel()
-    connect(mTreeView->selectionModel(),
+    connect(ui->treeView->selectionModel(),
             &QItemSelectionModel::selectionChanged,
             this,
             &MainWindow::onSelectionChanged);
@@ -80,33 +81,31 @@ void MainWindow::loadLog(const QString& filePath) {
 }
 
 void MainWindow::setupUi() {
-    setWindowTitle("Lovi");
+    auto resetMargins = [this] {
+        auto* layout = centralWidget()->layout();
+        layout->setMargin(0);
+        layout->setSpacing(0);
+    };
 
     connect(mController.get(), &MainController::currentRowChanged, this, [this](int row) {
         if (row < 0) {
             return;
         }
-        auto index = mTreeView->model()->index(row, 0);
+        auto index = ui->treeView->model()->index(row, 0);
         Q_ASSERT(index.isValid());
-        mTreeView->setCurrentIndex(index);
+        ui->treeView->setCurrentIndex(index);
     });
 
-    mTreeView->setRootIsDecorated(false);
-    mTreeView->setContextMenuPolicy(Qt::ActionsContextMenu);
-    mTreeView->setSelectionMode(QAbstractItemView::ExtendedSelection);
-    mTreeView->addAction(mCopyLinesAction);
+    ui->treeView->setRootIsDecorated(false);
+    ui->treeView->setContextMenuPolicy(Qt::ActionsContextMenu);
+    ui->treeView->setSelectionMode(QAbstractItemView::ExtendedSelection);
+    ui->treeView->addAction(mCopyLinesAction);
     // Make scrolling fast
-    mTreeView->setUniformRowHeights(true);
+    ui->treeView->setUniformRowHeights(true);
 
-    mSearchBar->init(mController.get());
+    ui->searchBar->init(mController.get());
 
-    auto* container = new QWidget;
-    auto* layout = new QVBoxLayout(container);
-    layout->setMargin(0);
-    layout->setSpacing(0);
-    layout->addWidget(mTreeView);
-    layout->addWidget(mSearchBar);
-    setCentralWidget(container);
+    resetMargins();
 
     mToolBar->addAction(mOpenLogAction);
     mToolBar->addAction(mSelectLogFormatAction);
@@ -145,7 +144,7 @@ void MainWindow::setupActions() {
     mAutoScrollAction->setCheckable(true);
     connect(mAutoScrollAction, &QAction::toggled, this, [this](bool toggled) {
         if (toggled) {
-            mTreeView->scrollToBottom();
+            ui->treeView->scrollToBottom();
         }
     });
 
@@ -162,12 +161,12 @@ void MainWindow::setupActions() {
 void MainWindow::onRowsInserted() {
     if (mAutoScrollAction->isChecked()) {
         // Delay the call a bit to ensure the view has created the rows
-        QTimer::singleShot(0, this, [this] { mTreeView->scrollToBottom(); });
+        QTimer::singleShot(0, this, [this] { ui->treeView->scrollToBottom(); });
     }
 }
 
 void MainWindow::onSelectionChanged() {
-    auto selectionModel = mTreeView->selectionModel();
+    auto selectionModel = ui->treeView->selectionModel();
     int lineCount = selectionModel->selectedRows().count();
     mCopyLinesAction->setEnabled(lineCount > 0);
     mCopyLinesAction->setText(tr("Copy %n line(s)", "", lineCount));
@@ -213,7 +212,7 @@ void MainWindow::showLogFormatDialog() {
 }
 
 void MainWindow::copySelectedLines() {
-    auto selectedRows = mTreeView->selectionModel()->selectedRows();
+    auto selectedRows = ui->treeView->selectionModel()->selectedRows();
     if (selectedRows.empty()) {
         return;
     }

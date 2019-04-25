@@ -34,6 +34,10 @@ class SearchBar;
 
 class QTreeView;
 
+namespace Ui {
+class MainWindow;
+}
+
 class MainWindow : public QMainWindow {
     Q_OBJECT
 public:
@@ -54,6 +58,7 @@ private:
     void copySelectedLines();
     void fillRecentFilesMenu();
 
+    const std::unique_ptr<Ui::MainWindow> ui;
     std::unique_ptr<MainController> mController;
 
     QAction* const mOpenLogAction;
@@ -63,8 +68,6 @@ private:
 
     QMenu* const mRecentFilesMenu;
     QToolBar* const mToolBar;
-    QTreeView* const mTreeView;
-    SearchBar* const mSearchBar;
     QPointer<LogFormatDialog> mLogFormatDialog;
 };
 

@@ -34,6 +34,7 @@ add_library(lovilib STATIC
     ui/LogFormatDialog.cpp
     ui/LogFormatDialog.ui
     ui/MainWindow.cpp
+    ui/MainWindow.ui
     ui/WidgetFloater.cpp
     ui/SearchBar.cpp
     ui/SearchBar.ui
