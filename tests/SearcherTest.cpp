@@ -39,6 +39,9 @@ public:
     }
 
     bool lineMatches(int row, const Condition* condition) const override {
+        if (row < 0) {
+            return false;
+        }
         if (row >= lineCount()) {
             return false;
         }
@@ -60,8 +63,6 @@ TEST_CASE("Searcher") {
     Searcher searcher;
     QSignalSpy finishedSpy(&searcher, &Searcher::finished);
 
-    StringListSearchable searchable({"foo", "bar", "baz"});
-
     auto checkFinishedEmitted = [&finishedSpy](const SearchResponse& expected) {
         REQUIRE(finishedSpy.count() == 1);
         QVariantList args = finishedSpy.takeFirst();
@@ -70,21 +71,46 @@ TEST_CASE("Searcher") {
         REQUIRE(output.row == expected.row);
     };
 
-    SECTION("DirectHit") {
-        searcher.start(&searchable, createTestCondition("l ~ ^b"), SearchDirection::Down, 0);
-        checkFinishedEmitted({SearchResponse::DirectHit, 1});
+    SECTION("Down") {
+        StringListSearchable searchable({"foo", "bar", "baz"});
+        SECTION("DirectHit") {
+            searcher.start(&searchable, createTestCondition("l ~ ^b"), SearchDirection::Down, 0);
+            checkFinishedEmitted({SearchResponse::DirectHit, 1});
 
-        searcher.start(&searchable, createTestCondition("l ~ ^b"), SearchDirection::Down, 2);
-        checkFinishedEmitted({SearchResponse::DirectHit, 2});
+            searcher.start(&searchable, createTestCondition("l ~ ^b"), SearchDirection::Down, 2);
+            checkFinishedEmitted({SearchResponse::DirectHit, 2});
+        }
+
+        SECTION("NoHit") {
+            searcher.start(
+                &searchable, createTestCondition("l ~ ^notFound"), SearchDirection::Down, 0);
+            checkFinishedEmitted({});
+        }
+
+        SECTION("Wrapped") {
+            searcher.start(&searchable, createTestCondition("l ~ ^foo"), SearchDirection::Down, 1);
+            checkFinishedEmitted({SearchResponse::WrappedDown, 0});
+        }
     }
+    SECTION("Up") {
+        StringListSearchable searchable({"baz", "bar", "foo"});
+        SECTION("DirectHit") {
+            searcher.start(&searchable, createTestCondition("l ~ ^b"), SearchDirection::Up, 2);
+            checkFinishedEmitted({SearchResponse::DirectHit, 1});
 
-    SECTION("NoHit") {
-        searcher.start(&searchable, createTestCondition("l ~ ^notFound"), SearchDirection::Down, 0);
-        checkFinishedEmitted({});
-    }
+            searcher.start(&searchable, createTestCondition("l ~ ^b"), SearchDirection::Up, 0);
+            checkFinishedEmitted({SearchResponse::DirectHit, 0});
+        }
 
-    SECTION("WrappedUp") {
-        searcher.start(&searchable, createTestCondition("l ~ ^foo"), SearchDirection::Down, 1);
-        checkFinishedEmitted({SearchResponse::WrappedDown, 0});
+        SECTION("NoHit") {
+            searcher.start(
+                &searchable, createTestCondition("l ~ ^notFound"), SearchDirection::Up, 0);
+            checkFinishedEmitted({});
+        }
+
+        SECTION("Wrapped") {
+            searcher.start(&searchable, createTestCondition("l ~ ^foo"), SearchDirection::Up, 1);
+            checkFinishedEmitted({SearchResponse::WrappedUp, 2});
+        }
     }
 }

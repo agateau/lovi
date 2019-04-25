@@ -31,8 +31,8 @@ Searcher::Searcher(QObject* parent) : QObject(parent) {
 }
 
 static optional<int>
-search(Searchable* searchable, const Condition* condition, int startRow, int endRow) {
-    for (int row = startRow; row < endRow; ++row) {
+search(Searchable* searchable, const Condition* condition, int startRow, int endRow, int delta) {
+    for (int row = startRow; row != endRow; row += delta) {
         if (searchable->lineMatches(row, condition)) {
             return row;
         }
@@ -44,15 +44,18 @@ void Searcher::start(Searchable* searchable,
                      std::unique_ptr<Condition> condition,
                      SearchDirection direction,
                      int startRow) {
-    int count = searchable->lineCount();
-    optional<int> row = search(searchable, condition.get(), startRow, count);
+    bool isDown = direction == SearchDirection::Down;
+    int delta = isDown ? 1 : -1;
+    int begin = isDown ? 0 : (searchable->lineCount() - 1);
+    int end = isDown ? searchable->lineCount() : -1;
+    optional<int> row = search(searchable, condition.get(), startRow, end, delta);
     if (row.has_value()) {
         finished({SearchResponse::DirectHit, row.value()});
         return;
     }
-    row = search(searchable, condition.get(), 0, startRow);
+    row = search(searchable, condition.get(), begin, startRow, delta);
     if (row.has_value()) {
-        finished({SearchResponse::WrappedDown, row.value()});
+        finished({isDown ? SearchResponse::WrappedDown : SearchResponse::WrappedUp, row.value()});
         return;
     }
     finished({});
