@@ -67,7 +67,7 @@ TEST_CASE("Searcher") {
         REQUIRE(finishedSpy.count() == 1);
         QVariantList args = finishedSpy.takeFirst();
         SearchResponse output = args.at(0).value<SearchResponse>();
-        REQUIRE(output.result == expected.result);
+        REQUIRE(output.matchType == expected.matchType);
         REQUIRE(output.row == expected.row);
     };
 
@@ -75,10 +75,10 @@ TEST_CASE("Searcher") {
         StringListSearchable searchable({"foo", "bar", "baz"});
         SECTION("DirectHit") {
             searcher.start(&searchable, createTestCondition("l ~ ^b"), SearchDirection::Down, 0);
-            checkFinishedEmitted({SearchResponse::DirectHit, 1});
+            checkFinishedEmitted({SearchMatchType::Direct, 1});
 
             searcher.start(&searchable, createTestCondition("l ~ ^b"), SearchDirection::Down, 2);
-            checkFinishedEmitted({SearchResponse::DirectHit, 2});
+            checkFinishedEmitted({SearchMatchType::Direct, 2});
         }
 
         SECTION("NoHit") {
@@ -89,17 +89,17 @@ TEST_CASE("Searcher") {
 
         SECTION("Wrapped") {
             searcher.start(&searchable, createTestCondition("l ~ ^foo"), SearchDirection::Down, 1);
-            checkFinishedEmitted({SearchResponse::WrappedDown, 0});
+            checkFinishedEmitted({SearchMatchType::HitBottom, 0});
         }
     }
     SECTION("Up") {
         StringListSearchable searchable({"baz", "bar", "foo"});
         SECTION("DirectHit") {
             searcher.start(&searchable, createTestCondition("l ~ ^b"), SearchDirection::Up, 2);
-            checkFinishedEmitted({SearchResponse::DirectHit, 1});
+            checkFinishedEmitted({SearchMatchType::Direct, 1});
 
             searcher.start(&searchable, createTestCondition("l ~ ^b"), SearchDirection::Up, 0);
-            checkFinishedEmitted({SearchResponse::DirectHit, 0});
+            checkFinishedEmitted({SearchMatchType::Direct, 0});
         }
 
         SECTION("NoHit") {
@@ -110,7 +110,7 @@ TEST_CASE("Searcher") {
 
         SECTION("Wrapped") {
             searcher.start(&searchable, createTestCondition("l ~ ^foo"), SearchDirection::Up, 1);
-            checkFinishedEmitted({SearchResponse::WrappedUp, 2});
+            checkFinishedEmitted({SearchMatchType::HitTop, 2});
         }
     }
 }

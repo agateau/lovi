@@ -50,12 +50,12 @@ void Searcher::start(Searchable* searchable,
     int end = isDown ? searchable->lineCount() : -1;
     optional<int> row = search(searchable, condition.get(), startRow, end, delta);
     if (row.has_value()) {
-        finished({SearchResponse::DirectHit, row.value()});
+        finished({SearchMatchType::Direct, row.value()});
         return;
     }
     row = search(searchable, condition.get(), begin, startRow, delta);
     if (row.has_value()) {
-        finished({isDown ? SearchResponse::WrappedDown : SearchResponse::WrappedUp, row.value()});
+        finished({isDown ? SearchMatchType::HitBottom : SearchMatchType::HitTop, row.value()});
         return;
     }
     finished({});

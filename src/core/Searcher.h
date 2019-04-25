@@ -26,10 +26,10 @@
 class Condition;
 
 enum class SearchDirection { Up, Down };
+enum class SearchMatchType { None, Direct, HitTop, HitBottom };
 
 struct SearchResponse {
-    enum Result { NoHit, DirectHit, WrappedUp, WrappedDown };
-    Result result = NoHit;
+    SearchMatchType matchType = SearchMatchType::None;
     int row = -1;
 };
 

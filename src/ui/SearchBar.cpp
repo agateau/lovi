@@ -79,17 +79,17 @@ void SearchBar::start(SearchDirection direction) {
 
 void SearchBar::onFinished(const SearchResponse& response) {
     QString text;
-    switch (response.result) {
-    case SearchResponse::DirectHit:
+    switch (response.matchType) {
+    case SearchMatchType::Direct:
         ui->resultLabel->hide();
         return;
-    case SearchResponse::NoHit:
+    case SearchMatchType::None:
         text = tr("No match found");
         break;
-    case SearchResponse::WrappedUp:
+    case SearchMatchType::HitTop:
         text = tr("Hit top, continuing at bottom");
         break;
-    case SearchResponse::WrappedDown:
+    case SearchMatchType::HitBottom:
         text = tr("Hit bottom, continuing at top");
         break;
     }

@@ -150,7 +150,7 @@ void MainController::addLogToRecentFiles() {
 }
 
 void MainController::onSearchFinished(const SearchResponse& response) {
-    if (response.result == SearchResponse::NoHit) {
+    if (response.matchType == SearchMatchType::None) {
         return;
     }
     Q_ASSERT(response.row >= 0);
