@@ -28,6 +28,8 @@
 
 using std::unique_ptr;
 
+static const int SEARCH_FIELD_CHARS = 40;
+
 template <class T> static unique_ptr<T> initUi(QWidget* parent) {
     auto ui = std::make_unique<T>();
     ui->setupUi(parent);
@@ -52,9 +54,14 @@ void SearchBar::init(MainController* controller) {
             &MainController::logFormatChanged,
             mLineEditChecker.get(),
             &ConditionLineEditChecker::setLogFormat);
+
+    connect(mController->searcher(), &Searcher::finished, this, &SearchBar::onFinished);
 }
 
 void SearchBar::setupUi() {
+    layout()->setSpacing(0);
+    ui->lineEdit->setFixedWidth(SEARCH_FIELD_CHARS * QFontMetrics(font()).width('M'));
+    ui->resultLabel->hide();
     connect(ui->nextButton, &QToolButton::clicked, this, [this] { start(SearchDirection::Down); });
     connect(
         ui->previousButton, &QToolButton::clicked, this, [this] { start(SearchDirection::Up); });
@@ -68,4 +75,24 @@ void SearchBar::start(SearchDirection direction) {
     }
     auto condition = std::move(std::get<unique_ptr<Condition>>(conditionOrError));
     mController->startSearch(std::move(condition), direction);
+}
+
+void SearchBar::onFinished(const SearchResponse& response) {
+    QString text;
+    switch (response.result) {
+    case SearchResponse::DirectHit:
+        ui->resultLabel->hide();
+        return;
+    case SearchResponse::NoHit:
+        text = tr("No match found");
+        break;
+    case SearchResponse::WrappedUp:
+        text = tr("Hit top, continuing at bottom");
+        break;
+    case SearchResponse::WrappedDown:
+        text = tr("Hit bottom, continuing at top");
+        break;
+    }
+    ui->resultLabel->show();
+    ui->resultLabel->setText(text);
 }
