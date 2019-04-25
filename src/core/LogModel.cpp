@@ -103,7 +103,11 @@ LogFormat* LogModel::logFormat() const {
     return mLogFormat;
 }
 
-bool LogModel::lineMatches(int row, Condition* condition) const {
+int LogModel::lineCount() const {
+    return mLineProvider->lineCount();
+}
+
+bool LogModel::lineMatches(int row, const Condition* condition) const {
     const LogLine& line = lineAt(row);
     int column = condition->column();
     if (line.cells.count() <= column) {

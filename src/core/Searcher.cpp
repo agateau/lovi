@@ -22,22 +22,38 @@
 
 #include <QDebug>
 
+using std::optional;
+
+Searchable::~Searchable() {
+}
+
 Searcher::Searcher(QObject* parent) : QObject(parent) {
 }
 
-void Searcher::start(LogModel* logModel,
+static optional<int>
+search(Searchable* searchable, const Condition* condition, int startRow, int endRow) {
+    for (int row = startRow; row < endRow; ++row) {
+        if (searchable->lineMatches(row, condition)) {
+            return row;
+        }
+    }
+    return {};
+}
+
+void Searcher::start(Searchable* searchable,
                      std::unique_ptr<Condition> condition,
                      SearchDirection direction,
                      int startRow) {
-    int count = logModel->rowCount();
-    for (int row = startRow; row < count; ++row) {
-        if (logModel->lineMatches(row, condition.get())) {
-            SearchResponse response;
-            response.result = SearchResponse::DirectHit;
-            response.row = row;
-            finished(response);
-            return;
-        }
+    int count = searchable->lineCount();
+    optional<int> row = search(searchable, condition.get(), startRow, count);
+    if (row.has_value()) {
+        finished({SearchResponse::DirectHit, row.value()});
+        return;
+    }
+    row = search(searchable, condition.get(), 0, startRow);
+    if (row.has_value()) {
+        finished({SearchResponse::WrappedDown, row.value()});
+        return;
     }
     finished({});
 }

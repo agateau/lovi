@@ -19,6 +19,8 @@
 #ifndef LOGMODEL_H
 #define LOGMODEL_H
 
+#include "Searcher.h"
+
 #include <QAbstractTableModel>
 #include <QColor>
 #include <QVector>
@@ -45,7 +47,7 @@ struct LogLine {
     }
 };
 
-class LogModel : public QAbstractTableModel {
+class LogModel : public QAbstractTableModel, public Searchable {
 public:
     LogModel(const LineProvider* lineProvider, LogFormat* logFormat, QObject* parent = nullptr);
 
@@ -64,7 +66,10 @@ public:
 
     LogFormat* logFormat() const;
 
-    bool lineMatches(int row, Condition* condition) const;
+    // Searchable interface
+    int lineCount() const override;
+
+    bool lineMatches(int row, const Condition* condition) const override;
 
 private:
     LogLine processLine(const QStringRef& line) const;

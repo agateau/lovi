@@ -24,7 +24,6 @@
 #include <memory>
 
 class Condition;
-class LogModel;
 
 enum class SearchDirection { Up, Down };
 
@@ -34,12 +33,23 @@ struct SearchResponse {
     int row = -1;
 };
 
+Q_DECLARE_METATYPE(SearchResponse)
+
+class Searchable {
+public:
+    virtual ~Searchable();
+
+    virtual int lineCount() const = 0;
+
+    virtual bool lineMatches(int row, const Condition* condition) const = 0;
+};
+
 class Searcher : public QObject {
     Q_OBJECT
 public:
     Searcher(QObject* parent = nullptr);
 
-    void start(LogModel*, std::unique_ptr<Condition> condition, SearchDirection, int startRow);
+    void start(Searchable*, std::unique_ptr<Condition> condition, SearchDirection, int startRow);
 
 signals:
     void finished(const SearchResponse& response);
