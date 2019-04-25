@@ -36,6 +36,7 @@ add_library(lovilib STATIC
     ui/MainWindow.cpp
     ui/WidgetFloater.cpp
     ui/SearchBar.cpp
+    ui/SearchBar.ui
     ${lovi_resources}
     )
 

@@ -24,18 +24,20 @@
 #include "LogFormat.h"
 #include "MainController.h"
 #include "Searcher.h"
-
-#include <QHBoxLayout>
-#include <QLineEdit>
-#include <QPushButton>
+#include "ui_SearchBar.h"
 
 using std::unique_ptr;
 
+template <class T> static unique_ptr<T> initUi(QWidget* parent) {
+    auto ui = std::make_unique<T>();
+    ui->setupUi(parent);
+    return ui;
+}
+
 SearchBar::SearchBar(QWidget* parent)
         : QWidget(parent)
-        , mLineEdit(new QLineEdit(this))
-        , mSearchButton(new QPushButton(this))
-        , mLineEditChecker(std::make_unique<ConditionLineEditChecker>(mLineEdit)) {
+        , ui(initUi<Ui::SearchBar>(this))
+        , mLineEditChecker(std::make_unique<ConditionLineEditChecker>(ui->lineEdit)) {
     setupUi();
 }
 
@@ -53,18 +55,12 @@ void SearchBar::init(MainController* controller) {
 }
 
 void SearchBar::setupUi() {
-    connect(mLineEdit, &QLineEdit::returnPressed, mSearchButton, &QPushButton::click);
-    mSearchButton->setText(tr("Find"));
-    connect(mSearchButton, &QPushButton::clicked, this, &SearchBar::start);
-
-    auto* layout = new QHBoxLayout(this);
-    layout->addWidget(mLineEdit);
-    layout->addWidget(mSearchButton);
+    connect(ui->nextButton, &QToolButton::clicked, this, &SearchBar::start);
 }
 
 void SearchBar::start() {
     auto conditionOrError =
-        ConditionIO::parse(mLineEdit->text(), mController->logFormat()->columnHash());
+        ConditionIO::parse(ui->lineEdit->text(), mController->logFormat()->columnHash());
     if (std::holds_alternative<ConditionIO::ParseError>(conditionOrError)) {
         return;
     }

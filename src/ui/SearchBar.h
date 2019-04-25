@@ -25,6 +25,10 @@
 
 #include <memory>
 
+namespace Ui {
+class SearchBar;
+}
+
 class QLineEdit;
 class QPushButton;
 
@@ -44,8 +48,7 @@ private:
     void setupUi();
     void start();
 
-    QLineEdit* const mLineEdit;
-    QPushButton* const mSearchButton;
+    const std::unique_ptr<Ui::SearchBar> ui;
     const std::unique_ptr<ConditionLineEditChecker> mLineEditChecker;
 
     // set-once
