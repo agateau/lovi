@@ -121,7 +121,8 @@ int MainController::currentRow() const {
 }
 
 void MainController::startSearch(std::unique_ptr<Condition> condition, SearchDirection direction) {
-    mSearcher->start(mLogModel.get(), std::move(condition), direction, mCurrentRow + 1);
+    int row = mCurrentRow + (direction == SearchDirection::Down ? 1 : -1);
+    mSearcher->start(mLogModel.get(), std::move(condition), direction, row);
 }
 
 void MainController::updateLogFormatForFile() {

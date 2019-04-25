@@ -55,15 +55,17 @@ void SearchBar::init(MainController* controller) {
 }
 
 void SearchBar::setupUi() {
-    connect(ui->nextButton, &QToolButton::clicked, this, &SearchBar::start);
+    connect(ui->nextButton, &QToolButton::clicked, this, [this] { start(SearchDirection::Down); });
+    connect(
+        ui->previousButton, &QToolButton::clicked, this, [this] { start(SearchDirection::Up); });
 }
 
-void SearchBar::start() {
+void SearchBar::start(SearchDirection direction) {
     auto conditionOrError =
         ConditionIO::parse(ui->lineEdit->text(), mController->logFormat()->columnHash());
     if (std::holds_alternative<ConditionIO::ParseError>(conditionOrError)) {
         return;
     }
     auto condition = std::move(std::get<unique_ptr<Condition>>(conditionOrError));
-    mController->startSearch(std::move(condition), SearchDirection::Down);
+    mController->startSearch(std::move(condition), direction);
 }

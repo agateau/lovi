@@ -18,6 +18,13 @@
     <widget class="QLineEdit" name="lineEdit"/>
    </item>
    <item>
+    <widget class="QToolButton" name="previousButton">
+     <property name="arrowType">
+      <enum>Qt::UpArrow</enum>
+     </property>
+    </widget>
+   </item>
+   <item>
     <widget class="QToolButton" name="nextButton">
      <property name="arrowType">
       <enum>Qt::DownArrow</enum>
@@ -28,6 +35,8 @@
  </widget>
  <tabstops>
   <tabstop>lineEdit</tabstop>
+  <tabstop>previousButton</tabstop>
+  <tabstop>nextButton</tabstop>
  </tabstops>
  <resources/>
  <connections>

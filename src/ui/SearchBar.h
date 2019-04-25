@@ -46,7 +46,7 @@ public:
 
 private:
     void setupUi();
-    void start();
+    void start(SearchDirection direction);
 
     const std::unique_ptr<Ui::SearchBar> ui;
     const std::unique_ptr<ConditionLineEditChecker> mLineEditChecker;
