@@ -86,25 +86,26 @@ void MainWindow::setupUi() {
         layout->setMargin(0);
         layout->setSpacing(0);
     };
+    auto setupTreeView = [this] {
+        connect(mController.get(), &MainController::currentRowChanged, this, [this](int row) {
+            if (row < 0) {
+                return;
+            }
+            auto index = ui->treeView->model()->index(row, 0);
+            Q_ASSERT(index.isValid());
+            ui->treeView->setCurrentIndex(index);
+        });
 
-    connect(mController.get(), &MainController::currentRowChanged, this, [this](int row) {
-        if (row < 0) {
-            return;
-        }
-        auto index = ui->treeView->model()->index(row, 0);
-        Q_ASSERT(index.isValid());
-        ui->treeView->setCurrentIndex(index);
-    });
-
-    ui->treeView->setRootIsDecorated(false);
-    ui->treeView->setContextMenuPolicy(Qt::ActionsContextMenu);
-    ui->treeView->setSelectionMode(QAbstractItemView::ExtendedSelection);
-    ui->treeView->addAction(mCopyLinesAction);
-    // Make scrolling fast
-    ui->treeView->setUniformRowHeights(true);
+        ui->treeView->setRootIsDecorated(false);
+        ui->treeView->setContextMenuPolicy(Qt::ActionsContextMenu);
+        ui->treeView->setSelectionMode(QAbstractItemView::ExtendedSelection);
+        ui->treeView->addAction(mCopyLinesAction);
+        // Make scrolling fast
+        ui->treeView->setUniformRowHeights(true);
+    };
 
     ui->searchBar->init(mController.get());
-
+    setupTreeView();
     changeOpenButtonMenuBehavior();
     resetMargins();
 
