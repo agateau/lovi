@@ -57,6 +57,7 @@ private:
     void showLogFormatDialog();
     void copySelectedLines();
     void fillRecentFilesMenu();
+    void toggleSearchBar(bool visible);
 
     const std::unique_ptr<Ui::MainWindow> ui;
     std::unique_ptr<MainController> mController;

@@ -42,6 +42,7 @@
    <addaction name="openAction"/>
    <addaction name="selectLogFormatAction"/>
    <addaction name="autoScrollAction"/>
+   <addaction name="searchAction"/>
   </widget>
   <action name="openAction">
    <property name="icon">
@@ -78,6 +79,20 @@
    </property>
    <property name="toolTip">
     <string>Automatically scroll down when new lines are logged</string>
+   </property>
+  </action>
+  <action name="searchAction">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
+   <property name="icon">
+    <iconset theme="search"/>
+   </property>
+   <property name="text">
+    <string>Find</string>
+   </property>
+   <property name="toolTip">
+    <string>Find text in log file</string>
    </property>
   </action>
  </widget>

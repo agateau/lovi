@@ -58,6 +58,11 @@ void SearchBar::init(MainController* controller) {
     connect(mController->searcher(), &Searcher::finished, this, &SearchBar::onFinished);
 }
 
+void SearchBar::focusInEvent(QFocusEvent* event) {
+    QWidget::focusInEvent(event);
+    ui->lineEdit->setFocus();
+}
+
 void SearchBar::setupUi() {
     layout()->setSpacing(0);
     ui->lineEdit->setFixedWidth(SEARCH_FIELD_CHARS * QFontMetrics(font()).width('M'));

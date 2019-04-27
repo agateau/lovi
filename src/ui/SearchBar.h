@@ -44,6 +44,9 @@ public:
 
     void init(MainController* mainController);
 
+protected:
+    void focusInEvent(QFocusEvent* event) override;
+
 private:
     void setupUi();
     void start(SearchDirection direction);

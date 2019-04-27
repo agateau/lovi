@@ -104,7 +104,11 @@ void MainWindow::setupUi() {
         ui->treeView->setUniformRowHeights(true);
     };
 
-    ui->searchBar->init(mController.get());
+    auto setupSearchBar = [this] {
+        ui->searchBar->init(mController.get());
+        ui->searchBar->hide();
+    };
+    setupSearchBar();
     setupTreeView();
     changeOpenButtonMenuBehavior();
     resetMargins();
@@ -133,7 +137,11 @@ void MainWindow::setupActions() {
         }
     });
 
-    for (auto action : {ui->openAction, ui->selectLogFormatAction, ui->autoScrollAction}) {
+    ui->searchAction->setShortcuts({QKeySequence::Find, Qt::Key_Slash});
+    connect(ui->searchAction, &QAction::toggled, this, &MainWindow::toggleSearchBar);
+
+    for (auto action :
+         {ui->openAction, ui->selectLogFormatAction, ui->autoScrollAction, ui->searchAction}) {
         appendShortcutToToolTip(action);
     }
 
@@ -213,5 +221,12 @@ void MainWindow::fillRecentFilesMenu() {
     mRecentFilesMenu->clear();
     for (const auto& filePath : mController->config()->recentLogFiles()) {
         mRecentFilesMenu->addAction(filePath, this, [this, filePath] { loadLog(filePath); });
+    }
+}
+
+void MainWindow::toggleSearchBar(bool visible) {
+    ui->searchBar->setVisible(visible);
+    if (visible) {
+        ui->searchBar->setFocus();
     }
 }
