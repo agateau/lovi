@@ -65,6 +65,7 @@ void SearchBar::focusInEvent(QFocusEvent* event) {
 
 void SearchBar::setupUi() {
     layout()->setSpacing(0);
+    layout()->setMargin(0);
     ui->lineEdit->setFixedWidth(SEARCH_FIELD_CHARS * QFontMetrics(font()).width('M'));
     ui->resultLabel->hide();
     connect(ui->nextButton, &QToolButton::clicked, this, [this] { start(SearchDirection::Down); });
