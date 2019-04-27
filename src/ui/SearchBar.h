@@ -44,6 +44,9 @@ public:
 
     void init(MainController* mainController);
 
+signals:
+    void closeClicked();
+
 protected:
     void focusInEvent(QFocusEvent* event) override;
 

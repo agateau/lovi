@@ -70,6 +70,7 @@ void SearchBar::setupUi() {
     connect(ui->nextButton, &QToolButton::clicked, this, [this] { start(SearchDirection::Down); });
     connect(
         ui->previousButton, &QToolButton::clicked, this, [this] { start(SearchDirection::Up); });
+    connect(ui->closeButton, &QToolButton::clicked, this, &SearchBar::closeClicked);
 }
 
 void SearchBar::start(SearchDirection direction) {

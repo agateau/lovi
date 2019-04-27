@@ -107,6 +107,7 @@ void MainWindow::setupUi() {
     auto setupSearchBar = [this] {
         ui->searchBar->init(mController.get());
         ui->searchBar->hide();
+        connect(ui->searchBar, &SearchBar::closeClicked, ui->searchAction, &QAction::toggle);
     };
     setupSearchBar();
     setupTreeView();
