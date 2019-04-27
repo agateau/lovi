@@ -36,7 +36,7 @@
 #include <QFileInfo>
 #include <QMenu>
 #include <QTimer>
-#include <QToolBar>
+#include <QToolButton>
 #include <QTreeView>
 #include <QVBoxLayout>
 
@@ -44,12 +44,8 @@ MainWindow::MainWindow(Config* config, LogFormatStore* store, QWidget* parent)
         : QMainWindow(parent)
         , ui(std::make_unique<Ui::MainWindow>())
         , mController(std::make_unique<MainController>(config, store))
-        , mOpenLogAction(new QAction(this))
-        , mSelectLogFormatAction(new QAction(this))
-        , mAutoScrollAction(new QAction(this))
         , mCopyLinesAction(new QAction(this))
-        , mRecentFilesMenu(new QMenu(this))
-        , mToolBar(addToolBar(tr("Toolbar"))) {
+        , mRecentFilesMenu(new QMenu(this)) {
     ui->setupUi(this);
     setupActions();
     setupUi();
@@ -81,6 +77,10 @@ void MainWindow::loadLog(const QString& filePath) {
 }
 
 void MainWindow::setupUi() {
+    auto changeOpenButtonMenuBehavior = [this] {
+        auto* button = static_cast<QToolButton*>(ui->toolBar->widgetForAction(ui->openAction));
+        button->setPopupMode(QToolButton::MenuButtonPopup);
+    };
     auto resetMargins = [this] {
         auto* layout = centralWidget()->layout();
         layout->setMargin(0);
@@ -105,14 +105,8 @@ void MainWindow::setupUi() {
 
     ui->searchBar->init(mController.get());
 
+    changeOpenButtonMenuBehavior();
     resetMargins();
-
-    mToolBar->addAction(mOpenLogAction);
-    mToolBar->addAction(mSelectLogFormatAction);
-    mToolBar->addAction(mAutoScrollAction);
-
-    mToolBar->setMovable(false);
-    mToolBar->setToolButtonStyle(Qt::ToolButtonTextBesideIcon);
 
     resize(800, 600);
 }
@@ -123,32 +117,22 @@ static void appendShortcutToToolTip(QAction* action) {
 }
 
 void MainWindow::setupActions() {
-    mOpenLogAction->setText(tr("Open"));
-    mOpenLogAction->setToolTip(tr("Open log file"));
-    mOpenLogAction->setIcon(QIcon::fromTheme("document-open"));
-    mOpenLogAction->setShortcut(QKeySequence::Open);
-    mOpenLogAction->setMenu(mRecentFilesMenu);
-    connect(mOpenLogAction, &QAction::triggered, this, &MainWindow::showOpenLogDialog);
+    ui->openAction->setShortcut(QKeySequence::Open);
+    ui->openAction->setMenu(mRecentFilesMenu);
+    connect(ui->openAction, &QAction::triggered, this, &MainWindow::showOpenLogDialog);
     connect(mRecentFilesMenu, &QMenu::aboutToShow, this, &MainWindow::fillRecentFilesMenu);
 
-    mSelectLogFormatAction->setText(tr("Format"));
-    mSelectLogFormatAction->setToolTip(tr("Select log format"));
-    mSelectLogFormatAction->setShortcut(Qt::SHIFT | Qt::Key_F);
-    mSelectLogFormatAction->setIcon(QIcon::fromTheme("object-columns"));
-    connect(mSelectLogFormatAction, &QAction::triggered, this, &MainWindow::showLogFormatDialog);
+    ui->selectLogFormatAction->setShortcut(Qt::SHIFT | Qt::Key_F);
+    connect(ui->selectLogFormatAction, &QAction::triggered, this, &MainWindow::showLogFormatDialog);
 
-    mAutoScrollAction->setText(tr("Auto scroll"));
-    mAutoScrollAction->setShortcut(Qt::SHIFT | Qt::Key_S);
-    mAutoScrollAction->setToolTip(tr("Automatically scroll down when new lines are logged"));
-    mAutoScrollAction->setIcon(QIcon::fromTheme("go-bottom"));
-    mAutoScrollAction->setCheckable(true);
-    connect(mAutoScrollAction, &QAction::toggled, this, [this](bool toggled) {
+    ui->autoScrollAction->setShortcut(Qt::SHIFT | Qt::Key_S);
+    connect(ui->autoScrollAction, &QAction::toggled, this, [this](bool toggled) {
         if (toggled) {
             ui->treeView->scrollToBottom();
         }
     });
 
-    for (auto action : {mOpenLogAction, mSelectLogFormatAction, mAutoScrollAction}) {
+    for (auto action : {ui->openAction, ui->selectLogFormatAction, ui->autoScrollAction}) {
         appendShortcutToToolTip(action);
     }
 
@@ -159,7 +143,7 @@ void MainWindow::setupActions() {
 }
 
 void MainWindow::onRowsInserted() {
-    if (mAutoScrollAction->isChecked()) {
+    if (ui->autoScrollAction->isChecked()) {
         // Delay the call a bit to ensure the view has created the rows
         QTimer::singleShot(0, this, [this] { ui->treeView->scrollToBottom(); });
     }

@@ -61,13 +61,9 @@ private:
     const std::unique_ptr<Ui::MainWindow> ui;
     std::unique_ptr<MainController> mController;
 
-    QAction* const mOpenLogAction;
-    QAction* const mSelectLogFormatAction;
-    QAction* const mAutoScrollAction;
     QAction* const mCopyLinesAction;
 
     QMenu* const mRecentFilesMenu;
-    QToolBar* const mToolBar;
     QPointer<LogFormatDialog> mLogFormatDialog;
 };
 
