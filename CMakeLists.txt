@@ -6,6 +6,7 @@ project(lovi
 
 # Dependencies
 find_package(Qt5 CONFIG REQUIRED Core Widgets Test LinguistTools)
+include(3rdparty/qpropgen/cmake/qpropgen.cmake)
 add_subdirectory(3rdparty/catch2)
 
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -Woverloaded-virtual")

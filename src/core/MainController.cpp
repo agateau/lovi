@@ -31,7 +31,7 @@
 static const int MAX_RECENT_FILES = 10;
 
 MainController::MainController(Config* config, LogFormatStore* store, QObject* parent)
-        : QObject(parent)
+        : BaseMainController(parent)
         , mConfig(config)
         , mLogFormatStore(store)
         , mEmptyLogFormat(LogFormat::createEmpty())
@@ -44,7 +44,7 @@ MainController::~MainController() {
 }
 
 void MainController::loadLog(const QString& filePath) {
-    mLogPath = filePath;
+    setLogPath(filePath);
 
     LogFormat* format = mLogFormat;
     if (!isStdin()) {
@@ -84,12 +84,8 @@ LogModel* MainController::logModel() const {
     return mLogModel.get();
 }
 
-QString MainController::logPath() const {
-    return mLogPath;
-}
-
 bool MainController::isStdin() const {
-    return mLogPath == "-";
+    return logPath() == "-";
 }
 
 void MainController::setLogFormat(LogFormat* format) {
@@ -108,26 +104,14 @@ LogFormat* MainController::logFormat() const {
     return mLogFormat;
 }
 
-void MainController::setCurrentRow(int row) {
-    if (mCurrentRow == row) {
-        return;
-    }
-    mCurrentRow = row;
-    currentRowChanged(mCurrentRow);
-}
-
-int MainController::currentRow() const {
-    return mCurrentRow;
-}
-
 void MainController::startSearch(std::unique_ptr<Condition> condition, SearchDirection direction) {
-    int row = mCurrentRow + (direction == SearchDirection::Down ? 1 : -1);
+    int row = currentRow() + (direction == SearchDirection::Down ? 1 : -1);
     mSearcher->start(mLogModel.get(), std::move(condition), direction, row);
 }
 
 void MainController::updateLogFormatForFile() {
-    if (!mLogPath.isEmpty() && !isStdin() && !mLogFormat->name().isEmpty()) {
-        mConfig->setLogFormatForFile(mLogPath, mLogFormat->name());
+    if (!logPath().isEmpty() && !isStdin() && !mLogFormat->name().isEmpty()) {
+        mConfig->setLogFormatForFile(logPath(), mLogFormat->name());
     }
 }
 
@@ -135,14 +119,14 @@ void MainController::createLineProvider() {
     if (isStdin()) {
         mLineProvider = std::make_unique<StdinLineProvider>();
     } else {
-        mLineProvider = std::make_unique<FileLineProvider>(mLogPath);
+        mLineProvider = std::make_unique<FileLineProvider>(logPath());
     }
 }
 
 void MainController::addLogToRecentFiles() {
     QStringList files = mConfig->recentLogFiles();
-    files.removeOne(mLogPath);
-    files.insert(0, mLogPath);
+    files.removeOne(logPath());
+    files.insert(0, logPath());
     while (files.length() > MAX_RECENT_FILES) {
         files.takeLast();
     }
