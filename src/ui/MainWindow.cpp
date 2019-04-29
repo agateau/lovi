@@ -21,8 +21,8 @@
 #include "Config.h"
 #include "LineProvider.h"
 #include "LogFormat.h"
-#include "LogFormatDialog.h"
 #include "LogFormatStore.h"
+#include "LogFormatWidget.h"
 #include "LogModel.h"
 #include "MainController.h"
 #include "SearchBar.h"
@@ -42,8 +42,9 @@
 
 MainWindow::MainWindow(Config* config, LogFormatStore* store, QWidget* parent)
         : QMainWindow(parent)
-        , ui(std::make_unique<Ui::MainWindow>())
         , mController(std::make_unique<MainController>(config, store))
+        , ui(std::make_unique<Ui::MainWindow>())
+        , mLogFormatWidget(std::make_unique<LogFormatWidget>(store, mController->logFormat()))
         , mCopyLinesAction(new QAction(this))
         , mRecentFilesMenu(new QMenu(this)) {
     ui->setupUi(this);
@@ -109,6 +110,7 @@ void MainWindow::setupUi() {
         ui->searchBar->hide();
         connect(ui->searchBar, &SearchBar::closeClicked, ui->searchAction, &QAction::toggle);
     };
+    setupLogFormatWidget();
     setupSearchBar();
     setupTreeView();
     changeOpenButtonMenuBehavior();
@@ -128,9 +130,6 @@ void MainWindow::setupActions() {
     connect(ui->openAction, &QAction::triggered, this, &MainWindow::showOpenLogDialog);
     connect(mRecentFilesMenu, &QMenu::aboutToShow, this, &MainWindow::fillRecentFilesMenu);
 
-    ui->selectLogFormatAction->setShortcut(Qt::SHIFT | Qt::Key_F);
-    connect(ui->selectLogFormatAction, &QAction::triggered, this, &MainWindow::showLogFormatDialog);
-
     ui->autoScrollAction->setShortcut(Qt::SHIFT | Qt::Key_S);
     connect(ui->autoScrollAction, &QAction::toggled, this, [this](bool toggled) {
         if (toggled) {
@@ -141,8 +140,7 @@ void MainWindow::setupActions() {
     ui->searchAction->setShortcuts({QKeySequence::Find, Qt::Key_Slash});
     connect(ui->searchAction, &QAction::toggled, this, &MainWindow::toggleSearchBar);
 
-    for (auto action :
-         {ui->openAction, ui->selectLogFormatAction, ui->autoScrollAction, ui->searchAction}) {
+    for (auto action : {ui->openAction, ui->autoScrollAction, ui->searchAction}) {
         appendShortcutToToolTip(action);
     }
 
@@ -185,24 +183,22 @@ void MainWindow::showOpenLogDialog() {
     loadLog(dialog.selectedFiles().first());
 }
 
-void MainWindow::showLogFormatDialog() {
-    if (mLogFormatDialog) {
-        mLogFormatDialog->setLogFormat(mController->logFormat());
-        mLogFormatDialog->show();
-        mLogFormatDialog->activateWindow();
-        return;
-    }
-    mLogFormatDialog =
-        new LogFormatDialog(mController->logFormatStore(), mController->logFormat(), this);
-    connect(mLogFormatDialog.data(),
-            &LogFormatDialog::logFormatChanged,
+void MainWindow::setupLogFormatWidget() {
+    ui->logFormatDockWidget->setWidget(mLogFormatWidget.get());
+    ui->logFormatDockWidget->setWindowTitle(mLogFormatWidget->windowTitle());
+
+    auto action = ui->logFormatDockWidget->toggleViewAction();
+    action->setIcon(mLogFormatWidget->windowIcon());
+    ui->toolBar->addAction(action);
+
+    connect(mLogFormatWidget.get(),
+            &LogFormatWidget::logFormatChanged,
             mController.get(),
             &MainController::setLogFormat);
     connect(mController.get(),
             &MainController::logFormatChanged,
-            mLogFormatDialog.data(),
-            &LogFormatDialog::setLogFormat);
-    mLogFormatDialog->show();
+            mLogFormatWidget.get(),
+            &LogFormatWidget::setLogFormat);
 }
 
 void MainWindow::copySelectedLines() {

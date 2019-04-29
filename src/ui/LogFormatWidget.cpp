@@ -16,7 +16,7 @@
  * You should have received a copy of the GNU General Public License along with
  * this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-#include "LogFormatDialog.h"
+#include "LogFormatWidget.h"
 
 #include "ConditionIO.h"
 #include "HighlightModel.h"
@@ -26,51 +26,51 @@
 #include "LogFormatModel.h"
 #include "LogFormatStore.h"
 #include "WidgetFloater.h"
-#include "ui_LogFormatDialog.h"
+#include "ui_LogFormatWidget.h"
 
 #include <QInputDialog>
 #include <QMessageBox>
 #include <QPushButton>
 #include <QStandardPaths>
 
-LogFormatDialog::LogFormatDialog(LogFormatStore* store,
+LogFormatWidget::LogFormatWidget(LogFormatStore* store,
                                  LogFormat* currentLogFormat,
                                  QWidget* parent)
-        : QDialog(parent)
-        , ui(std::make_unique<Ui::LogFormatDialog>())
+        : QWidget(parent)
+        , ui(std::make_unique<Ui::LogFormatWidget>())
         , mModel(std::make_unique<LogFormatModel>(store))
         , mHighlightModel(std::make_unique<HighlightModel>())
         , mLogFormatStore(store) {
     Q_ASSERT(store);
     Q_ASSERT(currentLogFormat);
     ui->setupUi(this);
-    setupSideBar(currentLogFormat);
+    setupLogFormatSelector(currentLogFormat);
     setupEditor();
     onCurrentChanged(ui->logFormatComboBox->currentIndex());
 }
 
-LogFormatDialog::~LogFormatDialog() {
+LogFormatWidget::~LogFormatWidget() {
 }
 
-void LogFormatDialog::setLogFormat(LogFormat* logFormat) {
+void LogFormatWidget::setLogFormat(LogFormat* logFormat) {
     Q_ASSERT(logFormat);
     selectLogFormat(logFormat->name());
 }
 
-void LogFormatDialog::setupSideBar(LogFormat* currentLogFormat) {
+void LogFormatWidget::setupLogFormatSelector(LogFormat* currentLogFormat) {
     ui->logFormatComboBox->setModel(mModel.get());
     selectLogFormat(currentLogFormat->name());
 
     connect(ui->logFormatComboBox,
             qOverload<int>(&QComboBox::currentIndexChanged),
             this,
-            &LogFormatDialog::onCurrentChanged);
-    connect(ui->addFormatButton, &QToolButton::clicked, this, &LogFormatDialog::onAddFormatClicked);
+            &LogFormatWidget::onCurrentChanged);
+    connect(ui->addFormatButton, &QToolButton::clicked, this, &LogFormatWidget::onAddFormatClicked);
 }
 
-void LogFormatDialog::setupEditor() {
+void LogFormatWidget::setupEditor() {
     // Parser edit
-    connect(ui->parserLineEdit, &QLineEdit::editingFinished, this, &LogFormatDialog::applyChanges);
+    connect(ui->parserLineEdit, &QLineEdit::editingFinished, this, &LogFormatWidget::applyChanges);
     new LineEditChecker(ui->parserLineEdit, [](const QString& text) -> QString {
         QRegularExpression rx(text);
         return rx.isValid() ? QString() : rx.errorString();
@@ -82,7 +82,7 @@ void LogFormatDialog::setupEditor() {
     connect(ui->highlightListView->selectionModel(),
             &QItemSelectionModel::currentChanged,
             this,
-            &LogFormatDialog::onCurrentHighlightChanged);
+            &LogFormatWidget::onCurrentHighlightChanged);
 
     // Highlight list context menu
     auto removeHighlightAction = new QAction(tr("Remove Highlight"));
@@ -108,7 +108,7 @@ void LogFormatDialog::setupEditor() {
     floater->setChildWidget(addHighlightButton);
 }
 
-void LogFormatDialog::onCurrentChanged(int row) {
+void LogFormatWidget::onCurrentChanged(int row) {
     QModelIndex index = mModel->index(row);
     if (!index.isValid()) {
         return;
@@ -121,7 +121,7 @@ void LogFormatDialog::onCurrentChanged(int row) {
     logFormatChanged(logFormat);
 }
 
-void LogFormatDialog::onCurrentHighlightChanged(const QModelIndex& index) {
+void LogFormatWidget::onCurrentHighlightChanged(const QModelIndex& index) {
     if (!index.isValid()) {
         ui->highlightWidget->setHighlight(nullptr);
         return;
@@ -131,7 +131,7 @@ void LogFormatDialog::onCurrentHighlightChanged(const QModelIndex& index) {
     ui->highlightWidget->setHighlight(logFormat->editableHighlightAt(row));
 }
 
-void LogFormatDialog::applyChanges() {
+void LogFormatWidget::applyChanges() {
     int row = ui->logFormatComboBox->currentIndex();
     QModelIndex index = mModel->index(row, 0);
     if (!index.isValid()) {
@@ -141,7 +141,7 @@ void LogFormatDialog::applyChanges() {
     logFormat->setParserPattern(ui->parserLineEdit->text());
 }
 
-void LogFormatDialog::onAddFormatClicked() {
+void LogFormatWidget::onAddFormatClicked() {
     QString name = QInputDialog::getText(
         this, tr("Log format name"), tr("Enter a name for the new log format"));
     if (name.isEmpty()) {
@@ -160,7 +160,7 @@ void LogFormatDialog::onAddFormatClicked() {
     selectLogFormat(name);
 }
 
-void LogFormatDialog::selectLogFormat(const QString& name) {
+void LogFormatWidget::selectLogFormat(const QString& name) {
     for (int row = 0; row < ui->logFormatComboBox->count(); ++row) {
         if (ui->logFormatComboBox->itemText(row) == name) {
             ui->logFormatComboBox->setCurrentIndex(row);

@@ -16,15 +16,15 @@
  * You should have received a copy of the GNU General Public License along with
  * this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-#ifndef LOGFORMATDIALOG_H
-#define LOGFORMATDIALOG_H
+#ifndef LOGFORMATWIDGET_H
+#define LOGFORMATWIDGET_H
 
-#include <QDialog>
+#include <QWidget>
 
 #include <memory>
 
 namespace Ui {
-class LogFormatDialog;
+class LogFormatWidget;
 }
 
 class HighlightModel;
@@ -32,13 +32,13 @@ class LogFormat;
 class LogFormatModel;
 class LogFormatStore;
 
-class LogFormatDialog : public QDialog {
+class LogFormatWidget : public QWidget {
     Q_OBJECT
 public:
-    explicit LogFormatDialog(LogFormatStore* store,
+    explicit LogFormatWidget(LogFormatStore* store,
                              LogFormat* currentLogFormat,
                              QWidget* parent = nullptr);
-    ~LogFormatDialog();
+    ~LogFormatWidget();
 
     void setLogFormat(LogFormat* logFormat);
 
@@ -46,7 +46,7 @@ signals:
     void logFormatChanged(LogFormat* logFormat);
 
 private:
-    void setupSideBar(LogFormat* currentLogFormat);
+    void setupLogFormatSelector(LogFormat* currentLogFormat);
     void setupEditor();
 
     void onCurrentChanged(int row);
@@ -55,10 +55,10 @@ private:
     void onAddFormatClicked();
     void selectLogFormat(const QString& name);
 
-    const std::unique_ptr<Ui::LogFormatDialog> ui;
+    const std::unique_ptr<Ui::LogFormatWidget> ui;
     const std::unique_ptr<LogFormatModel> mModel;
     const std::unique_ptr<HighlightModel> mHighlightModel;
     LogFormatStore* const mLogFormatStore;
 };
 
-#endif // LOGFORMATDIALOG_H
+#endif // LOGFORMATWIDGET_H

@@ -65,9 +65,18 @@ Highlight* HighlightWidget::highlight() const {
     return mHighlight;
 }
 
+static void setLabelIcon(QLabel* label, const QString& name) {
+    QIcon icon = QIcon::fromTheme(name);
+    label->setPixmap(icon.pixmap(32));
+    label->setFixedSize(label->pixmap()->size());
+}
+
 void HighlightWidget::setupUi() {
     setEnabled(false);
     layout()->setMargin(0);
+
+    setLabelIcon(ui->bgColorLabel, "color-fill");
+    setLabelIcon(ui->fgColorLabel, "format-text-color");
 
     connect(ui->conditionLineEdit, &QLineEdit::editingFinished, this, [this] {
         mHighlight->setConditionDefinition(ui->conditionLineEdit->text());

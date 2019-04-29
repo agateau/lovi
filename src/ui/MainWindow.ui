@@ -40,9 +40,14 @@
     <bool>false</bool>
    </attribute>
    <addaction name="openAction"/>
-   <addaction name="selectLogFormatAction"/>
    <addaction name="autoScrollAction"/>
    <addaction name="searchAction"/>
+  </widget>
+  <widget class="QDockWidget" name="logFormatDockWidget">
+   <attribute name="dockWidgetArea">
+    <number>1</number>
+   </attribute>
+   <widget class="QWidget" name="dockWidgetContents"/>
   </widget>
   <action name="openAction">
    <property name="icon">
@@ -56,23 +61,13 @@
     <string>Open log file</string>
    </property>
   </action>
-  <action name="selectLogFormatAction">
-   <property name="icon">
-    <iconset theme="object-columns"/>
-   </property>
-   <property name="text">
-    <string>Format</string>
-   </property>
-   <property name="toolTip">
-    <string>Select log format</string>
-   </property>
-  </action>
   <action name="autoScrollAction">
    <property name="checkable">
     <bool>true</bool>
    </property>
    <property name="icon">
-    <iconset theme="go-bottom"/>
+    <iconset theme="go-bottom">
+     <normaloff>.</normaloff>.</iconset>
    </property>
    <property name="text">
     <string>Auto scroll</string>
@@ -86,7 +81,8 @@
     <bool>true</bool>
    </property>
    <property name="icon">
-    <iconset theme="search"/>
+    <iconset theme="search">
+     <normaloff>.</normaloff>.</iconset>
    </property>
    <property name="text">
     <string>Find</string>

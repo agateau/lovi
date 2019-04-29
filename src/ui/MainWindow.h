@@ -26,9 +26,9 @@
 #include <memory>
 
 class Config;
-class LogFormatDialog;
-class LogFormatStore;
 class LogFormat;
+class LogFormatStore;
+class LogFormatWidget;
 class MainController;
 class SearchBar;
 
@@ -49,23 +49,24 @@ public:
 
 private:
     void setupUi();
+    void setupLogFormatWidget();
     void setupActions();
     void onRowsInserted();
     void onSelectionChanged();
     void reloadLogFormat();
     void showOpenLogDialog();
-    void showLogFormatDialog();
+    void showLogFormatWidget();
     void copySelectedLines();
     void fillRecentFilesMenu();
     void toggleSearchBar(bool visible);
 
+    const std::unique_ptr<MainController> mController;
     const std::unique_ptr<Ui::MainWindow> ui;
-    std::unique_ptr<MainController> mController;
+    const std::unique_ptr<LogFormatWidget> mLogFormatWidget;
 
     QAction* const mCopyLinesAction;
 
     QMenu* const mRecentFilesMenu;
-    QPointer<LogFormatDialog> mLogFormatDialog;
 };
 
 #endif // MAINWINDOW_H
