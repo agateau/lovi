@@ -53,8 +53,6 @@ public:
 
     LogModel* logModel() const;
 
-    QString logPath() const;
-
     bool isStdin() const;
 
     void setLogFormat(LogFormat* logFormat) override;
@@ -78,7 +76,6 @@ private:
     std::unique_ptr<LineProvider> mLineProvider;
     std::unique_ptr<LogModel> mLogModel;
 
-    QString mLogPath;
     LogFormat* mLogFormat = nullptr; // Never null
 };
 

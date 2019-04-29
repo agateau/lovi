@@ -9,3 +9,6 @@ properties:
 - name: currentRow
   type: int
   value: -1
+- name: logPath
+  type: QString
+  mutability: readonly
