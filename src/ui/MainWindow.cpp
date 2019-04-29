@@ -44,7 +44,7 @@ MainWindow::MainWindow(Config* config, LogFormatStore* store, QWidget* parent)
         : QMainWindow(parent)
         , mController(std::make_unique<MainController>(config, store))
         , ui(std::make_unique<Ui::MainWindow>())
-        , mLogFormatWidget(std::make_unique<LogFormatWidget>(store, mController->logFormat()))
+        , mLogFormatWidget(std::make_unique<LogFormatWidget>(mController.get()))
         , mCopyLinesAction(new QAction(this))
         , mRecentFilesMenu(new QMenu(this)) {
     ui->setupUi(this);
@@ -105,13 +105,7 @@ void MainWindow::setupUi() {
         ui->treeView->setUniformRowHeights(true);
     };
 
-    auto setupSearchBar = [this] {
-        ui->searchBar->init(mController.get());
-        ui->searchBar->hide();
-        connect(ui->searchBar, &SearchBar::closeClicked, ui->searchAction, &QAction::toggle);
-    };
     setupLogFormatWidget();
-    setupSearchBar();
     setupTreeView();
     changeOpenButtonMenuBehavior();
     resetMargins();
@@ -137,10 +131,7 @@ void MainWindow::setupActions() {
         }
     });
 
-    ui->searchAction->setShortcuts({QKeySequence::Find, Qt::Key_Slash});
-    connect(ui->searchAction, &QAction::toggled, this, &MainWindow::toggleSearchBar);
-
-    for (auto action : {ui->openAction, ui->autoScrollAction, ui->searchAction}) {
+    for (auto action : {ui->openAction, ui->autoScrollAction}) {
         appendShortcutToToolTip(action);
     }
 
@@ -218,12 +209,5 @@ void MainWindow::fillRecentFilesMenu() {
     mRecentFilesMenu->clear();
     for (const auto& filePath : mController->config()->recentLogFiles()) {
         mRecentFilesMenu->addAction(filePath, this, [this, filePath] { loadLog(filePath); });
-    }
-}
-
-void MainWindow::toggleSearchBar(bool visible) {
-    ui->searchBar->setVisible(visible);
-    if (visible) {
-        ui->searchBar->setFocus();
     }
 }

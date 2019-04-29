@@ -18,9 +18,6 @@
     <item>
      <widget class="QTreeView" name="treeView"/>
     </item>
-    <item>
-     <widget class="SearchBar" name="searchBar" native="true"/>
-    </item>
    </layout>
   </widget>
   <widget class="QToolBar" name="toolBar">
@@ -41,7 +38,6 @@
    </attribute>
    <addaction name="openAction"/>
    <addaction name="autoScrollAction"/>
-   <addaction name="searchAction"/>
   </widget>
   <widget class="QDockWidget" name="logFormatDockWidget">
    <attribute name="dockWidgetArea">
@@ -76,30 +72,7 @@
     <string>Automatically scroll down when new lines are logged</string>
    </property>
   </action>
-  <action name="searchAction">
-   <property name="checkable">
-    <bool>true</bool>
-   </property>
-   <property name="icon">
-    <iconset theme="search">
-     <normaloff>.</normaloff>.</iconset>
-   </property>
-   <property name="text">
-    <string>Find</string>
-   </property>
-   <property name="toolTip">
-    <string>Find text in log file</string>
-   </property>
-  </action>
  </widget>
- <customwidgets>
-  <customwidget>
-   <class>SearchBar</class>
-   <extends>QWidget</extends>
-   <header>SearchBar.h</header>
-   <container>1</container>
-  </customwidget>
- </customwidgets>
  <resources/>
  <connections/>
 </ui>

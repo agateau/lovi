@@ -25,6 +25,7 @@
 #include "LogFormatIO.h"
 #include "LogFormatModel.h"
 #include "LogFormatStore.h"
+#include "MainController.h"
 #include "WidgetFloater.h"
 #include "ui_LogFormatWidget.h"
 
@@ -33,19 +34,20 @@
 #include <QPushButton>
 #include <QStandardPaths>
 
-LogFormatWidget::LogFormatWidget(LogFormatStore* store,
-                                 LogFormat* currentLogFormat,
-                                 QWidget* parent)
+LogFormatWidget::LogFormatWidget(MainController* controller, QWidget* parent)
         : QWidget(parent)
+        , mController(controller)
         , ui(std::make_unique<Ui::LogFormatWidget>())
-        , mModel(std::make_unique<LogFormatModel>(store))
-        , mHighlightModel(std::make_unique<HighlightModel>())
-        , mLogFormatStore(store) {
-    Q_ASSERT(store);
-    Q_ASSERT(currentLogFormat);
+        , mModel(std::make_unique<LogFormatModel>(controller->logFormatStore()))
+        , mHighlightModel(std::make_unique<HighlightModel>()) {
+    Q_ASSERT(mController);
     ui->setupUi(this);
-    setupLogFormatSelector(currentLogFormat);
+    setupLogFormatSelector(mController->logFormat());
     setupEditor();
+    auto setupSearchBar = [this] {
+        ui->searchBar->init(mController, ui->highlightWidget->lineEdit());
+    };
+    setupSearchBar();
     onCurrentChanged(ui->logFormatComboBox->currentIndex());
 }
 
@@ -147,7 +149,7 @@ void LogFormatWidget::onAddFormatClicked() {
     if (name.isEmpty()) {
         return;
     }
-    auto error = mLogFormatStore->addLogFormat(name);
+    auto error = mController->logFormatStore()->addLogFormat(name);
     if (error.has_value()) {
         QString message = error.value();
         QMessageBox box(this);

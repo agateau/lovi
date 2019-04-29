@@ -30,14 +30,12 @@ class LogFormatWidget;
 class HighlightModel;
 class LogFormat;
 class LogFormatModel;
-class LogFormatStore;
+class MainController;
 
 class LogFormatWidget : public QWidget {
     Q_OBJECT
 public:
-    explicit LogFormatWidget(LogFormatStore* store,
-                             LogFormat* currentLogFormat,
-                             QWidget* parent = nullptr);
+    explicit LogFormatWidget(MainController* controller, QWidget* parent = nullptr);
     ~LogFormatWidget();
 
     void setLogFormat(LogFormat* logFormat);
@@ -55,10 +53,10 @@ private:
     void onAddFormatClicked();
     void selectLogFormat(const QString& name);
 
+    MainController* const mController;
     const std::unique_ptr<Ui::LogFormatWidget> ui;
     const std::unique_ptr<LogFormatModel> mModel;
     const std::unique_ptr<HighlightModel> mHighlightModel;
-    LogFormatStore* const mLogFormatStore;
 };
 
 #endif // LOGFORMATWIDGET_H

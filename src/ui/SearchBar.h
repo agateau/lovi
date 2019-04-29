@@ -42,24 +42,18 @@ public:
     explicit SearchBar(QWidget* parent = nullptr);
     ~SearchBar();
 
-    void init(MainController* mainController);
-
-signals:
-    void closeClicked();
-
-protected:
-    void focusInEvent(QFocusEvent* event) override;
+    void init(MainController* mainController, QLineEdit* lineEdit);
 
 private:
     void setupUi();
-    void start(SearchDirection direction);
     void onFinished(const SearchResponse& response);
+    void start(SearchDirection direction);
 
     const std::unique_ptr<Ui::SearchBar> ui;
-    const std::unique_ptr<ConditionLineEditChecker> mLineEditChecker;
 
     // set-once
     MainController* mController = nullptr;
+    QLineEdit* mLineEdit = nullptr;
 };
 
 #endif // SEARCHBAR_H

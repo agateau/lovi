@@ -65,6 +65,10 @@ Highlight* HighlightWidget::highlight() const {
     return mHighlight;
 }
 
+QLineEdit* HighlightWidget::lineEdit() const {
+    return ui->conditionLineEdit;
+}
+
 static void setLabelIcon(QLabel* label, const QString& name) {
     QIcon icon = QIcon::fromTheme(name);
     label->setPixmap(icon.pixmap(32));

@@ -26,9 +26,9 @@
 #include "Searcher.h"
 #include "ui_SearchBar.h"
 
-using std::unique_ptr;
+#include <QLineEdit>
 
-static const int SEARCH_FIELD_CHARS = 40;
+using std::unique_ptr;
 
 template <class T> static unique_ptr<T> initUi(QWidget* parent) {
     auto ui = std::make_unique<T>();
@@ -36,47 +36,35 @@ template <class T> static unique_ptr<T> initUi(QWidget* parent) {
     return ui;
 }
 
-SearchBar::SearchBar(QWidget* parent)
-        : QWidget(parent)
-        , ui(initUi<Ui::SearchBar>(this))
-        , mLineEditChecker(std::make_unique<ConditionLineEditChecker>(ui->lineEdit)) {
+SearchBar::SearchBar(QWidget* parent) : QWidget(parent), ui(initUi<Ui::SearchBar>(this)) {
     setupUi();
 }
 
 SearchBar::~SearchBar() {
 }
 
-void SearchBar::init(MainController* controller) {
+void SearchBar::init(MainController* controller, QLineEdit* lineEdit) {
     Q_ASSERT(!mController);
     Q_ASSERT(controller);
     mController = controller;
-    connect(mController,
-            &MainController::logFormatChanged,
-            mLineEditChecker.get(),
-            &ConditionLineEditChecker::setLogFormat);
-
     connect(mController->searcher(), &Searcher::finished, this, &SearchBar::onFinished);
-}
-
-void SearchBar::focusInEvent(QFocusEvent* event) {
-    QWidget::focusInEvent(event);
-    ui->lineEdit->setFocus();
+    mLineEdit = lineEdit;
 }
 
 void SearchBar::setupUi() {
     layout()->setSpacing(0);
     layout()->setMargin(0);
-    ui->lineEdit->setFixedWidth(SEARCH_FIELD_CHARS * QFontMetrics(font()).width('M'));
     ui->resultLabel->hide();
     connect(ui->nextButton, &QToolButton::clicked, this, [this] { start(SearchDirection::Down); });
     connect(
         ui->previousButton, &QToolButton::clicked, this, [this] { start(SearchDirection::Up); });
-    connect(ui->closeButton, &QToolButton::clicked, this, &SearchBar::closeClicked);
+
+    ui->nextButton->setShortcut(QKeySequence::Find);
 }
 
 void SearchBar::start(SearchDirection direction) {
     auto conditionOrError =
-        ConditionIO::parse(ui->lineEdit->text(), mController->logFormat()->columnHash());
+        ConditionIO::parse(mLineEdit->text(), mController->logFormat()->columnHash());
     if (std::holds_alternative<ConditionIO::ParseError>(conditionOrError)) {
         return;
     }

@@ -2,11 +2,20 @@
 <ui version="4.0">
  <class>LogFormatWidget</class>
  <widget class="QWidget" name="LogFormatWidget">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>274</width>
+    <height>303</height>
+   </rect>
+  </property>
   <property name="windowTitle">
    <string>Format</string>
   </property>
   <property name="windowIcon">
-   <iconset theme="object-columns"/>
+   <iconset theme="object-columns">
+    <normaloff>.</normaloff>.</iconset>
   </property>
   <layout class="QVBoxLayout" name="verticalLayout">
    <item>
@@ -85,9 +94,18 @@
      </property>
     </widget>
    </item>
+   <item>
+    <widget class="SearchBar" name="searchBar" native="true"/>
+   </item>
   </layout>
  </widget>
  <customwidgets>
+  <customwidget>
+   <class>SearchBar</class>
+   <extends>QWidget</extends>
+   <header>SearchBar.h</header>
+   <container>1</container>
+  </customwidget>
   <customwidget>
    <class>HighlightWidget</class>
    <extends>QWidget</extends>

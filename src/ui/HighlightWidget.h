@@ -29,6 +29,8 @@ namespace Ui {
 class HighlightWidget;
 }
 
+class QLineEdit;
+
 class ConditionLineEditChecker;
 
 class HighlightWidget : public QWidget {
@@ -39,6 +41,8 @@ public:
 
     void setHighlight(Highlight* highlight);
     Highlight* highlight() const;
+
+    QLineEdit* lineEdit() const;
 
 private:
     void setupUi();
