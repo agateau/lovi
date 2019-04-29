@@ -6,6 +6,10 @@ set(CMAKE_AUTOUIC ON)
 # Lib
 qt5_add_resources(lovi_resources ui/lovi.qrc)
 
+qpropgen(lovilib_qpropgen_sources
+    core/BaseMainController.yaml
+    )
+
 add_library(lovilib STATIC
     # core
     core/Color.cpp
@@ -25,6 +29,7 @@ add_library(lovilib STATIC
     core/MainController.cpp
     core/Searcher.cpp
     core/StdinLineProvider.cpp
+    ${lovilib_qpropgen_sources}
     # ui
     ui/ColorWidget.cpp
     ui/ConditionLineEditChecker.cpp
@@ -43,6 +48,7 @@ add_library(lovilib STATIC
 
 target_include_directories(lovilib PUBLIC
     ${CMAKE_CURRENT_BINARY_DIR}
+    ${CMAKE_CURRENT_BINARY_DIR}/core
     ${CMAKE_CURRENT_SOURCE_DIR}/core
     ${CMAKE_CURRENT_SOURCE_DIR}/ui
     )

@@ -19,6 +19,8 @@
 #ifndef MAINCONTROLLER_H
 #define MAINCONTROLLER_H
 
+#include "BaseMainController.h"
+
 #include <QObject>
 
 #include <memory>
@@ -33,7 +35,7 @@ class LogModel;
 class Searcher;
 class SearchResponse;
 
-class MainController : public QObject {
+class MainController : public BaseMainController {
     Q_OBJECT
 public:
     explicit MainController(Config* config, LogFormatStore* store, QObject* parent = nullptr);
@@ -55,17 +57,10 @@ public:
 
     bool isStdin() const;
 
-    void setLogFormat(LogFormat* logFormat);
-    LogFormat* logFormat() const;
-
-    void setCurrentRow(int row);
-    int currentRow() const;
+    void setLogFormat(LogFormat* logFormat) override;
+    LogFormat* logFormat() const override;
 
     void startSearch(std::unique_ptr<Condition> condition, SearchDirection direction);
-
-signals:
-    void logFormatChanged(LogFormat* logFormat);
-    void currentRowChanged(int row);
 
 private:
     void updateLogFormatForFile();
@@ -85,7 +80,6 @@ private:
 
     QString mLogPath;
     LogFormat* mLogFormat = nullptr; // Never null
-    int mCurrentRow = -1;
 };
 
 #endif // MAINCONTROLLER_H

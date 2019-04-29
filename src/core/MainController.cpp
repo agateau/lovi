@@ -31,7 +31,7 @@
 static const int MAX_RECENT_FILES = 10;
 
 MainController::MainController(Config* config, LogFormatStore* store, QObject* parent)
-        : QObject(parent)
+        : BaseMainController(parent)
         , mConfig(config)
         , mLogFormatStore(store)
         , mEmptyLogFormat(LogFormat::createEmpty())
@@ -108,20 +108,8 @@ LogFormat* MainController::logFormat() const {
     return mLogFormat;
 }
 
-void MainController::setCurrentRow(int row) {
-    if (mCurrentRow == row) {
-        return;
-    }
-    mCurrentRow = row;
-    currentRowChanged(mCurrentRow);
-}
-
-int MainController::currentRow() const {
-    return mCurrentRow;
-}
-
 void MainController::startSearch(std::unique_ptr<Condition> condition, SearchDirection direction) {
-    int row = mCurrentRow + (direction == SearchDirection::Down ? 1 : -1);
+    int row = currentRow() + (direction == SearchDirection::Down ? 1 : -1);
     mSearcher->start(mLogModel.get(), std::move(condition), direction, row);
 }
 

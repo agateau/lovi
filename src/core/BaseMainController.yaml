@@ -1,0 +1,11 @@
+class: BaseMainController
+includes:
+- LogFormat.h
+properties:
+- name: logFormat
+  type: LogFormat*
+  impl: pure
+  value: nullptr
+- name: currentRow
+  type: int
+  value: -1
