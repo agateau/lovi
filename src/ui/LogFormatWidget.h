@@ -54,7 +54,7 @@ private:
 
     MainController* const mController;
     const std::unique_ptr<Ui::LogFormatWidget> ui;
-    const std::unique_ptr<LogFormatModel> mModel;
+    const std::unique_ptr<LogFormatModel> mLogFormatModel;
     const std::unique_ptr<HighlightModel> mHighlightModel;
 };
 
