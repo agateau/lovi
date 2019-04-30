@@ -26,6 +26,7 @@
 #include "LogFormatModel.h"
 #include "LogFormatStore.h"
 #include "MainController.h"
+#include "Searcher.h"
 #include "WidgetFloater.h"
 #include "ui_LogFormatWidget.h"
 
@@ -44,7 +45,7 @@ LogFormatWidget::LogFormatWidget(MainController* controller, QWidget* parent)
     ui->setupUi(this);
     setupLogFormatSelector(mController->logFormat());
     setupEditor();
-    ui->searchBar->init(mController);
+    setupSearchBar();
     onCurrentChanged(ui->logFormatComboBox->currentIndex());
 }
 
@@ -107,6 +108,19 @@ void LogFormatWidget::setupEditor() {
     floater->setChildWidget(addHighlightButton);
 }
 
+void LogFormatWidget::setupSearchBar() {
+    ui->searchBar->layout()->setMargin(0);
+    connect(mController->searcher(), &Searcher::finished, this, &LogFormatWidget::onSearchFinished);
+    connect(ui->searchNextButton, &QToolButton::clicked, this, [this] {
+        mController->startSearch(SearchDirection::Down);
+    });
+    connect(ui->searchPreviousButton, &QToolButton::clicked, this, [this] {
+        mController->startSearch(SearchDirection::Up);
+    });
+
+    ui->searchNextButton->setShortcut(QKeySequence::Find);
+}
+
 void LogFormatWidget::onCurrentChanged(int row) {
     QModelIndex index = mModel->index(row);
     if (!index.isValid()) {
@@ -163,4 +177,24 @@ void LogFormatWidget::selectLogFormat(const QString& name) {
             return;
         }
     }
+}
+
+void LogFormatWidget::onSearchFinished(const SearchResponse& response) {
+    QString text;
+    switch (response.matchType) {
+    case SearchMatchType::Direct:
+        ui->searchResultLabel->hide();
+        return;
+    case SearchMatchType::None:
+        text = tr("No match found");
+        break;
+    case SearchMatchType::HitTop:
+        text = tr("Hit top, continuing at bottom");
+        break;
+    case SearchMatchType::HitBottom:
+        text = tr("Hit bottom, continuing at top");
+        break;
+    }
+    ui->searchResultLabel->show();
+    ui->searchResultLabel->setText(text);
 }

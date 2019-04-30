@@ -25,7 +25,6 @@
 #include "LogFormatWidget.h"
 #include "LogModel.h"
 #include "MainController.h"
-#include "SearchBar.h"
 #include "ui_MainWindow.h"
 
 #include <QAction>

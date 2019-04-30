@@ -31,6 +31,7 @@ class HighlightModel;
 class LogFormat;
 class LogFormatModel;
 class MainController;
+class SearchResponse;
 
 class LogFormatWidget : public QWidget {
     Q_OBJECT
@@ -46,12 +47,14 @@ signals:
 private:
     void setupLogFormatSelector(LogFormat* currentLogFormat);
     void setupEditor();
+    void setupSearchBar();
 
     void onCurrentChanged(int row);
     void onCurrentHighlightChanged(const QModelIndex& index);
     void applyChanges();
     void onAddFormatClicked();
     void selectLogFormat(const QString& name);
+    void onSearchFinished(const SearchResponse& response);
 
     MainController* const mController;
     const std::unique_ptr<Ui::LogFormatWidget> ui;
