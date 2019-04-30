@@ -141,12 +141,8 @@ void LogFormatWidget::onCurrentHighlightChanged(const QModelIndex& index) {
 }
 
 void LogFormatWidget::onParserEditingFinished() {
-    int row = ui->logFormatComboBox->currentIndex();
-    QModelIndex index = mLogFormatModel->index(row, 0);
-    if (!index.isValid()) {
-        return;
-    }
-    LogFormat* logFormat = mLogFormatModel->logFormatForIndex(index);
+    LogFormat* logFormat = mController->logFormat();
+    Q_ASSERT(logFormat);
     logFormat->setParserPattern(ui->parserLineEdit->text());
 }
 
