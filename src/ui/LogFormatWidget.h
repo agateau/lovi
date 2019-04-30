@@ -45,7 +45,7 @@ private:
     void setupSearchBar();
 
     void setLogFormat(LogFormat* logFormat);
-    void onCurrentChanged(int row);
+    void onCurrentLogFormatChanged(int row);
     void onCurrentHighlightChanged(const QModelIndex& index);
     void applyChanges();
     void onAddFormatClicked();

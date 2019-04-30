@@ -18,11 +18,9 @@
  */
 #include "LogFormatWidget.h"
 
-#include "ConditionIO.h"
 #include "HighlightModel.h"
 #include "LineEditChecker.h"
 #include "LogFormat.h"
-#include "LogFormatIO.h"
 #include "LogFormatModel.h"
 #include "LogFormatStore.h"
 #include "MainController.h"
@@ -33,7 +31,6 @@
 #include <QInputDialog>
 #include <QMessageBox>
 #include <QPushButton>
-#include <QStandardPaths>
 
 LogFormatWidget::LogFormatWidget(MainController* controller, QWidget* parent)
         : QWidget(parent)
@@ -65,7 +62,7 @@ void LogFormatWidget::setupLogFormatSelector() {
     connect(ui->logFormatComboBox,
             qOverload<int>(&QComboBox::currentIndexChanged),
             this,
-            &LogFormatWidget::onCurrentChanged);
+            &LogFormatWidget::onCurrentLogFormatChanged);
     connect(ui->addFormatButton, &QToolButton::clicked, this, &LogFormatWidget::onAddFormatClicked);
 
     connect(mController, &MainController::logFormatChanged, this, &LogFormatWidget::setLogFormat);
@@ -124,12 +121,11 @@ void LogFormatWidget::setupSearchBar() {
     ui->searchNextButton->setShortcut(QKeySequence::Find);
 }
 
-void LogFormatWidget::onCurrentChanged(int row) {
+void LogFormatWidget::onCurrentLogFormatChanged(int row) {
     QModelIndex index = mModel->index(row);
     if (!index.isValid()) {
         return;
     }
-
     LogFormat* logFormat = mModel->logFormatForIndex(index);
     mController->setLogFormat(logFormat);
 }
