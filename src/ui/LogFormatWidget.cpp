@@ -70,7 +70,10 @@ void LogFormatWidget::setupLogFormatSelector() {
 
 void LogFormatWidget::setupEditor() {
     // Parser edit
-    connect(ui->parserLineEdit, &QLineEdit::editingFinished, this, &LogFormatWidget::applyChanges);
+    connect(ui->parserLineEdit,
+            &QLineEdit::editingFinished,
+            this,
+            &LogFormatWidget::onParserEditingFinished);
     new LineEditChecker(ui->parserLineEdit, [](const QString& text) -> QString {
         QRegularExpression rx(text);
         return rx.isValid() ? QString() : rx.errorString();
@@ -137,7 +140,7 @@ void LogFormatWidget::onCurrentHighlightChanged(const QModelIndex& index) {
     ui->highlightWidget->setHighlight(highlight);
 }
 
-void LogFormatWidget::applyChanges() {
+void LogFormatWidget::onParserEditingFinished() {
     int row = ui->logFormatComboBox->currentIndex();
     QModelIndex index = mLogFormatModel->index(row, 0);
     if (!index.isValid()) {

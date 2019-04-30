@@ -47,7 +47,7 @@ private:
     void setLogFormat(LogFormat* logFormat);
     void onCurrentLogFormatChanged(int row);
     void onCurrentHighlightChanged(const QModelIndex& index);
-    void applyChanges();
+    void onParserEditingFinished();
     void onAddFormatClicked();
     void selectLogFormat(const QString& name);
     void onSearchFinished(const SearchResponse& response);
