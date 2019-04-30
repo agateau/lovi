@@ -180,15 +180,6 @@ void MainWindow::setupLogFormatWidget() {
     auto action = ui->logFormatDockWidget->toggleViewAction();
     action->setIcon(mLogFormatWidget->windowIcon());
     ui->toolBar->addAction(action);
-
-    connect(mLogFormatWidget.get(),
-            &LogFormatWidget::logFormatChanged,
-            mController.get(),
-            &MainController::setLogFormat);
-    connect(mController.get(),
-            &MainController::logFormatChanged,
-            mLogFormatWidget.get(),
-            &LogFormatWidget::setLogFormat);
 }
 
 void MainWindow::copySelectedLines() {

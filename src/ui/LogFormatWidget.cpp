@@ -43,10 +43,10 @@ LogFormatWidget::LogFormatWidget(MainController* controller, QWidget* parent)
         , mHighlightModel(std::make_unique<HighlightModel>()) {
     Q_ASSERT(mController);
     ui->setupUi(this);
-    setupLogFormatSelector(mController->logFormat());
+    setupLogFormatSelector();
     setupEditor();
     setupSearchBar();
-    onCurrentChanged(ui->logFormatComboBox->currentIndex());
+    setLogFormat(mController->logFormat());
 }
 
 LogFormatWidget::~LogFormatWidget() {
@@ -55,17 +55,20 @@ LogFormatWidget::~LogFormatWidget() {
 void LogFormatWidget::setLogFormat(LogFormat* logFormat) {
     Q_ASSERT(logFormat);
     selectLogFormat(logFormat->name());
+    ui->parserLineEdit->setText(logFormat->parserPattern());
+    mHighlightModel->setLogFormat(logFormat);
 }
 
-void LogFormatWidget::setupLogFormatSelector(LogFormat* currentLogFormat) {
+void LogFormatWidget::setupLogFormatSelector() {
     ui->logFormatComboBox->setModel(mModel.get());
-    selectLogFormat(currentLogFormat->name());
 
     connect(ui->logFormatComboBox,
             qOverload<int>(&QComboBox::currentIndexChanged),
             this,
             &LogFormatWidget::onCurrentChanged);
     connect(ui->addFormatButton, &QToolButton::clicked, this, &LogFormatWidget::onAddFormatClicked);
+
+    connect(mController, &MainController::logFormatChanged, this, &LogFormatWidget::setLogFormat);
 }
 
 void LogFormatWidget::setupEditor() {
@@ -128,10 +131,7 @@ void LogFormatWidget::onCurrentChanged(int row) {
     }
 
     LogFormat* logFormat = mModel->logFormatForIndex(index);
-    ui->parserLineEdit->setText(logFormat->parserPattern());
-    mHighlightModel->setLogFormat(logFormat);
-
-    logFormatChanged(logFormat);
+    mController->setLogFormat(logFormat);
 }
 
 void LogFormatWidget::onCurrentHighlightChanged(const QModelIndex& index) {

@@ -39,16 +39,12 @@ public:
     explicit LogFormatWidget(MainController* controller, QWidget* parent = nullptr);
     ~LogFormatWidget();
 
-    void setLogFormat(LogFormat* logFormat);
-
-signals:
-    void logFormatChanged(LogFormat* logFormat);
-
 private:
-    void setupLogFormatSelector(LogFormat* currentLogFormat);
+    void setupLogFormatSelector();
     void setupEditor();
     void setupSearchBar();
 
+    void setLogFormat(LogFormat* logFormat);
     void onCurrentChanged(int row);
     void onCurrentHighlightChanged(const QModelIndex& index);
     void applyChanges();
