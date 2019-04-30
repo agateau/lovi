@@ -58,7 +58,7 @@ public:
     void setLogFormat(LogFormat* logFormat) override;
     LogFormat* logFormat() const override;
 
-    void startSearch(std::unique_ptr<Condition> condition, SearchDirection direction);
+    void startSearch(SearchDirection direction);
 
 private:
     void updateLogFormatForFile();

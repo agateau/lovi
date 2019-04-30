@@ -29,7 +29,6 @@ namespace Ui {
 class SearchBar;
 }
 
-class QLineEdit;
 class QPushButton;
 
 class ConditionLineEditChecker;
@@ -42,7 +41,7 @@ public:
     explicit SearchBar(QWidget* parent = nullptr);
     ~SearchBar();
 
-    void init(MainController* mainController, QLineEdit* lineEdit);
+    void init(MainController* mainController);
 
 private:
     void setupUi();
@@ -53,7 +52,6 @@ private:
 
     // set-once
     MainController* mController = nullptr;
-    QLineEdit* mLineEdit = nullptr;
 };
 
 #endif // SEARCHBAR_H

@@ -12,3 +12,6 @@ properties:
 - name: logPath
   type: QString
   mutability: readonly
+- name: currentHighlight
+  type: Highlight*
+  value: nullptr

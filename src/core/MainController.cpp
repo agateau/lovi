@@ -104,9 +104,16 @@ LogFormat* MainController::logFormat() const {
     return mLogFormat;
 }
 
-void MainController::startSearch(std::unique_ptr<Condition> condition, SearchDirection direction) {
+void MainController::startSearch(SearchDirection direction) {
+    if (!currentHighlight()) {
+        return;
+    }
+    auto* condition = currentHighlight()->condition();
+    if (!condition) {
+        return;
+    }
     int row = currentRow() + (direction == SearchDirection::Down ? 1 : -1);
-    mSearcher->start(mLogModel.get(), std::move(condition), direction, row);
+    mSearcher->start(mLogModel.get(), condition, direction, row);
 }
 
 void MainController::updateLogFormatForFile() {

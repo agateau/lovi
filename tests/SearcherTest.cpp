@@ -74,42 +74,46 @@ TEST_CASE("Searcher") {
     SECTION("Down") {
         StringListSearchable searchable({"foo", "bar", "baz"});
         SECTION("DirectHit") {
-            searcher.start(&searchable, createTestCondition("l ~ ^b"), SearchDirection::Down, 0);
+            auto condition = createTestCondition("l ~ ^b");
+            searcher.start(&searchable, condition.get(), SearchDirection::Down, 0);
             checkFinishedEmitted({SearchMatchType::Direct, 1});
 
-            searcher.start(&searchable, createTestCondition("l ~ ^b"), SearchDirection::Down, 2);
+            searcher.start(&searchable, condition.get(), SearchDirection::Down, 2);
             checkFinishedEmitted({SearchMatchType::Direct, 2});
         }
 
         SECTION("NoHit") {
-            searcher.start(
-                &searchable, createTestCondition("l ~ ^notFound"), SearchDirection::Down, 0);
+            auto condition = createTestCondition("l ~ ^notFound");
+            searcher.start(&searchable, condition.get(), SearchDirection::Down, 0);
             checkFinishedEmitted({});
         }
 
         SECTION("Wrapped") {
-            searcher.start(&searchable, createTestCondition("l ~ ^foo"), SearchDirection::Down, 1);
+            auto condition = createTestCondition("l ~ ^foo");
+            searcher.start(&searchable, condition.get(), SearchDirection::Down, 1);
             checkFinishedEmitted({SearchMatchType::HitBottom, 0});
         }
     }
     SECTION("Up") {
         StringListSearchable searchable({"baz", "bar", "foo"});
         SECTION("DirectHit") {
-            searcher.start(&searchable, createTestCondition("l ~ ^b"), SearchDirection::Up, 2);
+            auto condition = createTestCondition("l ~ ^b");
+            searcher.start(&searchable, condition.get(), SearchDirection::Up, 2);
             checkFinishedEmitted({SearchMatchType::Direct, 1});
 
-            searcher.start(&searchable, createTestCondition("l ~ ^b"), SearchDirection::Up, 0);
+            searcher.start(&searchable, condition.get(), SearchDirection::Up, 0);
             checkFinishedEmitted({SearchMatchType::Direct, 0});
         }
 
         SECTION("NoHit") {
-            searcher.start(
-                &searchable, createTestCondition("l ~ ^notFound"), SearchDirection::Up, 0);
+            auto condition = createTestCondition("l ~ ^notFound");
+            searcher.start(&searchable, condition.get(), SearchDirection::Up, 0);
             checkFinishedEmitted({});
         }
 
         SECTION("Wrapped") {
-            searcher.start(&searchable, createTestCondition("l ~ ^foo"), SearchDirection::Up, 1);
+            auto condition = createTestCondition("l ~ ^foo");
+            searcher.start(&searchable, condition.get(), SearchDirection::Up, 1);
             checkFinishedEmitted({SearchMatchType::HitTop, 2});
         }
     }

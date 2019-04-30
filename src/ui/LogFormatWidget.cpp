@@ -44,10 +44,7 @@ LogFormatWidget::LogFormatWidget(MainController* controller, QWidget* parent)
     ui->setupUi(this);
     setupLogFormatSelector(mController->logFormat());
     setupEditor();
-    auto setupSearchBar = [this] {
-        ui->searchBar->init(mController, ui->highlightWidget->lineEdit());
-    };
-    setupSearchBar();
+    ui->searchBar->init(mController);
     onCurrentChanged(ui->logFormatComboBox->currentIndex());
 }
 
@@ -124,13 +121,10 @@ void LogFormatWidget::onCurrentChanged(int row) {
 }
 
 void LogFormatWidget::onCurrentHighlightChanged(const QModelIndex& index) {
-    if (!index.isValid()) {
-        ui->highlightWidget->setHighlight(nullptr);
-        return;
-    }
-    int row = index.row();
     auto logFormat = mHighlightModel->logFormat();
-    ui->highlightWidget->setHighlight(logFormat->editableHighlightAt(row));
+    auto* highlight = index.isValid() ? logFormat->editableHighlightAt(index.row()) : nullptr;
+    mController->setCurrentHighlight(highlight);
+    ui->highlightWidget->setHighlight(highlight);
 }
 
 void LogFormatWidget::applyChanges() {

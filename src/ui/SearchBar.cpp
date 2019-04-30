@@ -43,12 +43,11 @@ SearchBar::SearchBar(QWidget* parent) : QWidget(parent), ui(initUi<Ui::SearchBar
 SearchBar::~SearchBar() {
 }
 
-void SearchBar::init(MainController* controller, QLineEdit* lineEdit) {
+void SearchBar::init(MainController* controller) {
     Q_ASSERT(!mController);
     Q_ASSERT(controller);
     mController = controller;
     connect(mController->searcher(), &Searcher::finished, this, &SearchBar::onFinished);
-    mLineEdit = lineEdit;
 }
 
 void SearchBar::setupUi() {
@@ -63,13 +62,7 @@ void SearchBar::setupUi() {
 }
 
 void SearchBar::start(SearchDirection direction) {
-    auto conditionOrError =
-        ConditionIO::parse(mLineEdit->text(), mController->logFormat()->columnHash());
-    if (std::holds_alternative<ConditionIO::ParseError>(conditionOrError)) {
-        return;
-    }
-    auto condition = std::move(std::get<unique_ptr<Condition>>(conditionOrError));
-    mController->startSearch(std::move(condition), direction);
+    mController->startSearch(direction);
 }
 
 void SearchBar::onFinished(const SearchResponse& response) {

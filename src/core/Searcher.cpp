@@ -30,8 +30,8 @@ Searchable::~Searchable() {
 Searcher::Searcher(QObject* parent) : QObject(parent) {
 }
 
-static optional<int>
-search(Searchable* searchable, const Condition* condition, int startRow, int endRow, int delta) {
+static optional<int> search(
+    const Searchable* searchable, const Condition* condition, int startRow, int endRow, int delta) {
     for (int row = startRow; row != endRow; row += delta) {
         if (searchable->lineMatches(row, condition)) {
             return row;
@@ -40,20 +40,20 @@ search(Searchable* searchable, const Condition* condition, int startRow, int end
     return {};
 }
 
-void Searcher::start(Searchable* searchable,
-                     std::unique_ptr<Condition> condition,
+void Searcher::start(const Searchable* searchable,
+                     const Condition* condition,
                      SearchDirection direction,
                      int startRow) {
     bool isDown = direction == SearchDirection::Down;
     int delta = isDown ? 1 : -1;
     int begin = isDown ? 0 : (searchable->lineCount() - 1);
     int end = isDown ? searchable->lineCount() : -1;
-    optional<int> row = search(searchable, condition.get(), startRow, end, delta);
+    optional<int> row = search(searchable, condition, startRow, end, delta);
     if (row.has_value()) {
         finished({SearchMatchType::Direct, row.value()});
         return;
     }
-    row = search(searchable, condition.get(), begin, startRow, delta);
+    row = search(searchable, condition, begin, startRow, delta);
     if (row.has_value()) {
         finished({isDown ? SearchMatchType::HitBottom : SearchMatchType::HitTop, row.value()});
         return;

@@ -21,8 +21,6 @@
 
 #include <QObject>
 
-#include <memory>
-
 class Condition;
 
 enum class SearchDirection { Up, Down };
@@ -49,7 +47,7 @@ class Searcher : public QObject {
 public:
     Searcher(QObject* parent = nullptr);
 
-    void start(Searchable*, std::unique_ptr<Condition> condition, SearchDirection, int startRow);
+    void start(const Searchable*, const Condition* condition, SearchDirection, int startRow);
 
 signals:
     void finished(const SearchResponse& response);
