@@ -25,7 +25,7 @@
 
 class Color {
 public:
-    explicit Color(const QColor& color);
+    Color(const QColor& color);
     explicit Color(const QString& text);
 
     QColor toColor(const QString& matchingText) const;
@@ -39,6 +39,8 @@ private:
     bool mIsAuto = false;
     QColor mColor;
 };
+
+bool operator==(const Color& c1, const Color& c2);
 
 using OptionalColor = std::optional<Color>;
 
