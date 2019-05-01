@@ -19,6 +19,7 @@
 #include "ColorWidget.h"
 
 #include "Highlight.h"
+#include "Palette.h"
 
 #include <QButtonGroup>
 #include <QColorDialog>
@@ -98,7 +99,11 @@ CustomColorItem::CustomColorItem() : ColorItem(tr("Custom..."), {}) {
 
 void CustomColorItem::setColor(const OptionalColor& color) {
     mColor = color;
-    setIcon(createIcon(color, iconSize()));
+    if (color.has_value()) {
+        setIcon(createIcon(color, iconSize()));
+    } else {
+        setIcon({});
+    }
 }
 
 //# ColorWidget
@@ -117,6 +122,8 @@ ColorWidget::~ColorWidget() {
 }
 
 void ColorWidget::setupMenu() {
+    static std::optional<Palette> paletteOrNone = Palette::load(":/palette.gpl");
+
     auto* widget = new ColorMenuWidget;
 
     auto createMenu = [this, widget] {
@@ -129,16 +136,27 @@ void ColorWidget::setupMenu() {
         setMenu(menu);
     };
 
+    auto createPredefinedItems = [this, widget](const Palette& palette) {
+        int column = 0;
+        QHBoxLayout* row = nullptr;
+        for (const auto& color : palette.colors) {
+            if (column == 0) {
+                row = widget->addRow();
+            }
+            auto item = std::make_unique<SimpleColorItem>(color);
+            row->addWidget(item.get());
+            mPredefinedColorItems.push_back(std::move(item));
+            column = (column + 1) % std::min(palette.columns, 8);
+        }
+    };
+
     createMenu();
 
     auto* row = widget->addRow();
     row->addWidget(mNoneItem.get());
     row->addWidget(mAutoItem.get());
-    row = widget->addRow();
-    for (const QColor& color : {Qt::red, Qt::green, Qt::blue}) {
-        auto item = std::make_unique<SimpleColorItem>(color);
-        row->addWidget(item.get());
-        mPredefinedColorItems.push_back(std::move(item));
+    if (paletteOrNone.has_value()) {
+        createPredefinedItems(paletteOrNone.value());
     }
     row = widget->addRow();
     row->addWidget(mCustomItem.get());
@@ -167,6 +185,7 @@ void ColorWidget::setColor(const OptionalColor& color) {
 }
 
 void ColorWidget::onAboutToShowMenu() {
+    mCustomItem->setColor({});
     if (!mColor.has_value()) {
         setCurrentItem(mNoneItem.get());
         return;

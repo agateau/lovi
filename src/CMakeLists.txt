@@ -40,6 +40,7 @@ add_library(lovilib STATIC
     ui/LogFormatWidget.ui
     ui/MainWindow.cpp
     ui/MainWindow.ui
+    ui/Palette.cpp
     ui/WidgetFloater.cpp
     ${lovi_resources}
     )
