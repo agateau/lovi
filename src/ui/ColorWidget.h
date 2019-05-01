@@ -21,12 +21,55 @@
 
 #include "Highlight.h"
 
-#include <QComboBox>
+#include "Color.h"
+#include "Vector.h"
 
-class ColorWidget : public QComboBox {
+#include <QPushButton>
+#include <QToolButton>
+
+#include <memory>
+
+class QButtonGroup;
+class QHBoxLayout;
+class QVBoxLayout;
+
+class ColorMenuWidget : public QWidget {
+public:
+    ColorMenuWidget();
+    QHBoxLayout* addRow();
+
+private:
+    QVBoxLayout* const mLayout;
+};
+
+class ColorItem : public QToolButton {
+public:
+    ColorItem(const QString& text, const OptionalColor& color);
+    OptionalColor color() const {
+        return mColor;
+    }
+
+protected:
+    OptionalColor mColor;
+};
+
+class SimpleColorItem : public ColorItem {
+public:
+    explicit SimpleColorItem(const OptionalColor& color);
+    explicit SimpleColorItem(const QString& text, const OptionalColor& color);
+};
+
+class CustomColorItem : public ColorItem {
+public:
+    CustomColorItem();
+    void setColor(const OptionalColor& color);
+};
+
+class ColorWidget : public QPushButton {
     Q_OBJECT
 public:
     ColorWidget(QWidget* parent = nullptr);
+    ~ColorWidget();
 
     void setColor(const OptionalColor& color);
     OptionalColor color() const;
@@ -35,9 +78,19 @@ signals:
     void colorChanged(const OptionalColor& color);
 
 private:
-    void onActivated(int index);
+    void setupMenu();
+    void setupButtonGroup();
+    void onActivated(QAbstractButton* button);
+    void onAboutToShowMenu();
+    void setCurrentItem(ColorItem* item);
 
     OptionalColor mColor;
+
+    std::unique_ptr<QButtonGroup> mButtonGroup;
+    std::unique_ptr<ColorItem> mNoneItem;
+    std::unique_ptr<ColorItem> mAutoItem;
+    std::unique_ptr<CustomColorItem> mCustomItem;
+    stdq::Vector<std::unique_ptr<ColorItem>> mPredefinedColorItems;
 };
 
 #endif // COLORWIDGET_H
