@@ -16,32 +16,24 @@
  * You should have received a copy of the GNU General Public License along with
  * this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-#ifndef COLOR_H
-#define COLOR_H
+#ifndef PALETTEREADER_H
+#define PALETTEREADER_H
+
+#include "Vector.h"
 
 #include <QColor>
+#include <QString>
 
 #include <optional>
 
-class Color {
-public:
-    Color(const QColor& color);
-    explicit Color(const QString& text);
+/**
+ * Gimp palette reader
+ */
+struct Palette {
+    stdq::Vector<QColor> colors;
+    int columns = 0;
 
-    QColor toColor(const QString& matchingText) const;
-    QString toString() const;
-    bool isAuto() const;
-
-    static Color createAuto();
-
-private:
-    Color();
-    bool mIsAuto = false;
-    QColor mColor;
+    static std::optional<Palette> load(const QString& path);
 };
 
-bool operator==(const Color& c1, const Color& c2);
-
-using OptionalColor = std::optional<Color>;
-
-#endif // COLOR_H
+#endif // PALETTEREADER_H

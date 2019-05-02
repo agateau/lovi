@@ -94,7 +94,7 @@
  <customwidgets>
   <customwidget>
    <class>ColorWidget</class>
-   <extends>QComboBox</extends>
+   <extends>QPushButton</extends>
    <header>ColorWidget.h</header>
   </customwidget>
  </customwidgets>

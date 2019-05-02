@@ -67,3 +67,13 @@ Color Color::createAuto() {
 
 Color::Color() {
 }
+
+bool operator==(const Color& c1, const Color& c2) {
+    if (c1.isAuto() != c2.isAuto()) {
+        return false;
+    }
+    if (c1.isAuto()) {
+        return true;
+    }
+    return c1.toColor({}) == c2.toColor({});
+}
