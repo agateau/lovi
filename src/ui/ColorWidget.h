@@ -63,6 +63,7 @@ class CustomColorItem : public ColorItem {
 public:
     CustomColorItem();
     void setColor(const OptionalColor& color);
+    void resetIcon();
 };
 
 class ColorWidget : public QPushButton {

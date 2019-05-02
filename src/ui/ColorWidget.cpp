@@ -99,11 +99,11 @@ CustomColorItem::CustomColorItem() : ColorItem(tr("Custom..."), {}) {
 
 void CustomColorItem::setColor(const OptionalColor& color) {
     mColor = color;
-    if (color.has_value()) {
-        setIcon(createIcon(color, iconSize()));
-    } else {
-        setIcon({});
-    }
+    setIcon(createIcon(color, iconSize()));
+}
+
+void CustomColorItem::resetIcon() {
+    setIcon({});
 }
 
 //# ColorWidget
@@ -185,7 +185,7 @@ void ColorWidget::setColor(const OptionalColor& color) {
 }
 
 void ColorWidget::onAboutToShowMenu() {
-    mCustomItem->setColor({});
+    mCustomItem->resetIcon();
     if (!mColor.has_value()) {
         setCurrentItem(mNoneItem.get());
         return;
