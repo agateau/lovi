@@ -31,6 +31,7 @@
 #include <QInputDialog>
 #include <QMessageBox>
 #include <QPushButton>
+#include <QToolTip>
 
 LogFormatWidget::LogFormatWidget(MainController* controller, QWidget* parent)
         : QWidget(parent)
@@ -178,7 +179,6 @@ void LogFormatWidget::onSearchFinished(const SearchResponse& response) {
     QString text;
     switch (response.matchType) {
     case SearchMatchType::Direct:
-        ui->searchResultLabel->hide();
         return;
     case SearchMatchType::None:
         text = tr("No match found");
@@ -190,6 +190,6 @@ void LogFormatWidget::onSearchFinished(const SearchResponse& response) {
         text = tr("Hit bottom, continuing at top");
         break;
     }
-    ui->searchResultLabel->show();
-    ui->searchResultLabel->setText(text);
+    auto pos = ui->searchNextButton->mapToGlobal({ui->searchNextButton->width(), 0});
+    QToolTip::showText(pos, text);
 }

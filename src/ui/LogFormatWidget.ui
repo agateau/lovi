@@ -99,20 +99,17 @@
      <layout class="QHBoxLayout" name="horizontalLayout_2">
       <item>
        <widget class="QToolButton" name="searchPreviousButton">
-        <property name="arrowType">
-         <enum>Qt::UpArrow</enum>
+        <property name="text">
+         <string>&amp;Previous</string>
         </property>
        </widget>
       </item>
       <item>
        <widget class="QToolButton" name="searchNextButton">
-        <property name="arrowType">
-         <enum>Qt::DownArrow</enum>
+        <property name="text">
+         <string>&amp;Next</string>
         </property>
        </widget>
-      </item>
-      <item>
-       <widget class="QLabel" name="searchResultLabel"/>
       </item>
       <item>
        <spacer name="horizontalSpacer">
