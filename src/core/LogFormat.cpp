@@ -28,14 +28,14 @@ LogFormat::LogFormat(QObject* parent) : QObject(parent) {
 }
 
 void LogFormat::emitHighlightChanged(Highlight* highlight) {
-    for (int row = 0; row < mHighlights.size(); ++row) {
-        if (mHighlights.at(row).get() == highlight) {
-            highlightChanged(row);
-            changed();
-            return;
-        }
-    }
-    Q_UNREACHABLE();
+    auto it = std::find_if(mHighlights.begin(), mHighlights.end(), [highlight](const auto& ptr) {
+        return ptr.get() == highlight;
+    });
+    Q_ASSERT(it != mHighlights.end());
+
+    int row = int(it - mHighlights.begin());
+    highlightChanged(row);
+    changed();
 }
 
 void LogFormat::setName(const QString& name) {
