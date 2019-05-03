@@ -104,7 +104,8 @@ void LogFormatWidget::setupEditor() {
     auto addHighlightButton = new QToolButton;
     addHighlightButton->setIcon(QIcon::fromTheme("list-add"));
     connect(addHighlightButton, &QToolButton::pressed, this, [this] {
-        mHighlightModel->logFormat()->addHighlight();
+        Highlight* highlight = mHighlightModel->logFormat()->addHighlight();
+        highlight->setBgColor(Color::createAuto());
     });
 
     auto floater = new WidgetFloater(ui->highlightListView);
