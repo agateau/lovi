@@ -39,6 +39,8 @@
 #include <QTreeView>
 #include <QVBoxLayout>
 
+using std::optional;
+
 MainWindow::MainWindow(Config* config, LogFormatStore* store, QWidget* parent)
         : QMainWindow(parent)
         , mController(std::make_unique<MainController>(config, store))
@@ -87,14 +89,15 @@ void MainWindow::setupUi() {
         layout->setSpacing(0);
     };
     auto setupTreeView = [this] {
-        connect(mController.get(), &MainController::currentRowChanged, this, [this](int row) {
-            if (row < 0) {
-                return;
-            }
-            auto index = ui->treeView->model()->index(row, 0);
-            Q_ASSERT(index.isValid());
-            ui->treeView->setCurrentIndex(index);
-        });
+        connect(
+            mController.get(), &MainController::currentRowChanged, this, [this](optional<int> row) {
+                if (!row.has_value()) {
+                    return;
+                }
+                auto index = ui->treeView->model()->index(row.value(), 0);
+                Q_ASSERT(index.isValid());
+                ui->treeView->setCurrentIndex(index);
+            });
 
         ui->treeView->setRootIsDecorated(false);
         ui->treeView->setContextMenuPolicy(Qt::ActionsContextMenu);
@@ -154,7 +157,7 @@ void MainWindow::onSelectionChanged() {
     mCopyLinesAction->setText(tr("Copy %n line(s)", "", lineCount));
 
     auto index = selectionModel->currentIndex();
-    mController->setCurrentRow(index.isValid() ? index.row() : -1);
+    mController->setCurrentRow(index.isValid() ? index.row() : optional<int>{});
 }
 
 void MainWindow::showOpenLogDialog() {

@@ -112,7 +112,7 @@ void MainController::startSearch(SearchDirection direction) {
     if (!condition) {
         return;
     }
-    int row = currentRow() + (direction == SearchDirection::Down ? 1 : -1);
+    int row = currentRow().value_or(0) + (direction == SearchDirection::Down ? 1 : -1);
     mSearcher->start(mLogModel.get(), condition, direction, row);
 }
 
