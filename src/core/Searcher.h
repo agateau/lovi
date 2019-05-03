@@ -21,6 +21,8 @@
 
 #include <QObject>
 
+#include <optional>
+
 class Condition;
 
 enum class SearchDirection { Up, Down };
@@ -28,7 +30,7 @@ enum class SearchMatchType { None, Direct, HitTop, HitBottom };
 
 struct SearchResponse {
     SearchMatchType matchType = SearchMatchType::None;
-    int row = -1;
+    std::optional<int> row;
 };
 
 Q_DECLARE_METATYPE(SearchResponse)

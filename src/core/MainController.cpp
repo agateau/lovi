@@ -144,6 +144,6 @@ void MainController::onSearchFinished(const SearchResponse& response) {
     if (response.matchType == SearchMatchType::None) {
         return;
     }
-    Q_ASSERT(response.row >= 0);
+    Q_ASSERT(response.row.has_value());
     setCurrentRow(response.row);
 }
