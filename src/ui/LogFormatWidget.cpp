@@ -19,6 +19,7 @@
 #include "LogFormatWidget.h"
 
 #include "HighlightModel.h"
+#include "ItemDelegate.h"
 #include "LineEditChecker.h"
 #include "LogFormat.h"
 #include "LogFormatModel.h"
@@ -82,6 +83,7 @@ void LogFormatWidget::setupEditor() {
 
     // Highlight list
     ui->highlightListView->setModel(mHighlightModel.get());
+    ui->highlightListView->setItemDelegate(new ItemDelegate(ui->highlightListView));
 
     connect(ui->highlightListView->selectionModel(),
             &QItemSelectionModel::currentChanged,

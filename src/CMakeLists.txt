@@ -36,6 +36,7 @@ add_library(lovilib STATIC
     ui/ConditionLineEditChecker.cpp
     ui/HighlightWidget.cpp
     ui/HighlightWidget.ui
+    ui/ItemDelegate.cpp
     ui/LineEditChecker.cpp
     ui/LogFormatWidget.cpp
     ui/LogFormatWidget.ui

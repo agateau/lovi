@@ -19,6 +19,7 @@
 #include "MainWindow.h"
 
 #include "Config.h"
+#include "ItemDelegate.h"
 #include "LineProvider.h"
 #include "LogFormat.h"
 #include "LogFormatStore.h"
@@ -105,6 +106,7 @@ void MainWindow::setupUi() {
         ui->treeView->addAction(mCopyLinesAction);
         // Make scrolling fast
         ui->treeView->setUniformRowHeights(true);
+        ui->treeView->setItemDelegate(new ItemDelegate(ui->treeView));
     };
 
     setupLogFormatWidget();
