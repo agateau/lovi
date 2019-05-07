@@ -19,27 +19,26 @@
 #ifndef CONFIG_H
 #define CONFIG_H
 
-#include <QHash>
 #include <QObject>
+
+#include <memory>
+
+class JsonSettings;
 
 class Config : public QObject {
     Q_OBJECT
 public:
     explicit Config(const QString& configPath, QObject* parent = nullptr);
+    ~Config();
 
     QStringList recentLogFiles() const;
     void setRecentLogFiles(const QStringList& files);
 
-    QHash<QString, QString> logFormatForFile() const;
+    QString logFormatForFile(const QString& file) const;
     void setLogFormatForFile(const QString& file, const QString& format);
 
 private:
-    void load();
-    void save() const;
-    const QString mConfigPath;
-
-    QStringList mRecentLogFiles;
-    QHash<QString, QString> mLogFormatForFile;
+    const std::unique_ptr<JsonSettings> mSettings;
 };
 
 #endif // CONFIG_H

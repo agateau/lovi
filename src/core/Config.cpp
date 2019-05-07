@@ -18,96 +18,33 @@
  */
 #include "Config.h"
 
-#include <QDebug>
-#include <QFile>
-#include <QJsonArray>
-#include <QJsonDocument>
-#include <QJsonObject>
-#include <QJsonParseError>
+#include "JsonSettings.h"
+
+static constexpr char RECENT_LOG_FILES_KEY[] = "recentLogFiles";
+static constexpr char LOG_FORMAT_FOR_FILE_KEY[] = "logFormatForFile";
 
 Config::Config(const QString& configPath, QObject* parent)
-        : QObject(parent), mConfigPath(configPath) {
-    load();
+        : QObject(parent), mSettings(std::make_unique<JsonSettings>(configPath)) {
+}
+
+Config::~Config() {
 }
 
 QStringList Config::recentLogFiles() const {
-    return mRecentLogFiles;
+    return mSettings->readStringList(RECENT_LOG_FILES_KEY);
 }
 
 void Config::setRecentLogFiles(const QStringList& files) {
-    mRecentLogFiles = files;
-    save();
+    mSettings->writeStringList(RECENT_LOG_FILES_KEY, files);
 }
 
-QHash<QString, QString> Config::logFormatForFile() const {
-    return mLogFormatForFile;
+QString Config::logFormatForFile(const QString& file) const {
+    QVariantHash hash = mSettings->readVariantHash(LOG_FORMAT_FOR_FILE_KEY);
+    return hash.value(file).toString();
 }
 
 void Config::setLogFormatForFile(const QString& file, const QString& format) {
-    mLogFormatForFile[file] = format;
-    save();
-}
-
-void Config::load() {
-    QFile file(mConfigPath);
-    if (!file.exists()) {
-        return;
-    }
-    if (!file.open(QIODevice::ReadOnly)) {
-        qWarning() << "Cannot read" << mConfigPath << ":" << file.errorString();
-        return;
-    }
-    QByteArray json = file.readAll();
-
-    QJsonParseError error;
-    auto doc = QJsonDocument::fromJson(json, &error);
-    if (error.error != QJsonParseError::NoError) {
-        qWarning() << "Cannot parse" << mConfigPath << ":" << error.errorString();
-        return;
-    }
-
-    auto root = doc.object();
-    {
-        auto array = root.value("recentLogFiles").toArray();
-        mRecentLogFiles.clear();
-        for (const QJsonValue value : array) {
-            mRecentLogFiles << value.toString();
-        }
-    }
-
-    mLogFormatForFile.clear();
-    {
-        auto obj = root.value("logFormatForFile").toObject();
-        for (const QString& key : obj.keys()) {
-            mLogFormatForFile[key] = obj.value(key).toString();
-        }
-    }
-}
-
-void Config::save() const {
-    QFile file(mConfigPath);
-    if (!file.open(QIODevice::WriteOnly)) {
-        qWarning() << "Cannot write to" << mConfigPath << ":" << file.errorString();
-        return;
-    }
-
-    QJsonObject root;
-    {
-        QJsonArray array;
-        for (const auto& value : mRecentLogFiles) {
-            array << QJsonValue(value);
-        }
-        root["recentLogFiles"] = array;
-    }
-
-    {
-        QJsonObject obj;
-        auto it = mLogFormatForFile.constBegin();
-        auto end = mLogFormatForFile.constEnd();
-        for (; it != end; ++it) {
-            obj[it.key()] = it.value();
-        }
-        root["logFormatForFile"] = obj;
-    }
-    file.write(QJsonDocument(root).toJson());
+    QVariantHash hash = mSettings->readVariantHash(LOG_FORMAT_FOR_FILE_KEY);
+    hash.insert(file, format);
+    mSettings->writeVariantHash(LOG_FORMAT_FOR_FILE_KEY, hash);
 }

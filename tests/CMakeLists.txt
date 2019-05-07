@@ -7,6 +7,7 @@ add_executable(tests
     ConditionIOTest.cpp
     FileLineProviderTest.cpp
     FileWatcherTest.cpp
+    JsonSettingsTest.cpp
     LogFormatIOTest.cpp
     LogFormatStoreTest.cpp
     LogFormatTest.cpp

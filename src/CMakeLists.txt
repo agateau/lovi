@@ -20,6 +20,7 @@ add_library(lovilib STATIC
     core/FileWatcher.cpp
     core/Highlight.cpp
     core/HighlightModel.cpp
+    core/JsonSettings.cpp
     core/LineProvider.cpp
     core/LogFormat.cpp
     core/LogFormatIO.cpp

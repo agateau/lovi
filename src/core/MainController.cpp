@@ -49,7 +49,7 @@ void MainController::loadLog(const QString& filePath) {
     LogFormat* format = mLogFormat;
     if (!isStdin()) {
         addLogToRecentFiles();
-        QString name = mConfig->logFormatForFile().value(filePath);
+        QString name = mConfig->logFormatForFile(filePath);
         if (!name.isEmpty()) {
             format = mLogFormatStore->byName(name);
         }
