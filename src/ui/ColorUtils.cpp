@@ -16,7 +16,7 @@
  * You should have received a copy of the GNU General Public License along with
  * this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-#include "Palette.h"
+#include "ColorUtils.h"
 
 #include <QDebug>
 #include <QFile>
@@ -31,7 +31,9 @@ static optional<int> toInt(const QString& txt) {
     return ok ? value : optional<int>{};
 }
 
-optional<Palette> Palette::load(const QString& path) {
+namespace ColorUtils {
+
+optional<Palette> loadGimpPalette(const QString& path) {
     QFile file(path);
     if (!file.open(QIODevice::ReadOnly)) {
         qWarning() << "Failed to open" << path << file.error();
@@ -83,3 +85,5 @@ optional<Palette> Palette::load(const QString& path) {
     }
     return std::move(palette);
 }
+
+} // namespace ColorUtils

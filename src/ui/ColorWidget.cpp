@@ -18,8 +18,8 @@
  */
 #include "ColorWidget.h"
 
+#include "ColorUtils.h"
 #include "Highlight.h"
-#include "Palette.h"
 
 #include <QButtonGroup>
 #include <QColorDialog>
@@ -122,7 +122,7 @@ ColorWidget::~ColorWidget() {
 }
 
 void ColorWidget::setupMenu() {
-    static std::optional<Palette> paletteOrNone = Palette::load(":/palette.gpl");
+    static std::optional<Palette> paletteOrNone = ColorUtils::loadGimpPalette(":/palette.gpl");
 
     auto* widget = new ColorMenuWidget;
 

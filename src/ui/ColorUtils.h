@@ -16,8 +16,8 @@
  * You should have received a copy of the GNU General Public License along with
  * this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-#ifndef PALETTEREADER_H
-#define PALETTEREADER_H
+#ifndef COLORUTILS_H
+#define COLORUTILS_H
 
 #include "Vector.h"
 
@@ -26,14 +26,13 @@
 
 #include <optional>
 
-/**
- * Gimp palette reader
- */
 struct Palette {
     stdq::Vector<QColor> colors;
     int columns = 0;
-
-    static std::optional<Palette> load(const QString& path);
 };
 
-#endif // PALETTEREADER_H
+namespace ColorUtils {
+std::optional<Palette> loadGimpPalette(const QString& path);
+}
+
+#endif // COLORUTILS_H

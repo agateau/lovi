@@ -33,6 +33,7 @@ add_library(lovilib STATIC
     ${lovilib_qpropgen_sources}
     # ui
     ui/ColorWidget.cpp
+    ui/ColorUtils.cpp
     ui/ConditionLineEditChecker.cpp
     ui/HighlightWidget.cpp
     ui/HighlightWidget.ui
@@ -42,7 +43,6 @@ add_library(lovilib STATIC
     ui/LogFormatWidget.ui
     ui/MainWindow.cpp
     ui/MainWindow.ui
-    ui/Palette.cpp
     ui/WidgetFloater.cpp
     ${lovi_resources}
     )
