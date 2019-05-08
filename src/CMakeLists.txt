@@ -54,7 +54,7 @@ target_include_directories(lovilib PUBLIC
     ${CMAKE_CURRENT_SOURCE_DIR}/ui
     )
 
-target_link_libraries(lovilib Qt5::Widgets)
+target_link_libraries(lovilib Qt5::Widgets KF5::GuiAddons)
 
 # Main
 add_executable(lovi ui/main.cpp)

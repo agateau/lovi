@@ -18,6 +18,8 @@
  */
 #include "ItemDelegate.h"
 
+#include "ColorUtils.h"
+
 #include <QAbstractItemView>
 #include <QDebug>
 #include <QPainter>
@@ -26,7 +28,37 @@ static constexpr qreal NOT_SELECTED_AND_OVER_ALPHA = 0.1;
 static constexpr qreal SELECTED_AND_OVER_ALPHA = 0.3;
 static constexpr qreal SELECTED_NOT_OVER_ALPHA = 0.2;
 
+static constexpr QPalette::ColorRole BG_ROLE = QPalette::ColorRole::Base;
+static constexpr QPalette::ColorRole FG_ROLE = QPalette::ColorRole::Text;
+
 ItemDelegate::ItemDelegate(QObject* parent) : QStyledItemDelegate(parent) {
+}
+
+static void
+ensureContrast(QPalette* palette, const QVariant& bgVariant, const QVariant& fgVariant) {
+    if (bgVariant.isNull() && fgVariant.isNull()) {
+        return;
+    }
+    if (bgVariant.isValid() && fgVariant.isValid()) {
+        // User defined both colors, trust them
+        return;
+    }
+    if (bgVariant.isValid()) {
+        // Only background
+        auto bgColor = bgVariant.value<QColor>();
+        auto fgColor = ColorUtils::getContrastedColor(bgColor);
+        palette->setColor(FG_ROLE, fgColor);
+    } else {
+        // User only defined foreground, adjust the background but take into account the background
+        // color set by the OS color scheme
+        auto fgColor = fgVariant.value<QColor>();
+        auto bgColor = palette->color(BG_ROLE);
+        if (ColorUtils::areColorContrasted(bgColor, fgColor)) {
+            return;
+        }
+        bgColor = ColorUtils::getContrastedColor(fgColor);
+        palette->setColor(BG_ROLE, bgColor);
+    }
 }
 
 void ItemDelegate::paint(QPainter* painter,
@@ -51,9 +83,17 @@ void ItemDelegate::paint(QPainter* painter,
         return itemView->selectionModel()->isSelected(index);
     };
 
+    ensureContrast(&option.palette, index.data(Qt::BackgroundRole), index.data(Qt::TextColorRole));
+
     takeFlag(&option.state, QStyle::State_HasFocus);
     bool selected = takeFlag(&option.state, QStyle::State_Selected);
     bool mouseOver = takeFlag(&option.state, QStyle::State_MouseOver);
+
+    if (option.palette.color(BG_ROLE) != option_.palette.color(BG_ROLE)) {
+        // bg color was modified, paint it ourselves, because QStyledItemDelegate does not do it
+        painter->fillRect(option.rect, option.palette.brush(BG_ROLE));
+    }
+
     QStyledItemDelegate::paint(painter, option, index);
     if (selected) {
         QRectF rect = option.rect;

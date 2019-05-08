@@ -18,9 +18,12 @@
  */
 #include "ColorUtils.h"
 
+#include <KColorUtils>
+
 #include <QDebug>
 #include <QFile>
 #include <QRegularExpression>
+#include <QRgb>
 #include <QTextStream>
 
 using std::optional;
@@ -84,6 +87,15 @@ optional<Palette> loadGimpPalette(const QString& path) {
         palette.columns = palette.colors.size();
     }
     return std::move(palette);
+}
+
+bool areColorContrasted(const QColor& color1, const QColor& color2) {
+    return KColorUtils::contrastRatio(color1, color2) > 4;
+}
+
+QColor getContrastedColor(const QColor& color) {
+    qreal dLuma = KColorUtils::luma(color) < 0.3 ? 0.7 : -0.8;
+    return KColorUtils::shade(color, dLuma, -1);
 }
 
 } // namespace ColorUtils

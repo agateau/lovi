@@ -3,6 +3,7 @@ configure_file(
     testconfig.h.in
     ${CMAKE_CURRENT_BINARY_DIR}/testconfig.h)
 
+# Unit test
 add_executable(tests
     ConditionIOTest.cpp
     FileLineProviderTest.cpp
@@ -25,3 +26,10 @@ target_link_libraries(tests
 )
 
 add_test(NAME tests COMMAND tests)
+
+# Color contrast table generator
+add_executable(colortablegen
+    ColorTableGen.cpp
+)
+
+target_link_libraries(colortablegen lovilib)

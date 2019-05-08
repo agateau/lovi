@@ -33,6 +33,11 @@ struct Palette {
 
 namespace ColorUtils {
 std::optional<Palette> loadGimpPalette(const QString& path);
-}
+
+bool areColorContrasted(const QColor& color1, const QColor& color2);
+
+QColor getContrastedColor(const QColor& color);
+
+} // namespace ColorUtils
 
 #endif // COLORUTILS_H
