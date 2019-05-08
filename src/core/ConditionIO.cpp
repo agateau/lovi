@@ -102,7 +102,7 @@ variant<unique_ptr<Condition>, ParseError> parse(const QString& text,
     }
     int column = *it;
 
-    if (op == "==") {
+    if (op == "=" || op == "==") {
         return std::make_unique<ExactCondition>(column, value);
     } else if (op == "contains") {
         return std::make_unique<ContainsCondition>(column, value);
