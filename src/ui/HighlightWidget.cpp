@@ -50,6 +50,7 @@ void HighlightWidget::setHighlight(Highlight* highlight) {
     mHighlight = highlight;
     if (!mHighlight) {
         setEnabled(false);
+        ui->conditionLineEdit->clear();
         return;
     }
     setEnabled(true);

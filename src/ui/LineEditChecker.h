@@ -31,8 +31,13 @@ class LineEditChecker : public QObject {
 public:
     LineEditChecker(QLineEdit* lineEdit, const CheckFunction& validationFunction);
 
+protected:
+    bool eventFilter(QObject* target, QEvent* event) override;
+
 private:
-    void onChanged(const QString& text);
+    void update();
+    void hideError();
+    void showError(const QString& error);
     QLineEdit* const mLineEdit;
     CheckFunction mCheckFunction;
 };

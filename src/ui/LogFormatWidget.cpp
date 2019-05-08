@@ -113,11 +113,22 @@ void LogFormatWidget::setupEditor() {
     auto floater = new WidgetFloater(ui->highlightListView);
     floater->setAlignment(Qt::AlignRight | Qt::AlignBottom);
     floater->setChildWidget(addHighlightButton);
+
+    // Highlight widget
+    connect(mController,
+            &MainController::currentHighlightChanged,
+            ui->highlightWidget,
+            &HighlightWidget::setHighlight);
 }
 
 void LogFormatWidget::setupSearchBar() {
     ui->searchBar->setEnabled(false);
     ui->searchBar->layout()->setMargin(0);
+    connect(mController,
+            &MainController::currentHighlightChanged,
+            this,
+            [this](Highlight* highlight) { ui->searchBar->setEnabled(highlight); });
+
     connect(mController->searcher(), &Searcher::finished, this, &LogFormatWidget::onSearchFinished);
     connect(ui->searchNextButton, &QToolButton::clicked, this, [this] {
         mController->startSearch(SearchDirection::Down);
@@ -142,8 +153,6 @@ void LogFormatWidget::onCurrentHighlightChanged(const QModelIndex& index) {
     auto logFormat = mHighlightModel->logFormat();
     auto* highlight = index.isValid() ? logFormat->editableHighlightAt(index.row()) : nullptr;
     mController->setCurrentHighlight(highlight);
-    ui->highlightWidget->setHighlight(highlight);
-    ui->searchBar->setEnabled(highlight);
 }
 
 void LogFormatWidget::onParserEditingFinished() {

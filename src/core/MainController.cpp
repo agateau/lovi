@@ -98,6 +98,7 @@ void MainController::setLogFormat(LogFormat* format) {
         mLogModel->setLogFormat(format);
     }
     logFormatChanged(mLogFormat);
+    setCurrentHighlight(nullptr);
 }
 
 LogFormat* MainController::logFormat() const {
