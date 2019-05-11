@@ -36,28 +36,20 @@ ItemDelegate::ItemDelegate(QObject* parent) : QStyledItemDelegate(parent) {
 
 static void
 ensureContrast(QPalette* palette, const QVariant& bgVariant, const QVariant& fgVariant) {
-    if (bgVariant.isNull() && fgVariant.isNull()) {
+    if (bgVariant.isValid() == fgVariant.isValid()) {
+        // Either user did not define any color, so nothing to do, or they defined both colors, in
+        // which case, trust them, so nothing to do either.
         return;
     }
-    if (bgVariant.isValid() && fgVariant.isValid()) {
-        // User defined both colors, trust them
-        return;
-    }
-    if (bgVariant.isValid()) {
-        // Only background
+    if (bgVariant.isValid() && !fgVariant.isValid()) {
+        // Only adjust fg color if it is not set.
+        // If both bg and fg are set, do nothing.
+        // If none are set, do nothing, obviously.
+        // If only fg is set, do nothing because changing the background color automatically is
+        // surprising.
         auto bgColor = bgVariant.value<QColor>();
         auto fgColor = ColorUtils::getContrastedColor(bgColor);
         palette->setColor(FG_ROLE, fgColor);
-    } else {
-        // User only defined foreground, adjust the background but take into account the background
-        // color set by the OS color scheme
-        auto fgColor = fgVariant.value<QColor>();
-        auto bgColor = palette->color(BG_ROLE);
-        if (ColorUtils::areColorContrasted(bgColor, fgColor)) {
-            return;
-        }
-        bgColor = ColorUtils::getContrastedColor(fgColor);
-        palette->setColor(BG_ROLE, bgColor);
     }
 }
 
@@ -88,11 +80,6 @@ void ItemDelegate::paint(QPainter* painter,
     takeFlag(&option.state, QStyle::State_HasFocus);
     bool selected = takeFlag(&option.state, QStyle::State_Selected);
     bool mouseOver = takeFlag(&option.state, QStyle::State_MouseOver);
-
-    if (option.palette.color(BG_ROLE) != option_.palette.color(BG_ROLE)) {
-        // bg color was modified, paint it ourselves, because QStyledItemDelegate does not do it
-        painter->fillRect(option.rect, option.palette.brush(BG_ROLE));
-    }
 
     QStyledItemDelegate::paint(painter, option, index);
     if (selected) {
