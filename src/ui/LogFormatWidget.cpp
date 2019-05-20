@@ -27,12 +27,23 @@
 #include "MainController.h"
 #include "Searcher.h"
 #include "WidgetFloater.h"
+#include "WidgetUtils.h"
 #include "ui_LogFormatWidget.h"
 
 #include <QInputDialog>
 #include <QMessageBox>
 #include <QPushButton>
 #include <QToolTip>
+
+static constexpr char PARSER_SYNTAX_HELP[] =
+    QT_TRANSLATE_NOOP("LogFormatWidget",
+                      "<qt><p>The parser is a regular expression with named groups. "
+                      "For example, this line:</p>"
+                      "<pre>12:34:56 myapp:1234 debug Start app</pre>"
+                      "<p>can be parsed with:</p>"
+                      "<pre>(?&lt;time>\\d+:\\d+:\\d+) (?&lt;app>\\w+):(?&lt;pid>\\d+) "
+                      "(?&lt;level>\\w+) (?&lt;message>.*)</pre>"
+                      "</qt>");
 
 LogFormatWidget::LogFormatWidget(MainController* controller, QWidget* parent)
         : QWidget(parent)
@@ -80,6 +91,7 @@ void LogFormatWidget::setupEditor() {
         QRegularExpression rx(text);
         return rx.isValid() ? QString() : rx.errorString();
     });
+    WidgetUtils::addLineEditHelpIcon(ui->parserLineEdit, PARSER_SYNTAX_HELP);
 
     // Highlight list
     ui->highlightListView->setModel(mHighlightModel.get());
