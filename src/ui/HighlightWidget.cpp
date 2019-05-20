@@ -20,9 +20,26 @@
 
 #include "ConditionLineEditChecker.h"
 #include "LogFormat.h"
+#include "WidgetUtils.h"
 #include "ui_HighlightWidget.h"
 
 using std::unique_ptr;
+
+static constexpr char HIGHLIGHT_SYNTAX_HELP[] = QT_TRANSLATE_NOOP(
+    "HighlightWidget",
+    "<qt>The syntax for an highlight condition is:\n"
+    "\n"
+    "<pre>[COLUMN] [OPERATOR] [CRITERIA]</pre>\n"
+    "\n"
+    "<p><b>COLUMN</b>: The name of a column defined in the log parser.</p>"
+    "<p><b>OPERATOR</b>: One of:<ul>"
+    "  <li>= or ==: exact match</li>"
+    "  <li>contains: the cell must contain the \"criteria\" string</li>"
+    "  <li>~: the cell must match the \"criteria\" regular expression</li>"
+    "</ul></p>"
+    "<p><b>CRITERIA</b>: The string to match. If it contains spaces, surround it with "
+    "<b>\"</b>. To use a literal <b>\"</b>, escape it by prefixing it with another <b>\"</b>.</p>"
+    "</qt>");
 
 // Helper function to init `ui` and create all its widgets so that mLineEditChecker can be called
 // with a valid QLineEdit instance
@@ -86,6 +103,8 @@ void HighlightWidget::setupUi() {
     connect(ui->conditionLineEdit, &QLineEdit::editingFinished, this, [this] {
         mHighlight->setConditionDefinition(ui->conditionLineEdit->text());
     });
+
+    WidgetUtils::addLineEditHelpIcon(ui->conditionLineEdit, tr(HIGHLIGHT_SYNTAX_HELP));
 
     connect(ui->bgColorWidget,
             &ColorWidget::colorChanged,

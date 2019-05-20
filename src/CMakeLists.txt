@@ -44,6 +44,7 @@ add_library(lovilib STATIC
     ui/MainWindow.cpp
     ui/MainWindow.ui
     ui/WidgetFloater.cpp
+    ui/WidgetUtils.cpp
     ${lovi_resources}
     )
 
