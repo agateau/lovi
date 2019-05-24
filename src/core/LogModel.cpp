@@ -117,6 +117,22 @@ bool LogModel::lineMatches(int row, const Condition* condition) const {
     return condition->eval(text);
 }
 
+/**
+ * Replace some chars which causes lines to be twice the expected height
+ */
+static void postProcessText(QString* text) {
+    for (QChar& ch : *text) {
+        auto unicode = ch.unicode();
+        if (unicode == QChar::CarriageReturn) {
+            ch = QChar(0x21b5); // ↵
+        } else if (unicode == QChar::Tabulation) {
+            // Keep tabs unchanged
+        } else if (unicode < 32) {
+            ch = QChar::ReplacementCharacter;
+        }
+    }
+}
+
 LogLine LogModel::processLine(const QStringRef& line) const {
     auto match = mLogFormat->parser().match(line);
     if (!match.hasMatch()) {
@@ -129,6 +145,7 @@ LogLine LogModel::processLine(const QStringRef& line) const {
     for (int column = 0; column < count; ++column) {
         LogCell& cell = logLine.cells[column];
         cell.text = match.captured(column + 1);
+        postProcessText(&cell.text);
         applyHighlights(&logLine, &cell, column);
     }
     return logLine;
