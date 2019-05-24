@@ -19,6 +19,10 @@
 #ifndef WIDGETUTILS_H
 #define WIDGETUTILS_H
 
+#include <QWidget>
+
+#include <memory>
+
 class QLineEdit;
 class QString;
 
@@ -29,6 +33,17 @@ namespace WidgetUtils {
  * shows message as a tooltip
  */
 void addLineEditHelpIcon(QLineEdit* lineEdit, const QString& message);
+
+/**
+ * Instantiate a Qt Designer ui class and call setupUi() on it.
+ * Makes it possible to pass its members to the constructor of other members.
+ */
+template <class T> std::unique_ptr<T> initUi(QWidget* parent) {
+    auto ui = std::make_unique<T>();
+    ui->setupUi(parent);
+    return ui;
+}
+
 } // namespace WidgetUtils
 
 #endif // WIDGETUTILS_H

@@ -41,17 +41,9 @@ static constexpr char HIGHLIGHT_SYNTAX_HELP[] = QT_TRANSLATE_NOOP(
     "<b>\"</b>. To use a literal <b>\"</b>, escape it by prefixing it with another <b>\"</b>.</p>"
     "</qt>");
 
-// Helper function to init `ui` and create all its widgets so that mLineEditChecker can be called
-// with a valid QLineEdit instance
-static unique_ptr<Ui::HighlightWidget> initUi(QWidget* parent) {
-    auto ui = std::make_unique<Ui::HighlightWidget>();
-    ui->setupUi(parent);
-    return ui;
-}
-
 HighlightWidget::HighlightWidget(QWidget* parent)
         : QWidget(parent)
-        , ui(initUi(this))
+        , ui(WidgetUtils::initUi<Ui::HighlightWidget>(this))
         , mLineEditChecker(std::make_unique<ConditionLineEditChecker>(ui->conditionLineEdit)) {
     setSizePolicy(QSizePolicy::Minimum, QSizePolicy::Fixed);
     setupUi();

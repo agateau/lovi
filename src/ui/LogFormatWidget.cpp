@@ -48,11 +48,10 @@ static constexpr char PARSER_SYNTAX_HELP[] =
 LogFormatWidget::LogFormatWidget(MainController* controller, QWidget* parent)
         : QWidget(parent)
         , mController(controller)
-        , ui(std::make_unique<Ui::LogFormatWidget>())
+        , ui(WidgetUtils::initUi<Ui::LogFormatWidget>(this))
         , mLogFormatModel(std::make_unique<LogFormatModel>(controller->logFormatStore()))
         , mHighlightModel(std::make_unique<HighlightModel>()) {
     Q_ASSERT(mController);
-    ui->setupUi(this);
     setupLogFormatSelector();
     setupEditor();
     setupSearchBar();
