@@ -6,4 +6,4 @@ Type=Application
 Exec=lovi
 Icon=lovi
 Terminal=false
-Categories=Qt;Utility;Development;System;TextTools;Monitor;System;
+Categories=Qt;Utility;Development;System;TextTools;Monitor;
