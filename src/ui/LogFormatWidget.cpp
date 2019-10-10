@@ -192,6 +192,11 @@ void LogFormatWidget::onAddFormatClicked() {
 void LogFormatWidget::onAddHighlightClicked() {
     Highlight* highlight = mHighlightModel->logFormat()->addHighlight();
     highlight->setBgColor(Color::createAuto());
+
+    auto index = mHighlightModel->index(mHighlightModel->rowCount() - 1, 0);
+    ui->highlightListView->setCurrentIndex(index);
+
+    ui->highlightWidget->lineEdit()->setFocus();
 }
 
 void LogFormatWidget::selectLogFormat(const QString& name) {
