@@ -49,6 +49,7 @@ private:
     void onCurrentHighlightChanged(const QModelIndex& index);
     void onParserEditingFinished();
     void onAddFormatClicked();
+    void onAddHighlightClicked();
     void selectLogFormat(const QString& name);
     void onSearchFinished(const SearchResponse& response);
 

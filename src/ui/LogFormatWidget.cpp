@@ -116,10 +116,8 @@ void LogFormatWidget::setupEditor() {
     // Highlight add button
     auto addHighlightButton = new QToolButton;
     addHighlightButton->setIcon(QIcon::fromTheme("list-add"));
-    connect(addHighlightButton, &QToolButton::pressed, this, [this] {
-        Highlight* highlight = mHighlightModel->logFormat()->addHighlight();
-        highlight->setBgColor(Color::createAuto());
-    });
+    connect(
+        addHighlightButton, &QToolButton::pressed, this, &LogFormatWidget::onAddHighlightClicked);
 
     auto floater = new WidgetFloater(ui->highlightListView);
     floater->setAlignment(Qt::AlignRight | Qt::AlignBottom);
@@ -189,6 +187,11 @@ void LogFormatWidget::onAddFormatClicked() {
         return;
     }
     selectLogFormat(name);
+}
+
+void LogFormatWidget::onAddHighlightClicked() {
+    Highlight* highlight = mHighlightModel->logFormat()->addHighlight();
+    highlight->setBgColor(Color::createAuto());
 }
 
 void LogFormatWidget::selectLogFormat(const QString& name) {
