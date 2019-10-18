@@ -28,7 +28,7 @@
         </sizepolicy>
        </property>
       </widget>
-      <widget class="QPlainTextEdit" name="rawLogLineView">
+      <widget class="ThinPlainTextEdit" name="rawLogLineView">
        <property name="sizePolicy">
         <sizepolicy hsizetype="Expanding" vsizetype="Preferred">
          <horstretch>0</horstretch>
@@ -102,6 +102,13 @@
    </property>
   </action>
  </widget>
+ <customwidgets>
+  <customwidget>
+   <class>ThinPlainTextEdit</class>
+   <extends>QPlainTextEdit</extends>
+   <header>ThinPlainTextEdit.h</header>
+  </customwidget>
+ </customwidgets>
  <resources/>
  <connections/>
 </ui>
