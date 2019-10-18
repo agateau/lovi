@@ -158,12 +158,15 @@ void MainWindow::onSelectionChanged() {
 }
 
 void MainWindow::onCurrentRowChanged(const std::optional<int>& row) {
-    if (!row.has_value()) {
-        return;
+    if (row.has_value()) {
+        auto index = ui->treeView->model()->index(row.value(), 0);
+        Q_ASSERT(index.isValid());
+        ui->treeView->setCurrentIndex(index);
     }
-    auto index = ui->treeView->model()->index(row.value(), 0);
-    Q_ASSERT(index.isValid());
-    ui->treeView->setCurrentIndex(index);
+
+    auto line =
+        row.has_value() ? mController->logModel()->rawLineAt(row.value()).toString() : QString();
+    ui->rawLogLineView->setPlainText(line);
 }
 
 void MainWindow::showOpenLogDialog() {
