@@ -90,15 +90,10 @@ void MainWindow::setupUi() {
         layout->setSpacing(0);
     };
     auto setupTreeView = [this] {
-        connect(
-            mController.get(), &MainController::currentRowChanged, this, [this](optional<int> row) {
-                if (!row.has_value()) {
-                    return;
-                }
-                auto index = ui->treeView->model()->index(row.value(), 0);
-                Q_ASSERT(index.isValid());
-                ui->treeView->setCurrentIndex(index);
-            });
+        connect(mController.get(),
+                &MainController::currentRowChanged,
+                this,
+                &MainWindow::onCurrentRowChanged);
 
         ui->treeView->setRootIsDecorated(false);
         ui->treeView->setContextMenuPolicy(Qt::ActionsContextMenu);
@@ -160,6 +155,18 @@ void MainWindow::onSelectionChanged() {
 
     auto index = selectionModel->currentIndex();
     mController->setCurrentRow(index.isValid() ? index.row() : optional<int>{});
+}
+
+void MainWindow::onCurrentRowChanged(const std::optional<int>& row) {
+    if (row.has_value()) {
+        auto index = ui->treeView->model()->index(row.value(), 0);
+        Q_ASSERT(index.isValid());
+        ui->treeView->setCurrentIndex(index);
+    }
+
+    auto line =
+        row.has_value() ? mController->logModel()->rawLineAt(row.value()).toString() : QString();
+    ui->rawLogLineView->setPlainText(line);
 }
 
 void MainWindow::showOpenLogDialog() {
