@@ -24,6 +24,7 @@
 #include <QPointer>
 
 #include <memory>
+#include <optional>
 
 class Config;
 class LogFormat;
@@ -53,6 +54,7 @@ private:
     void setupActions();
     void onRowsInserted();
     void onSelectionChanged();
+    void onCurrentRowChanged(const std::optional<int>& row);
     void reloadLogFormat();
     void showOpenLogDialog();
     void showLogFormatWidget();
