@@ -82,7 +82,7 @@ git submodule update --init --recursive
 Install qpropgen dependencies:
 
 ```
-pip3 install 3rdparty/qpropgen/requirements.txt`
+pip3 install -r 3rdparty/qpropgen/requirements.txt`
 ```
 
 Create a build dir:

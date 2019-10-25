@@ -30,6 +30,7 @@
 #include "WidgetUtils.h"
 #include "ui_LogFormatWidget.h"
 
+#include <QAction>
 #include <QInputDialog>
 #include <QMessageBox>
 #include <QPushButton>
