@@ -28,7 +28,7 @@
         </sizepolicy>
        </property>
       </widget>
-      <widget class="ThinPlainTextEdit" name="rawLogLineView">
+      <widget class="ThinPlainTextEdit" name="logLineView">
        <property name="sizePolicy">
         <sizepolicy hsizetype="Expanding" vsizetype="Preferred">
          <horstretch>0</horstretch>
