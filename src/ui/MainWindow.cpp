@@ -166,6 +166,7 @@ void MainWindow::onCurrentRowChanged(const std::optional<int>& row) {
 
     auto line =
         row.has_value() ? mController->logModel()->rawLineAt(row.value()).toString() : QString();
+    line = line.replace("\\n", "\n");
     ui->rawLogLineView->setPlainText(line);
 }
 
