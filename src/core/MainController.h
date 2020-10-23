@@ -49,8 +49,6 @@ public:
 
     Searcher* searcher() const;
 
-    LineProvider* lineProvider() const;
-
     LogModel* logModel() const;
 
     bool isStdin() const;
@@ -59,6 +57,8 @@ public:
     LogFormat* logFormat() const override;
 
     void startSearch(SearchDirection direction);
+
+    QStringRef lineAt(int row) const;
 
 private:
     void updateLogFormatForFile();

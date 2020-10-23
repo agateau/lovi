@@ -76,10 +76,6 @@ Searcher* MainController::searcher() const {
     return mSearcher.get();
 }
 
-LineProvider* MainController::lineProvider() const {
-    return mLineProvider.get();
-}
-
 LogModel* MainController::logModel() const {
     return mLogModel.get();
 }
@@ -115,6 +111,10 @@ void MainController::startSearch(SearchDirection direction) {
     }
     int row = currentRow().value_or(0) + (direction == SearchDirection::Down ? 1 : -1);
     mSearcher->start(mLogModel.get(), condition, direction, row);
+}
+
+QStringRef MainController::lineAt(int row) const {
+    return mLineProvider->lineAt(row);
 }
 
 void MainController::updateLogFormatForFile() {
