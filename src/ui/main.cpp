@@ -79,7 +79,6 @@ static void loadTranslations(QObject* parent) {
 int main(int argc, char* argv[]) {
     QApplication app(argc, argv);
     Q_INIT_RESOURCE(lovi);
-    app.setOrganizationName(ORGANIZATION_NAME);
     app.setApplicationName(APP_NAME);
     app.setApplicationVersion(APP_VERSION);
     auto iconName = QString(":/icons/sc-apps-%1.svg").arg(APP_NAME);
