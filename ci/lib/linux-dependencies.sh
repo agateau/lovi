@@ -11,6 +11,7 @@ main() {
             file \
             g++ \
             git \
+            libkf5guiaddons-dev \
             make \
             openbox \
             python3 \
