@@ -18,10 +18,10 @@
  */
 #include "Searcher.h"
 
+#include "Catch2QtUtils.h"
 #include "ConditionIO.h"
 #include "Conditions.h"
 #include "LogFormat.h"
-#include "TestUtils.h"
 
 #include <QSignalSpy>
 

@@ -18,7 +18,7 @@
  */
 #include "FileLineProvider.h"
 
-#include "TestUtils.h"
+#include "Catch2QtUtils.h"
 
 #include <QSignalSpy>
 #include <QTemporaryDir>

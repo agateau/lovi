@@ -14,9 +14,12 @@
    class="feather feather-edit-2"
    id="svg4310"
    version="1.1"
-   inkscape:version="0.92.3 (2405546, 2018-03-11)"
-   sodipodi:docname="appicon.svg"
-   style="fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round">
+   inkscape:version="0.92.5 (2060ec1f9f, 2020-04-08)"
+   sodipodi:docname="sc-apps-lovi.svg"
+   style="fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round"
+   inkscape:export-filename="/home/perso/src/lovi/src/ui/icons/256-apps-lovi.png"
+   inkscape:export-xdpi="512"
+   inkscape:export-ydpi="512">
   <metadata
      id="metadata4318">
     <rdf:RDF>
@@ -53,14 +56,14 @@
      guidetolerance="10"
      inkscape:pageopacity="0"
      inkscape:pageshadow="2"
-     inkscape:window-width="1868"
-     inkscape:window-height="1061"
+     inkscape:window-width="1866"
+     inkscape:window-height="1053"
      id="namedview4314"
      showgrid="false"
      inkscape:zoom="11.313709"
-     inkscape:cx="27.014785"
+     inkscape:cx="11.149077"
      inkscape:cy="27.776349"
-     inkscape:window-x="52"
+     inkscape:window-x="54"
      inkscape:window-y="0"
      inkscape:window-maximized="1"
      inkscape:current-layer="svg4310"
