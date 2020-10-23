@@ -20,7 +20,7 @@
 
 #include "LogFormat.h"
 
-#include "TestUtils.h"
+#include "Catch2QtUtils.h"
 #include "testconfig.h"
 
 #include <QTemporaryDir>

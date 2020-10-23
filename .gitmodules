@@ -1,6 +1,3 @@
-[submodule "3rdparty/catch2"]
-	path = 3rdparty/catch2
-	url = https://github.com/catchorg/Catch2
-[submodule "3rdparty/qpropgen"]
-	path = 3rdparty/qpropgen
+[submodule "third-party/qpropgen"]
+	path = third-party/qpropgen
 	url = https://github.com/agateau/qpropgen

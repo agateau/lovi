@@ -1,0 +1,48 @@
+#!/bin/bash
+set -euo pipefail
+
+pushd $PWD > /dev/null
+cd $(dirname $0)/..
+SRC_DIR=$PWD
+popd > /dev/null
+
+. $SRC_DIR/ci/lib/common.sh
+
+BUILD_DIR=$SRC_DIR/build
+INSTALL_DIR=$SRC_DIR/inst
+
+BUILD_TYPE=Release
+
+BUILD_CMD="cmake --build . --config $BUILD_TYPE"
+
+echo_title Configuring
+mkdir $BUILD_DIR
+cd $BUILD_DIR
+cmake -DCMAKE_BUILD_TYPE=$BUILD_TYPE -DCMAKE_INSTALL_PREFIX=$INSTALL_DIR $SRC_DIR
+
+echo_title Updating translations
+$BUILD_CMD --target lupdate
+
+echo_title Building
+$BUILD_CMD --parallel $NPROC
+
+echo_title Running tests
+test_cmd="$BUILD_CMD --target check"
+if is_linux && [ -z "${DISPLAY:-}" ] ; then
+    xvfb-run $SRC_DIR/ci/headless-test-helper $test_cmd
+else
+    $test_cmd
+fi
+
+echo_title Installing
+$BUILD_CMD --target install
+
+echo_title "Creating binary packages"
+$BUILD_CMD --target package
+
+if is_linux ; then
+    # No need to build the source package everywhere, arbitrarily decide to
+    # build it on Linux
+    echo_title "Creating source package"
+    $BUILD_CMD --target package_source
+fi

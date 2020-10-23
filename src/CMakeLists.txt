@@ -1,16 +1,15 @@
-cmake_minimum_required(VERSION 3.0.0)
+include(translations)
+include(ECMAddAppIcon)
 
-set(CMAKE_AUTOMOC ON)
-set(CMAKE_AUTOUIC ON)
+add_subdirectory(ui/icons)
 
-# Lib
-qt5_add_resources(lovi_resources ui/lovi.qrc)
+# Sources
+configure_file(
+    ${CMAKE_CURRENT_SOURCE_DIR}/BuildConfig.h.in
+    ${CMAKE_CURRENT_BINARY_DIR}/BuildConfig.h
+)
 
-qpropgen(lovilib_qpropgen_sources
-    core/BaseMainController.yaml
-    )
-
-add_library(lovilib STATIC
+set(APPLIB_SRCS
     # core
     core/Color.cpp
     core/ConditionIO.cpp
@@ -30,7 +29,6 @@ add_library(lovilib STATIC
     core/MainController.cpp
     core/Searcher.cpp
     core/StdinLineProvider.cpp
-    ${lovilib_qpropgen_sources}
     # ui
     ui/ColorWidget.cpp
     ui/ColorUtils.cpp
@@ -43,34 +41,96 @@ add_library(lovilib STATIC
     ui/LogFormatWidget.ui
     ui/MainWindow.cpp
     ui/MainWindow.ui
+    ui/Resources.cpp
     ui/ThinPlainTextEdit.cpp
     ui/WidgetFloater.cpp
     ui/WidgetUtils.cpp
-    ${lovi_resources}
-    )
+)
 
-target_include_directories(lovilib PUBLIC
+qt5_add_resources(APPLIB_RESOURCES_SRCS ui/lovi.qrc)
+
+qpropgen(QPROPGEN_SRCS
+    core/BaseMainController.yaml
+)
+
+# App library
+add_library(${APPLIB_NAME} STATIC
+    ${APPLIB_SRCS}
+    ${QPROPGEN_SRCS}
+    ${APPLIB_RESOURCES_SRCS}
+    ${TRANSLATIONS_RESOURCES_SRCS}
+)
+target_include_directories(${APPLIB_NAME} PUBLIC
     ${CMAKE_CURRENT_BINARY_DIR}
     ${CMAKE_CURRENT_BINARY_DIR}/core
     ${CMAKE_CURRENT_SOURCE_DIR}/core
     ${CMAKE_CURRENT_SOURCE_DIR}/ui
+)
+target_link_libraries(${APPLIB_NAME}
+    Qt5::Core
+    Qt5::Widgets
+    KF5::GuiAddons
+)
+
+# Translations
+set(TS_FILES
+    translations/${APP_NAME}_en.ts
+)
+qt5_add_translation(QM_FILES ${TS_FILES})
+add_custom_target(build_qm DEPENDS ${QM_FILES})
+add_dependencies(${APPLIB_NAME} build_qm)
+
+add_lupdate_target(SOURCES ${APPLIB_SRCS} TS_FILES ${TS_FILES} OPTIONS -no-obsolete)
+
+# App executable
+set(APP_SRCS ui/main.cpp)
+ecm_add_app_icon(
+    APP_SRCS
+    ICONS
+        ui/icons/256-apps-${APP_NAME}.png
+        ui/icons/sc-apps-${APP_NAME}.svg
+)
+add_executable(${APP_NAME} WIN32 MACOSX_BUNDLE ${APP_SRCS})
+
+if (APPLE)
+    configure_file(
+        ${CMAKE_CURRENT_SOURCE_DIR}/macos/Info.plist.in
+        ${CMAKE_CURRENT_BINARY_DIR}/macos/Info.plist
     )
+    set_target_properties(${APP_NAME} PROPERTIES
+        MACOSX_BUNDLE_INFO_PLIST ${CMAKE_CURRENT_BINARY_DIR}/macos/Info.plist
+    )
+endif()
 
-target_link_libraries(lovilib Qt5::Widgets KF5::GuiAddons)
-
-# Main
-add_executable(lovi ui/main.cpp)
-target_link_libraries(lovi lovilib)
+target_link_libraries(${APP_NAME}
+    ${APPLIB_NAME}
+)
 
 # Install
-install(TARGETS ${PROJECT_NAME} DESTINATION bin)
-
-install(FILES ui/icons/lovi.desktop
-    DESTINATION share/applications
-    RENAME com.agateau.lovi.desktop
+install(
+    TARGETS ${APP_NAME}
+    BUNDLE DESTINATION .
+    RUNTIME DESTINATION ${BIN_INSTALL_DIR}
 )
 
-install(FILES ui/icons/appicon.svg
-    DESTINATION share/icons/hicolor/scalable/apps
-    RENAME lovi.svg
+install(
+    FILES ${QM_FILES}
+    DESTINATION ${DATA_INSTALL_DIR}/translations
 )
+
+if (UNIX AND NOT APPLE)
+    install(FILES linux/${APP_NAME}.desktop
+        DESTINATION share/applications
+        RENAME ${INVERSE_ORGANIZATION_NAME}.${APP_NAME}.desktop
+    )
+endif()
+
+if (WIN32)
+    include(DeployQt)
+    windeployqt(${APP_NAME})
+endif()
+
+if (APPLE)
+    include(DeployQt)
+    macdeployqt(${APP_NAME})
+endif()

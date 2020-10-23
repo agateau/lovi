@@ -18,14 +18,19 @@
  */
 #include "MainWindow.h"
 
+#include "BuildConfig.h"
 #include "Config.h"
 #include "LogFormatStore.h"
+#include "Resources.h"
 
 #include <QApplication>
 #include <QCommandLineParser>
 #include <QDebug>
 #include <QDir>
+#include <QIcon>
+#include <QLocale>
 #include <QStandardPaths>
+#include <QTranslator>
 
 #include <memory>
 
@@ -57,10 +62,31 @@ static QString logFormatsDirPath() {
     return QStandardPaths::writableLocation(QStandardPaths::AppLocalDataLocation) + "/logformats";
 }
 
+static void loadTranslations(QObject* parent) {
+    // Search in current path first, to give translators an easy way to test
+    // their translations
+    QStringList searchDirs = {QDir::currentPath(), Resources::findDir("translations")};
+    auto translator = new QTranslator(parent);
+    QLocale locale;
+    for (const auto& dir : searchDirs) {
+        if (translator->load(locale, APP_NAME, "_", dir)) {
+            QCoreApplication::installTranslator(translator);
+            return;
+        }
+    }
+}
+
 int main(int argc, char* argv[]) {
     QApplication app(argc, argv);
     Q_INIT_RESOURCE(lovi);
-    app.setWindowIcon(QIcon(":/icons/appicon.svg"));
+    app.setOrganizationName(ORGANIZATION_NAME);
+    app.setApplicationName(APP_NAME);
+    app.setApplicationVersion(APP_VERSION);
+    auto iconName = QString(":/icons/sc-apps-%1.svg").arg(APP_NAME);
+    app.setWindowIcon(QIcon(iconName));
+    app.setAttribute(Qt::AA_UseHighDpiPixmaps);
+
+    loadTranslations(&app);
 
     unique_ptr<QCommandLineParser> parser = createParser();
     parser->process(app);
@@ -79,5 +105,6 @@ int main(int argc, char* argv[]) {
         window.loadLog(parser->positionalArguments().first());
     }
     window.show();
+
     return app.exec();
 }

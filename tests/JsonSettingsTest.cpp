@@ -18,7 +18,7 @@
  */
 #include "JsonSettings.h"
 
-#include "TestUtils.h"
+#include "Catch2QtUtils.h"
 
 #include <QJsonDocument>
 #include <QJsonObject>

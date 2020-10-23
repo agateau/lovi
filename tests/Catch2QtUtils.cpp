@@ -16,7 +16,7 @@
  * You should have received a copy of the GNU General Public License along with
  * this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-#include "TestUtils.h"
+#include "Catch2QtUtils.h"
 
 std::ostream& operator<<(std::ostream& ostr, const QString& str) {
     ostr << '"' << str.toStdString() << '"';
