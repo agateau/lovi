@@ -201,9 +201,8 @@ void MainWindow::copySelectedLines() {
         return;
     }
     QStringList list;
-    auto lineProvider = mController->lineProvider();
     for (const auto& index : selectedRows) {
-        list << lineProvider->lineAt(index.row()).toString();
+        list << mController->lineAt(index.row()).toString();
     }
     qApp->clipboard()->setText(list.join("\n"));
 }
