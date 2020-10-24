@@ -76,7 +76,7 @@ Searcher* MainController::searcher() const {
     return mSearcher.get();
 }
 
-LogModel* MainController::logModel() const {
+QAbstractItemModel* MainController::logModel() const {
     return mLogModel.get();
 }
 

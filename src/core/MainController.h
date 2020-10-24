@@ -35,6 +35,8 @@ class LogModel;
 class Searcher;
 class SearchResponse;
 
+class QAbstractItemModel;
+
 class MainController : public BaseMainController {
     Q_OBJECT
 public:
@@ -49,7 +51,7 @@ public:
 
     Searcher* searcher() const;
 
-    LogModel* logModel() const;
+    QAbstractItemModel* logModel() const;
 
     bool isStdin() const;
 

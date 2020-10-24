@@ -24,7 +24,6 @@
 #include "LogFormat.h"
 #include "LogFormatStore.h"
 #include "LogFormatWidget.h"
-#include "LogModel.h"
 #include "MainController.h"
 #include "ui_MainWindow.h"
 
