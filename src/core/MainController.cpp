@@ -20,6 +20,7 @@
 
 #include "Config.h"
 #include "FileLineProvider.h"
+#include "FilterProxyModel.h"
 #include "LogFormat.h"
 #include "LogFormatStore.h"
 #include "LogModel.h"
@@ -27,6 +28,7 @@
 #include "StdinLineProvider.h"
 
 #include <QDebug>
+#include <QSortFilterProxyModel>
 
 static const int MAX_RECENT_FILES = 10;
 
@@ -57,6 +59,7 @@ void MainController::loadLog(const QString& filePath) {
 
     createLineProvider();
     mLogModel = std::make_unique<LogModel>(mLineProvider.get(), format);
+    mFilterProxyModel = std::make_unique<FilterProxyModel>(mLogModel.get(), format);
     if (mLogFormat == format) {
         updateLogFormatForFile();
     } else {
@@ -77,7 +80,7 @@ Searcher* MainController::searcher() const {
 }
 
 QAbstractItemModel* MainController::logModel() const {
-    return mLogModel.get();
+    return mFilterProxyModel.get();
 }
 
 bool MainController::isStdin() const {

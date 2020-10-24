@@ -19,6 +19,7 @@ set(APPLIB_SRCS
     core/FileWatcher.cpp
     core/Filter.cpp
     core/FilterModel.cpp
+    core/FilterProxyModel.cpp
     core/Highlight.cpp
     core/HighlightModel.cpp
     core/JsonSettings.cpp
