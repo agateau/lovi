@@ -66,8 +66,6 @@ public:
 
     LogFormat* logFormat() const;
 
-    QStringRef rawLineAt(int row) const;
-
     // Searchable interface
     int lineCount() const override;
 

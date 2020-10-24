@@ -103,10 +103,6 @@ LogFormat* LogModel::logFormat() const {
     return mLogFormat;
 }
 
-QStringRef LogModel::rawLineAt(int row) const {
-    return mLineProvider->lineAt(row);
-}
-
 int LogModel::lineCount() const {
     return mLineProvider->lineCount();
 }
