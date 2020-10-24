@@ -24,7 +24,6 @@
 #include "LogFormat.h"
 #include "LogFormatStore.h"
 #include "LogFormatWidget.h"
-#include "LogModel.h"
 #include "MainController.h"
 #include "ui_MainWindow.h"
 
@@ -164,8 +163,7 @@ void MainWindow::onCurrentRowChanged(const std::optional<int>& row) {
         ui->treeView->setCurrentIndex(index);
     }
 
-    auto line =
-        row.has_value() ? mController->logModel()->rawLineAt(row.value()).toString() : QString();
+    auto line = row.has_value() ? mController->lineAt(row.value()).toString() : QString();
     line = line.replace("\\n", "\n");
     ui->logLineView->setPlainText(line);
 }
