@@ -41,7 +41,8 @@ public:
 
 private:
     void setupLogFormatSelector();
-    void setupEditor();
+    void setupLogFormatEditor();
+    void setupHighlightEditor();
     void setupSearchBar();
 
     void setLogFormat(LogFormat* logFormat);

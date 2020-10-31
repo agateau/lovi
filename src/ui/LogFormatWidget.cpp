@@ -54,7 +54,8 @@ LogFormatWidget::LogFormatWidget(MainController* controller, QWidget* parent)
         , mHighlightModel(std::make_unique<HighlightModel>()) {
     Q_ASSERT(mController);
     setupLogFormatSelector();
-    setupEditor();
+    setupLogFormatEditor();
+    setupHighlightEditor();
     setupSearchBar();
     setLogFormat(mController->logFormat());
 }
@@ -81,8 +82,7 @@ void LogFormatWidget::setupLogFormatSelector() {
     connect(mController, &MainController::logFormatChanged, this, &LogFormatWidget::setLogFormat);
 }
 
-void LogFormatWidget::setupEditor() {
-    // Parser edit
+void LogFormatWidget::setupLogFormatEditor() {
     connect(ui->parserLineEdit,
             &QLineEdit::editingFinished,
             this,
@@ -92,7 +92,9 @@ void LogFormatWidget::setupEditor() {
         return rx.isValid() ? QString() : rx.errorString();
     });
     WidgetUtils::addLineEditHelpIcon(ui->parserLineEdit, PARSER_SYNTAX_HELP);
+}
 
+void LogFormatWidget::setupHighlightEditor() {
     // Highlight list
     ui->highlightListView->setModel(mHighlightModel.get());
     ui->highlightListView->setItemDelegate(new ItemDelegate(ui->highlightListView));
