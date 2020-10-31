@@ -32,8 +32,6 @@ public:
 
     void setLogFormat(LogFormat* logFormat);
 
-    LogFormat* logFormat() const;
-
     int rowCount(const QModelIndex& parent = {}) const override;
 
     QVariant data(const QModelIndex& index, int role = Qt::DisplayRole) const override;

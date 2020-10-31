@@ -42,10 +42,6 @@ void HighlightModel::setLogFormat(LogFormat* logFormat) {
     endResetModel();
 }
 
-LogFormat* HighlightModel::logFormat() const {
-    return mLogFormat;
-}
-
 int HighlightModel::rowCount(const QModelIndex& parent) const {
     if (parent.isValid() || !mLogFormat) {
         return 0;

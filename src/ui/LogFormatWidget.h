@@ -42,7 +42,8 @@ public:
 private:
     void setupLogFormatSelector();
     void setupLogFormatEditor();
-    void setupHighlightEditor();
+    void setupHighlightTab();
+    void setupFilterTab();
     void setupSearchBar();
 
     void setLogFormat(LogFormat* logFormat);
@@ -51,6 +52,7 @@ private:
     void onParserEditingFinished();
     void onAddFormatClicked();
     void onAddHighlightClicked();
+    void onAddFilterClicked();
     void selectLogFormat(const QString& name);
     void onSearchFinished(const SearchResponse& response);
 
