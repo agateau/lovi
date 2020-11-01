@@ -245,6 +245,14 @@ void LogFormatWidget::onAddHighlightClicked() {
 }
 
 void LogFormatWidget::onAddFilterClicked() {
+    LogFormat* logFormat = mController->logFormat();
+    Q_ASSERT(logFormat);
+    logFormat->addFilter();
+
+    auto index = mFilterModel->index(mFilterModel->rowCount() - 1, 0);
+    ui->filterListView->setCurrentIndex(index);
+
+    ui->filterLineEdit->setFocus();
 }
 
 void LogFormatWidget::selectLogFormat(const QString& name) {
