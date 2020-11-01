@@ -153,6 +153,18 @@ void LogFormatWidget::setupFilterTab() {
             this,
             &LogFormatWidget::onCurrentFilterChanged);
 
+    // List context menu
+    auto removeAction = new QAction(tr("Remove Filter"));
+    connect(removeAction, &QAction::triggered, this, [this] {
+        auto index = ui->filterListView->currentIndex();
+        if (!index.isValid()) {
+            return;
+        }
+        mController->logFormat()->removeFilterAt(index.row());
+    });
+    ui->filterListView->addAction(removeAction);
+    ui->filterListView->setContextMenuPolicy(Qt::ActionsContextMenu);
+
     // Add button
     auto addButton = createAddButton(ui->filterListView);
     connect(addButton, &QToolButton::pressed, this, &LogFormatWidget::onAddFilterClicked);
