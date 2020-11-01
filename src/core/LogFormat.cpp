@@ -38,6 +38,17 @@ void LogFormat::emitHighlightChanged(Highlight* highlight) {
     changed();
 }
 
+void LogFormat::emitFilterChanged(Filter* filter) {
+    auto it = std::find_if(mFilters.begin(), mFilters.end(), [filter](const auto& ptr) {
+        return ptr.get() == filter;
+    });
+    Q_ASSERT(it != mFilters.end());
+
+    int row = int(it - mFilters.begin());
+    filterChanged(row);
+    changed();
+}
+
 void LogFormat::setName(const QString& name) {
     mName = name;
 }

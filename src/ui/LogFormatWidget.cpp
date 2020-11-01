@@ -148,9 +148,20 @@ void LogFormatWidget::setupFilterTab() {
     // List
     ui->filterListView->setModel(mFilterModel.get());
 
+    connect(ui->filterListView->selectionModel(),
+            &QItemSelectionModel::currentChanged,
+            this,
+            &LogFormatWidget::onCurrentFilterChanged);
+
     // Add button
     auto addButton = createAddButton(ui->filterListView);
     connect(addButton, &QToolButton::pressed, this, &LogFormatWidget::onAddFilterClicked);
+
+    // Filter line edit
+    connect(ui->filterLineEdit,
+            &QLineEdit::editingFinished,
+            this,
+            &LogFormatWidget::onFilterEditingFinished);
 }
 
 void LogFormatWidget::setupSearchBar() {
@@ -186,6 +197,14 @@ void LogFormatWidget::onCurrentHighlightChanged(const QModelIndex& index) {
     Q_ASSERT(logFormat);
     auto* highlight = index.isValid() ? logFormat->editableHighlightAt(index.row()) : nullptr;
     mController->setCurrentHighlight(highlight);
+}
+
+void LogFormatWidget::onCurrentFilterChanged(const QModelIndex& index) {
+    LogFormat* logFormat = mController->logFormat();
+    Q_ASSERT(logFormat);
+    auto* filter = index.isValid() ? logFormat->editableFilterAt(index.row()) : nullptr;
+    auto text = filter ? filter->conditionDefinition() : QString();
+    ui->filterLineEdit->setText(text);
 }
 
 void LogFormatWidget::onParserEditingFinished() {
@@ -254,4 +273,13 @@ void LogFormatWidget::onSearchFinished(const SearchResponse& response) {
     }
     auto pos = ui->searchNextButton->mapToGlobal({ui->searchNextButton->width(), 0});
     QToolTip::showText(pos, text);
+}
+
+void LogFormatWidget::onFilterEditingFinished() {
+    LogFormat* logFormat = mController->logFormat();
+    Q_ASSERT(logFormat);
+    auto index = ui->filterListView->currentIndex();
+    Q_ASSERT(index.isValid());
+    auto* filter = logFormat->editableFilterAt(index.row());
+    filter->setConditionDefinition(ui->filterLineEdit->text());
 }

@@ -50,12 +50,14 @@ private:
     void setLogFormat(LogFormat* logFormat);
     void onCurrentLogFormatChanged(int row);
     void onCurrentHighlightChanged(const QModelIndex& index);
+    void onCurrentFilterChanged(const QModelIndex& index);
     void onParserEditingFinished();
     void onAddFormatClicked();
     void onAddHighlightClicked();
     void onAddFilterClicked();
     void selectLogFormat(const QString& name);
     void onSearchFinished(const SearchResponse& response);
+    void onFilterEditingFinished();
 
     MainController* const mController;
     const std::unique_ptr<Ui::LogFormatWidget> ui;

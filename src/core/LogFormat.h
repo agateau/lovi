@@ -36,6 +36,7 @@ public:
     LogFormat(QObject* parent = nullptr);
 
     void emitHighlightChanged(Highlight* highlight);
+    void emitFilterChanged(Filter* filter);
 
     void setName(const QString& name);
     QString name() const;

@@ -43,4 +43,5 @@ void Filter::updateCondition() {
     mCondition = std::holds_alternative<ConditionPtr>(condition)
                      ? std::move(std::get<ConditionPtr>(condition))
                      : nullptr;
+    mLogFormat->emitFilterChanged(this);
 }
