@@ -18,6 +18,7 @@
  */
 #include "LogFormatWidget.h"
 
+#include "FilterModel.h"
 #include "HighlightModel.h"
 #include "ItemDelegate.h"
 #include "LineEditChecker.h"
@@ -51,7 +52,8 @@ LogFormatWidget::LogFormatWidget(MainController* controller, QWidget* parent)
         , mController(controller)
         , ui(WidgetUtils::initUi<Ui::LogFormatWidget>(this))
         , mLogFormatModel(std::make_unique<LogFormatModel>(controller->logFormatStore()))
-        , mHighlightModel(std::make_unique<HighlightModel>()) {
+        , mHighlightModel(std::make_unique<HighlightModel>())
+        , mFilterModel(std::make_unique<FilterModel>()) {
     Q_ASSERT(mController);
     setupLogFormatSelector();
     setupLogFormatEditor();
@@ -69,6 +71,7 @@ void LogFormatWidget::setLogFormat(LogFormat* logFormat) {
     selectLogFormat(logFormat->name());
     ui->parserLineEdit->setText(logFormat->parserPattern());
     mHighlightModel->setLogFormat(logFormat);
+    mFilterModel->setLogFormat(logFormat);
 }
 
 void LogFormatWidget::setupLogFormatSelector() {
@@ -142,6 +145,10 @@ void LogFormatWidget::setupHighlightTab() {
 }
 
 void LogFormatWidget::setupFilterTab() {
+    // List
+    ui->filterListView->setModel(mFilterModel.get());
+
+    // Add button
     auto addButton = createAddButton(ui->filterListView);
     connect(addButton, &QToolButton::pressed, this, &LogFormatWidget::onAddFilterClicked);
 }

@@ -27,6 +27,7 @@ namespace Ui {
 class LogFormatWidget;
 }
 
+class FilterModel;
 class HighlightModel;
 class LogFormat;
 class LogFormatModel;
@@ -60,6 +61,7 @@ private:
     const std::unique_ptr<Ui::LogFormatWidget> ui;
     const std::unique_ptr<LogFormatModel> mLogFormatModel;
     const std::unique_ptr<HighlightModel> mHighlightModel;
+    const std::unique_ptr<FilterModel> mFilterModel;
 };
 
 #endif // LOGFORMATWIDGET_H
