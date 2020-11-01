@@ -60,6 +60,9 @@ void LogFormat::setParserPattern(const QString& pattern) {
     for (const auto& highlight : mHighlights) {
         highlight->updateCondition();
     }
+    for (const auto& filter : mFilters) {
+        filter->updateCondition();
+    }
 
     changed();
 }
@@ -95,6 +98,28 @@ void LogFormat::removeHighlightAt(int row) {
     Q_ASSERT(row >= 0 && row < mHighlights.size());
     mHighlights.erase(mHighlights.begin() + row);
     highlightRemoved(row);
+    changed();
+}
+
+const stdq::Vector<std::unique_ptr<Filter>>& LogFormat::filters() const {
+    return mFilters;
+}
+
+Filter* LogFormat::addFilter() {
+    mFilters.push_back(std::make_unique<Filter>(this));
+    filterAdded();
+    changed();
+    return mFilters.back().get();
+}
+
+Filter* LogFormat::editableFilterAt(int row) {
+    return mFilters[row].get();
+}
+
+void LogFormat::removeFilterAt(int row) {
+    Q_ASSERT(row >= 0 && row < mFilters.size());
+    mFilters.erase(mFilters.begin() + row);
+    filterRemoved(row);
     changed();
 }
 

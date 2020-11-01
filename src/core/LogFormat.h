@@ -19,6 +19,7 @@
 #ifndef LOGFORMAT_H
 #define LOGFORMAT_H
 
+#include "Filter.h"
 #include "Highlight.h"
 #include "Vector.h"
 
@@ -50,12 +51,22 @@ public:
     Highlight* editableHighlightAt(int row);
     void removeHighlightAt(int row);
 
+    const stdq::Vector<std::unique_ptr<Filter>>& filters() const;
+    Filter* addFilter();
+    Filter* editableFilterAt(int row);
+    void removeFilterAt(int row);
+
     static std::unique_ptr<LogFormat> createEmpty();
 
 signals:
     void highlightChanged(int row);
     void highlightAdded();
     void highlightRemoved(int row);
+
+    void filterChanged(int row);
+    void filterAdded();
+    void filterRemoved(int row);
+
     void changed();
 
 private:
@@ -63,6 +74,7 @@ private:
     QRegularExpression mParser;
     ColumnHash mColumnHash;
     stdq::Vector<std::unique_ptr<Highlight>> mHighlights;
+    stdq::Vector<std::unique_ptr<Filter>> mFilters;
 };
 
 #endif // LOGFORMAT_H

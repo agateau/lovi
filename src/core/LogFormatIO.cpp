@@ -86,6 +86,14 @@ static unique_ptr<LogFormat> loadLogFormat(const QJsonDocument& doc) {
         highlight->setFgColor(initColor(fgColor));
     }
 
+    for (QJsonValue jsonValue : doc.object().value("filters").toArray()) {
+        QJsonObject filterObj = jsonValue.toObject();
+
+        auto* filter = logFormat->addFilter();
+
+        filter->setConditionDefinition(filterObj.value("condition").toString());
+    }
+
     return logFormat;
 }
 
