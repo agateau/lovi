@@ -36,6 +36,9 @@ bool FilterProxyModel::filterAcceptsRow(int sourceRow, const QModelIndex& /*sour
     return !std::any_of(mLogFormat->filters().begin(),
                         mLogFormat->filters().end(),
                         [this, sourceRow](const auto& filter) {
+                            if (!filter->condition()) {
+                                return false;
+                            }
                             return mLogModel->lineMatches(sourceRow, filter->condition());
                         });
 }
