@@ -114,6 +114,12 @@ static QJsonObject saveHighlight(const Highlight* highlight) {
     return root;
 }
 
+static QJsonObject saveFilter(const Filter* filter) {
+    QJsonObject root;
+    root["condition"] = filter->conditionDefinition();
+    return root;
+}
+
 static QJsonDocument saveToJson(LogFormat* logFormat) {
     QJsonObject root;
     {
@@ -128,6 +134,13 @@ static QJsonDocument saveToJson(LogFormat* logFormat) {
         highlightsArray.append(highlightObj);
     }
     root["highlights"] = highlightsArray;
+
+    QJsonArray filtersArray;
+    for (const auto& filter : logFormat->filters()) {
+        QJsonObject filterObj = saveFilter(filter.get());
+        filtersArray.append(filterObj);
+    }
+    root["filters"] = filtersArray;
 
     QJsonDocument doc;
     doc.setObject(root);

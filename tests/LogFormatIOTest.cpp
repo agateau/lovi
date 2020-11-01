@@ -44,6 +44,13 @@ void checkLogFormatEquality(const LogFormat& f1, const LogFormat& f2) {
         const auto& hl2 = f2.highlights().at(idx);
         REQUIRE(hl1->conditionDefinition() == hl2->conditionDefinition());
     }
+
+    for (int idx = 0; idx < f1.filters().size(); ++idx) {
+        REQUIRE(idx < f2.filters().size());
+        const auto& filter1 = f1.filters().at(idx);
+        const auto& filter2 = f2.filters().at(idx);
+        REQUIRE(filter1->conditionDefinition() == filter2->conditionDefinition());
+    }
 }
 
 TEST_CASE("logformatio") {
@@ -52,37 +59,55 @@ TEST_CASE("logformatio") {
 
     SECTION("load") {
         REQUIRE(format->parserPattern() == "^(?<level>[DEW])/(?<app>[^:]*): (?<message>.*)");
-        auto it = format->highlights().begin();
-        auto end = format->highlights().end();
-        REQUIRE(it != end);
-        Highlight* hl = it->get();
-        REQUIRE(hl->conditionDefinition() == "level == E");
-        REQUIRE(hl->scope() == Highlight::Row);
-        REQUIRE(hl->bgColor()->toString() == "#ff0000");
 
-        ++it;
-        REQUIRE(it != end);
-        hl = it->get();
-        REQUIRE(hl->conditionDefinition() == "level == W");
-        REQUIRE(hl->scope() == Highlight::Row);
-        REQUIRE(hl->fgColor()->toString() == "#ff8800");
+        {
+            auto it = format->highlights().begin();
+            auto end = format->highlights().end();
+            REQUIRE(it != end);
+            Highlight* hl = it->get();
+            REQUIRE(hl->conditionDefinition() == "level == E");
+            REQUIRE(hl->scope() == Highlight::Row);
+            REQUIRE(hl->bgColor()->toString() == "#ff0000");
 
-        ++it;
-        REQUIRE(it != end);
-        hl = it->get();
-        REQUIRE(hl->conditionDefinition() == "message ~ start.*");
-        REQUIRE(hl->scope() == Highlight::Cell);
-        REQUIRE(hl->bgColor()->toString() == "auto");
+            ++it;
+            REQUIRE(it != end);
+            hl = it->get();
+            REQUIRE(hl->conditionDefinition() == "level == W");
+            REQUIRE(hl->scope() == Highlight::Row);
+            REQUIRE(hl->fgColor()->toString() == "#ff8800");
 
-        ++it;
-        REQUIRE(it != end);
-        hl = it->get();
-        REQUIRE(hl->conditionDefinition() == "message contains bob");
-        REQUIRE(hl->scope() == Highlight::Cell);
-        REQUIRE(hl->fgColor()->toString() == "#00ff00");
+            ++it;
+            REQUIRE(it != end);
+            hl = it->get();
+            REQUIRE(hl->conditionDefinition() == "message ~ start.*");
+            REQUIRE(hl->scope() == Highlight::Cell);
+            REQUIRE(hl->bgColor()->toString() == "auto");
 
-        ++it;
-        REQUIRE(it == end);
+            ++it;
+            REQUIRE(it != end);
+            hl = it->get();
+            REQUIRE(hl->conditionDefinition() == "message contains bob");
+            REQUIRE(hl->scope() == Highlight::Cell);
+            REQUIRE(hl->fgColor()->toString() == "#00ff00");
+
+            ++it;
+            REQUIRE(it == end);
+        }
+        {
+            auto it = format->filters().begin();
+            auto end = format->filters().end();
+            REQUIRE(it != end);
+            auto* filter = it->get();
+            REQUIRE(filter->conditionDefinition() == "level == D");
+
+            ++it;
+            REQUIRE(it != end);
+            filter = it->get();
+            REQUIRE(filter->conditionDefinition() == "message contains noise");
+
+            ++it;
+            REQUIRE(it == end);
+        }
     }
 
     SECTION("save") {
