@@ -145,6 +145,16 @@ void LogFormatWidget::setupHighlightTab() {
 }
 
 void LogFormatWidget::setupFilterTab() {
+    // Mode
+    connect(ui->filterModeComboBox,
+            qOverload<int>(&QComboBox::currentIndexChanged),
+            this,
+            [this](int index) {
+                FilterMode mode =
+                    index == 0 ? FilterMode::HideMatchingLines : FilterMode::ShowMatchingLines;
+                mController->logFormat()->setFilterMode(mode);
+            });
+
     // List
     ui->filterListView->setModel(mFilterModel.get());
 

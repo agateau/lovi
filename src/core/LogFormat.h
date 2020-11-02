@@ -30,6 +30,11 @@
 
 using ColumnHash = QHash<QString, int>;
 
+enum class FilterMode {
+    HideMatchingLines,
+    ShowMatchingLines,
+};
+
 class LogFormat : public QObject {
     Q_OBJECT
 public:
@@ -57,6 +62,9 @@ public:
     Filter* editableFilterAt(int row);
     void removeFilterAt(int row);
 
+    void setFilterMode(FilterMode filterMode);
+    FilterMode filterMode() const;
+
     static std::unique_ptr<LogFormat> createEmpty();
 
 signals:
@@ -76,6 +84,7 @@ private:
     ColumnHash mColumnHash;
     stdq::Vector<std::unique_ptr<Highlight>> mHighlights;
     stdq::Vector<std::unique_ptr<Filter>> mFilters;
+    FilterMode mFilterMode = FilterMode::HideMatchingLines;
 };
 
 #endif // LOGFORMAT_H

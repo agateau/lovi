@@ -134,6 +134,18 @@ void LogFormat::removeFilterAt(int row) {
     changed();
 }
 
+void LogFormat::setFilterMode(FilterMode filterMode) {
+    if (mFilterMode == filterMode) {
+        return;
+    }
+    mFilterMode = filterMode;
+    changed();
+}
+
+FilterMode LogFormat::filterMode() const {
+    return mFilterMode;
+}
+
 unique_ptr<LogFormat> LogFormat::createEmpty() {
     unique_ptr<LogFormat> logFormat = std::make_unique<LogFormat>();
     logFormat->setParserPattern("(?<line>.*)");

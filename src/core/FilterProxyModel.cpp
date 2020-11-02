@@ -30,15 +30,22 @@ FilterProxyModel::FilterProxyModel(LogModel* logModel, const LogFormat* logForma
     connect(mLogFormat, &LogFormat::filterChanged, this, &FilterProxyModel::invalidateFilter);
     connect(mLogFormat, &LogFormat::filterAdded, this, &FilterProxyModel::invalidateFilter);
     connect(mLogFormat, &LogFormat::filterRemoved, this, &FilterProxyModel::invalidateFilter);
+    connect(mLogFormat, &LogFormat::changed, this, &FilterProxyModel::invalidateFilter);
 }
 
 bool FilterProxyModel::filterAcceptsRow(int sourceRow, const QModelIndex& /*sourceParent*/) const {
-    return !std::any_of(mLogFormat->filters().begin(),
-                        mLogFormat->filters().end(),
-                        [this, sourceRow](const auto& filter) {
-                            if (!filter->condition()) {
-                                return false;
-                            }
-                            return mLogModel->lineMatches(sourceRow, filter->condition());
-                        });
+    bool anyMatch = std::any_of(mLogFormat->filters().begin(),
+                                mLogFormat->filters().end(),
+                                [this, sourceRow](const auto& filter) {
+                                    if (!filter->condition()) {
+                                        return false;
+                                    }
+                                    return mLogModel->lineMatches(sourceRow, filter->condition());
+                                });
+
+    if (mLogFormat->filterMode() == FilterMode::ShowMatchingLines) {
+        return anyMatch;
+    } else {
+        return !anyMatch;
+    }
 }
