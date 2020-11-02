@@ -178,12 +178,12 @@
         <widget class="QComboBox" name="filterModeComboBox">
          <item>
           <property name="text">
-           <string>Hide lines matching filters</string>
+           <string>Hide lines matching any of</string>
           </property>
          </item>
          <item>
           <property name="text">
-           <string>Show only lines matching filters</string>
+           <string>Show lines matching any of</string>
           </property>
          </item>
         </widget>
