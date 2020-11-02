@@ -226,6 +226,8 @@ void LogFormatWidget::onCurrentFilterChanged(const QModelIndex& index) {
     Q_ASSERT(logFormat);
     auto* filter = index.isValid() ? logFormat->editableFilterAt(index.row()) : nullptr;
     auto text = filter ? filter->conditionDefinition() : QString();
+
+    ui->filterLineEdit->setEnabled(index.isValid());
     ui->filterLineEdit->setText(text);
 }
 

@@ -202,7 +202,11 @@
         </widget>
        </item>
        <item>
-        <widget class="QLineEdit" name="filterLineEdit"/>
+        <widget class="QLineEdit" name="filterLineEdit">
+         <property name="enabled">
+          <bool>false</bool>
+         </property>
+        </widget>
        </item>
       </layout>
      </widget>
