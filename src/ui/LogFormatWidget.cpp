@@ -73,6 +73,7 @@ void LogFormatWidget::setLogFormat(LogFormat* logFormat) {
     mHighlightModel->setLogFormat(logFormat);
     ui->filterModeComboBox->setCurrentIndex(static_cast<int>(logFormat->filterMode()));
     mFilterModel->setLogFormat(logFormat);
+    ui->filterLineEdit->setLogFormat(logFormat);
 }
 
 void LogFormatWidget::setupLogFormatSelector() {

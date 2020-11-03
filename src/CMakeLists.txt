@@ -35,6 +35,7 @@ set(APPLIB_SRCS
     # ui
     ui/ColorWidget.cpp
     ui/ColorUtils.cpp
+    ui/ConditionLineEdit.cpp
     ui/ConditionLineEditChecker.cpp
     ui/HighlightWidget.cpp
     ui/HighlightWidget.ui

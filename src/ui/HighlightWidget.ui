@@ -18,7 +18,7 @@
     <widget class="ColorWidget" name="fgColorWidget"/>
    </item>
    <item row="1" column="0" colspan="5">
-    <widget class="QLineEdit" name="conditionLineEdit"/>
+    <widget class="ConditionLineEdit" name="conditionLineEdit"/>
    </item>
    <item row="2" column="2">
     <widget class="QLabel" name="fgColorLabel">
@@ -86,6 +86,11 @@
    <class>ColorWidget</class>
    <extends>QComboBox</extends>
    <header>ColorWidget.h</header>
+  </customwidget>
+  <customwidget>
+   <class>ConditionLineEdit</class>
+   <extends>QLineEdit</extends>
+   <header>ConditionLineEdit.h</header>
   </customwidget>
  </customwidgets>
  <tabstops>

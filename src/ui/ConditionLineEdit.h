@@ -1,5 +1,5 @@
 /*
- * Copyright 2019 Aurélien Gâteau <mail@agateau.com>
+ * Copyright 2020 Aurélien Gâteau <mail@agateau.com>
  *
  * This file is part of Lovi.
  *
@@ -16,36 +16,28 @@
  * You should have received a copy of the GNU General Public License along with
  * this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-#ifndef HIGHLIGHTWIDGET_H
-#define HIGHLIGHTWIDGET_H
+#ifndef CONDITIONLINEEDIT_H
+#define CONDITIONLINEEDIT_H
 
-#include "Highlight.h"
-
-#include <QWidget>
+#include <QLineEdit>
 
 #include <memory>
 
-namespace Ui {
-class HighlightWidget;
-}
+class ConditionLineEditChecker;
+class LogFormat;
 
-class QLineEdit;
-
-class HighlightWidget : public QWidget {
+/**
+ * A QLineEdit which indicates errors if its content is not a valid LogFormat condition
+ */
+class ConditionLineEdit : public QLineEdit {
     Q_OBJECT
 public:
-    explicit HighlightWidget(QWidget* parent = nullptr);
-    ~HighlightWidget();
-
-    void setHighlight(Highlight* highlight);
-    Highlight* highlight() const;
-
-    QLineEdit* lineEdit() const;
+    explicit ConditionLineEdit(QWidget* parent = nullptr);
+    ~ConditionLineEdit();
+    void setLogFormat(const LogFormat* logFormat);
 
 private:
-    void setupUi();
-    const std::unique_ptr<Ui::HighlightWidget> ui;
-    Highlight* mHighlight = nullptr;
+    const std::unique_ptr<ConditionLineEditChecker> mLineEditChecker;
 };
 
-#endif // HIGHLIGHTWIDGET_H
+#endif // CONDITIONLINEEDIT_H

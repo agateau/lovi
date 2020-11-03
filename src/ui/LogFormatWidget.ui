@@ -202,7 +202,7 @@
         </widget>
        </item>
        <item>
-        <widget class="QLineEdit" name="filterLineEdit">
+        <widget class="ConditionLineEdit" name="filterLineEdit">
          <property name="enabled">
           <bool>false</bool>
          </property>
@@ -215,6 +215,11 @@
   </layout>
  </widget>
  <customwidgets>
+  <customwidget>
+   <class>ConditionLineEdit</class>
+   <extends>QLineEdit</extends>
+   <header>ConditionLineEdit.h</header>
+  </customwidget>
   <customwidget>
    <class>HighlightWidget</class>
    <extends>QWidget</extends>
