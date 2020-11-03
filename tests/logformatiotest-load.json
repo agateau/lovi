@@ -24,6 +24,7 @@
             "fgColor": "#00ff00"
         }
     ],
+    "filterMode": "ShowMatchingLines",
     "filters": [
         {
             "condition": "level == D"

@@ -37,6 +37,7 @@ struct Fixture {
 void checkLogFormatEquality(const LogFormat& f1, const LogFormat& f2) {
     REQUIRE(f1.name() == f2.name());
     REQUIRE(f1.parserPattern() == f2.parserPattern());
+    REQUIRE(f1.filterMode() == f2.filterMode());
 
     for (int idx = 0; idx < f1.highlights().size(); ++idx) {
         REQUIRE(idx < f2.highlights().size());
@@ -59,7 +60,7 @@ TEST_CASE("logformatio") {
 
     SECTION("load") {
         REQUIRE(format->parserPattern() == "^(?<level>[DEW])/(?<app>[^:]*): (?<message>.*)");
-
+        REQUIRE(format->filterMode() == FilterMode::ShowMatchingLines);
         {
             auto it = format->highlights().begin();
             auto end = format->highlights().end();

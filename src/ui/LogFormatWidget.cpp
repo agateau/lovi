@@ -71,6 +71,7 @@ void LogFormatWidget::setLogFormat(LogFormat* logFormat) {
     selectLogFormat(logFormat->name());
     ui->parserLineEdit->setText(logFormat->parserPattern());
     mHighlightModel->setLogFormat(logFormat);
+    ui->filterModeComboBox->setCurrentIndex(static_cast<int>(logFormat->filterMode()));
     mFilterModel->setLogFormat(logFormat);
 }
 
@@ -150,8 +151,7 @@ void LogFormatWidget::setupFilterTab() {
             qOverload<int>(&QComboBox::currentIndexChanged),
             this,
             [this](int index) {
-                FilterMode mode =
-                    index == 0 ? FilterMode::HideMatchingLines : FilterMode::ShowMatchingLines;
+                auto mode = static_cast<FilterMode>(index);
                 mController->logFormat()->setFilterMode(mode);
             });
 

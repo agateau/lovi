@@ -51,6 +51,20 @@ static OptionalColor initColor(const QString& text) {
     return Color(text);
 }
 
+static optional<FilterMode> filterModeForString(const QString& str) {
+    if (str == "HideMatchingLines") {
+        return FilterMode::HideMatchingLines;
+    } else if (str == "ShowMatchingLines") {
+        return FilterMode::ShowMatchingLines;
+    } else {
+        return {};
+    }
+}
+
+static QString stringForFilterMode(FilterMode mode) {
+    return mode == FilterMode::HideMatchingLines ? "HideMatchingLines" : "ShowMatchingLines";
+}
+
 static unique_ptr<LogFormat> loadLogFormat(const QJsonDocument& doc) {
     unique_ptr<LogFormat> logFormat = std::make_unique<LogFormat>();
 
@@ -84,6 +98,16 @@ static unique_ptr<LogFormat> loadLogFormat(const QJsonDocument& doc) {
         auto fgColor = highlightObj.value("fgColor").toString();
         highlight->setBgColor(initColor(bgColor));
         highlight->setFgColor(initColor(fgColor));
+    }
+
+    auto filterModeString = doc.object().value("filterMode").toString();
+    if (!filterModeString.isEmpty()) {
+        optional<FilterMode> filterMode = filterModeForString(filterModeString);
+        if (filterMode.has_value()) {
+            logFormat->setFilterMode(filterMode.value());
+        } else {
+            qWarning() << "Invalid filter mode:" << filterModeString;
+        }
     }
 
     for (QJsonValue jsonValue : doc.object().value("filters").toArray()) {
@@ -134,6 +158,8 @@ static QJsonDocument saveToJson(LogFormat* logFormat) {
         highlightsArray.append(highlightObj);
     }
     root["highlights"] = highlightsArray;
+
+    root["filterMode"] = stringForFilterMode(logFormat->filterMode());
 
     QJsonArray filtersArray;
     for (const auto& filter : logFormat->filters()) {
