@@ -27,6 +27,7 @@ namespace Ui {
 class LogFormatWidget;
 }
 
+class FilterModel;
 class HighlightModel;
 class LogFormat;
 class LogFormatModel;
@@ -41,22 +42,28 @@ public:
 
 private:
     void setupLogFormatSelector();
-    void setupEditor();
+    void setupLogFormatEditor();
+    void setupHighlightTab();
+    void setupFilterTab();
     void setupSearchBar();
 
     void setLogFormat(LogFormat* logFormat);
     void onCurrentLogFormatChanged(int row);
     void onCurrentHighlightChanged(const QModelIndex& index);
+    void onCurrentFilterChanged(const QModelIndex& index);
     void onParserEditingFinished();
     void onAddFormatClicked();
     void onAddHighlightClicked();
+    void onAddFilterClicked();
     void selectLogFormat(const QString& name);
     void onSearchFinished(const SearchResponse& response);
+    void onFilterEditingFinished();
 
     MainController* const mController;
     const std::unique_ptr<Ui::LogFormatWidget> ui;
     const std::unique_ptr<LogFormatModel> mLogFormatModel;
     const std::unique_ptr<HighlightModel> mHighlightModel;
+    const std::unique_ptr<FilterModel> mFilterModel;
 };
 
 #endif // LOGFORMATWIDGET_H

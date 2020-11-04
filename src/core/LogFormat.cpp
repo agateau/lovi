@@ -38,6 +38,17 @@ void LogFormat::emitHighlightChanged(Highlight* highlight) {
     changed();
 }
 
+void LogFormat::emitFilterChanged(Filter* filter) {
+    auto it = std::find_if(mFilters.begin(), mFilters.end(), [filter](const auto& ptr) {
+        return ptr.get() == filter;
+    });
+    Q_ASSERT(it != mFilters.end());
+
+    int row = int(it - mFilters.begin());
+    filterChanged(row);
+    changed();
+}
+
 void LogFormat::setName(const QString& name) {
     mName = name;
 }
@@ -59,6 +70,9 @@ void LogFormat::setParserPattern(const QString& pattern) {
     }
     for (const auto& highlight : mHighlights) {
         highlight->updateCondition();
+    }
+    for (const auto& filter : mFilters) {
+        filter->updateCondition();
     }
 
     changed();
@@ -96,6 +110,40 @@ void LogFormat::removeHighlightAt(int row) {
     mHighlights.erase(mHighlights.begin() + row);
     highlightRemoved(row);
     changed();
+}
+
+const stdq::Vector<std::unique_ptr<Filter>>& LogFormat::filters() const {
+    return mFilters;
+}
+
+Filter* LogFormat::addFilter() {
+    mFilters.push_back(std::make_unique<Filter>(this));
+    filterAdded();
+    changed();
+    return mFilters.back().get();
+}
+
+Filter* LogFormat::editableFilterAt(int row) {
+    return mFilters[row].get();
+}
+
+void LogFormat::removeFilterAt(int row) {
+    Q_ASSERT(row >= 0 && row < mFilters.size());
+    mFilters.erase(mFilters.begin() + row);
+    filterRemoved(row);
+    changed();
+}
+
+void LogFormat::setFilterMode(FilterMode filterMode) {
+    if (mFilterMode == filterMode) {
+        return;
+    }
+    mFilterMode = filterMode;
+    changed();
+}
+
+FilterMode LogFormat::filterMode() const {
+    return mFilterMode;
 }
 
 unique_ptr<LogFormat> LogFormat::createEmpty() {

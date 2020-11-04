@@ -51,6 +51,20 @@ static OptionalColor initColor(const QString& text) {
     return Color(text);
 }
 
+static optional<FilterMode> filterModeForString(const QString& str) {
+    if (str == "HideMatchingLines") {
+        return FilterMode::HideMatchingLines;
+    } else if (str == "ShowMatchingLines") {
+        return FilterMode::ShowMatchingLines;
+    } else {
+        return {};
+    }
+}
+
+static QString stringForFilterMode(FilterMode mode) {
+    return mode == FilterMode::HideMatchingLines ? "HideMatchingLines" : "ShowMatchingLines";
+}
+
 static unique_ptr<LogFormat> loadLogFormat(const QJsonDocument& doc) {
     unique_ptr<LogFormat> logFormat = std::make_unique<LogFormat>();
 
@@ -86,6 +100,24 @@ static unique_ptr<LogFormat> loadLogFormat(const QJsonDocument& doc) {
         highlight->setFgColor(initColor(fgColor));
     }
 
+    auto filterModeString = doc.object().value("filterMode").toString();
+    if (!filterModeString.isEmpty()) {
+        optional<FilterMode> filterMode = filterModeForString(filterModeString);
+        if (filterMode.has_value()) {
+            logFormat->setFilterMode(filterMode.value());
+        } else {
+            qWarning() << "Invalid filter mode:" << filterModeString;
+        }
+    }
+
+    for (QJsonValue jsonValue : doc.object().value("filters").toArray()) {
+        QJsonObject filterObj = jsonValue.toObject();
+
+        auto* filter = logFormat->addFilter();
+
+        filter->setConditionDefinition(filterObj.value("condition").toString());
+    }
+
     return logFormat;
 }
 
@@ -106,6 +138,12 @@ static QJsonObject saveHighlight(const Highlight* highlight) {
     return root;
 }
 
+static QJsonObject saveFilter(const Filter* filter) {
+    QJsonObject root;
+    root["condition"] = filter->conditionDefinition();
+    return root;
+}
+
 static QJsonDocument saveToJson(LogFormat* logFormat) {
     QJsonObject root;
     {
@@ -120,6 +158,15 @@ static QJsonDocument saveToJson(LogFormat* logFormat) {
         highlightsArray.append(highlightObj);
     }
     root["highlights"] = highlightsArray;
+
+    root["filterMode"] = stringForFilterMode(logFormat->filterMode());
+
+    QJsonArray filtersArray;
+    for (const auto& filter : logFormat->filters()) {
+        QJsonObject filterObj = saveFilter(filter.get());
+        filtersArray.append(filterObj);
+    }
+    root["filters"] = filtersArray;
 
     QJsonDocument doc;
     doc.setObject(root);

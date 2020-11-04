@@ -1,5 +1,5 @@
 /*
- * Copyright 2019 Aurélien Gâteau <mail@agateau.com>
+ * Copyright 2020 Aurélien Gâteau <mail@agateau.com>
  *
  * This file is part of Lovi.
  *
@@ -16,31 +16,27 @@
  * You should have received a copy of the GNU General Public License along with
  * this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-#ifndef HIGHLIGHTMODEL_H
-#define HIGHLIGHTMODEL_H
+#ifndef FILTERPROXYMODEL_H
+#define FILTERPROXYMODEL_H
 
-#include <QAbstractItemModel>
-
-#include <memory>
+#include <QSortFilterProxyModel>
 
 class LogFormat;
+class LogModel;
 
-class HighlightModel : public QAbstractListModel {
-    Q_OBJECT
+/**
+ * Implements filtering of the log lines, according to a log format
+ */
+class FilterProxyModel : public QSortFilterProxyModel {
 public:
-    HighlightModel(QObject* parent = nullptr);
+    FilterProxyModel(LogModel* logModel, const LogFormat* logFormat);
 
-    void setLogFormat(LogFormat* logFormat);
-
-    int rowCount(const QModelIndex& parent = {}) const override;
-
-    QVariant data(const QModelIndex& index, int role = Qt::DisplayRole) const override;
+protected:
+    bool filterAcceptsRow(int sourceRow, const QModelIndex& sourceParent) const override;
 
 private:
-    void onHighlightChanged(int row);
-    void onHighlightAdded();
-    void onHighlightRemoved(int row);
-    LogFormat* mLogFormat = nullptr;
+    const LogModel* const mLogModel;
+    const LogFormat* const mLogFormat;
 };
 
-#endif // HIGHLIGHTMODEL_H
+#endif // FILTERPROXYMODEL_H

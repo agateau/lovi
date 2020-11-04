@@ -30,11 +30,11 @@ class ConditionLineEditChecker : public LineEditChecker {
 public:
     explicit ConditionLineEditChecker(QLineEdit* lineEdit);
 
-    void setLogFormat(LogFormat* logFormat);
+    void setLogFormat(const LogFormat* logFormat);
 
 private:
     QString check(const QString& text) const;
-    LogFormat* mLogFormat = nullptr;
+    const LogFormat* mLogFormat = nullptr;
 };
 
 #endif // CONDITIONLINEEDITCHECKER_H

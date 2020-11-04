@@ -19,6 +19,7 @@
 #ifndef LOGFORMAT_H
 #define LOGFORMAT_H
 
+#include "Filter.h"
 #include "Highlight.h"
 #include "Vector.h"
 
@@ -29,12 +30,18 @@
 
 using ColumnHash = QHash<QString, int>;
 
+enum class FilterMode {
+    HideMatchingLines,
+    ShowMatchingLines,
+};
+
 class LogFormat : public QObject {
     Q_OBJECT
 public:
     LogFormat(QObject* parent = nullptr);
 
     void emitHighlightChanged(Highlight* highlight);
+    void emitFilterChanged(Filter* filter);
 
     void setName(const QString& name);
     QString name() const;
@@ -50,12 +57,25 @@ public:
     Highlight* editableHighlightAt(int row);
     void removeHighlightAt(int row);
 
+    const stdq::Vector<std::unique_ptr<Filter>>& filters() const;
+    Filter* addFilter();
+    Filter* editableFilterAt(int row);
+    void removeFilterAt(int row);
+
+    void setFilterMode(FilterMode filterMode);
+    FilterMode filterMode() const;
+
     static std::unique_ptr<LogFormat> createEmpty();
 
 signals:
     void highlightChanged(int row);
     void highlightAdded();
     void highlightRemoved(int row);
+
+    void filterChanged(int row);
+    void filterAdded();
+    void filterRemoved(int row);
+
     void changed();
 
 private:
@@ -63,6 +83,8 @@ private:
     QRegularExpression mParser;
     ColumnHash mColumnHash;
     stdq::Vector<std::unique_ptr<Highlight>> mHighlights;
+    stdq::Vector<std::unique_ptr<Filter>> mFilters;
+    FilterMode mFilterMode = FilterMode::HideMatchingLines;
 };
 
 #endif // LOGFORMAT_H

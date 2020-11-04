@@ -25,7 +25,7 @@ ConditionLineEditChecker::ConditionLineEditChecker(QLineEdit* lineEdit)
                           [this](const QString& text) -> QString { return check(text); }) {
 }
 
-void ConditionLineEditChecker::setLogFormat(LogFormat* logFormat) {
+void ConditionLineEditChecker::setLogFormat(const LogFormat* logFormat) {
     mLogFormat = logFormat;
 }
 

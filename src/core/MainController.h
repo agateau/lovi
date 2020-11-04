@@ -1,4 +1,4 @@
-﻿/*
+/*
  * Copyright 2019 Aurélien Gâteau <mail@agateau.com>
  *
  * This file is part of Lovi.
@@ -36,6 +36,7 @@ class Searcher;
 class SearchResponse;
 
 class QAbstractItemModel;
+class FilterProxyModel;
 
 class MainController : public BaseMainController {
     Q_OBJECT
@@ -77,6 +78,7 @@ private:
     // Mutable state
     std::unique_ptr<LineProvider> mLineProvider;
     std::unique_ptr<LogModel> mLogModel;
+    std::unique_ptr<FilterProxyModel> mFilterProxyModel;
 
     LogFormat* mLogFormat = nullptr; // Never null
 };

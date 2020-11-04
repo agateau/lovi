@@ -17,6 +17,9 @@ set(APPLIB_SRCS
     core/Config.cpp
     core/FileLineProvider.cpp
     core/FileWatcher.cpp
+    core/Filter.cpp
+    core/FilterModel.cpp
+    core/FilterProxyModel.cpp
     core/Highlight.cpp
     core/HighlightModel.cpp
     core/JsonSettings.cpp
@@ -32,6 +35,7 @@ set(APPLIB_SRCS
     # ui
     ui/ColorWidget.cpp
     ui/ColorUtils.cpp
+    ui/ConditionLineEdit.cpp
     ui/ConditionLineEditChecker.cpp
     ui/HighlightWidget.cpp
     ui/HighlightWidget.ui

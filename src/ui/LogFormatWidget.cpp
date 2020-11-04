@@ -18,6 +18,7 @@
  */
 #include "LogFormatWidget.h"
 
+#include "FilterModel.h"
 #include "HighlightModel.h"
 #include "ItemDelegate.h"
 #include "LineEditChecker.h"
@@ -51,10 +52,13 @@ LogFormatWidget::LogFormatWidget(MainController* controller, QWidget* parent)
         , mController(controller)
         , ui(WidgetUtils::initUi<Ui::LogFormatWidget>(this))
         , mLogFormatModel(std::make_unique<LogFormatModel>(controller->logFormatStore()))
-        , mHighlightModel(std::make_unique<HighlightModel>()) {
+        , mHighlightModel(std::make_unique<HighlightModel>())
+        , mFilterModel(std::make_unique<FilterModel>()) {
     Q_ASSERT(mController);
     setupLogFormatSelector();
-    setupEditor();
+    setupLogFormatEditor();
+    setupHighlightTab();
+    setupFilterTab();
     setupSearchBar();
     setLogFormat(mController->logFormat());
 }
@@ -67,6 +71,9 @@ void LogFormatWidget::setLogFormat(LogFormat* logFormat) {
     selectLogFormat(logFormat->name());
     ui->parserLineEdit->setText(logFormat->parserPattern());
     mHighlightModel->setLogFormat(logFormat);
+    ui->filterModeComboBox->setCurrentIndex(static_cast<int>(logFormat->filterMode()));
+    mFilterModel->setLogFormat(logFormat);
+    ui->filterLineEdit->setLogFormat(logFormat);
 }
 
 void LogFormatWidget::setupLogFormatSelector() {
@@ -81,8 +88,7 @@ void LogFormatWidget::setupLogFormatSelector() {
     connect(mController, &MainController::logFormatChanged, this, &LogFormatWidget::setLogFormat);
 }
 
-void LogFormatWidget::setupEditor() {
-    // Parser edit
+void LogFormatWidget::setupLogFormatEditor() {
     connect(ui->parserLineEdit,
             &QLineEdit::editingFinished,
             this,
@@ -92,6 +98,20 @@ void LogFormatWidget::setupEditor() {
         return rx.isValid() ? QString() : rx.errorString();
     });
     WidgetUtils::addLineEditHelpIcon(ui->parserLineEdit, PARSER_SYNTAX_HELP);
+}
+
+static QToolButton* createAddButton(QWidget* parent) {
+    auto addHighlightButton = new QToolButton;
+    addHighlightButton->setIcon(QIcon::fromTheme("list-add"));
+
+    auto floater = new WidgetFloater(parent);
+    floater->setAlignment(Qt::AlignRight | Qt::AlignBottom);
+    floater->setChildWidget(addHighlightButton);
+    return addHighlightButton;
+}
+
+void LogFormatWidget::setupHighlightTab() {
+    ui->tabWidget->setCurrentIndex(0);
 
     // Highlight list
     ui->highlightListView->setModel(mHighlightModel.get());
@@ -109,26 +129,62 @@ void LogFormatWidget::setupEditor() {
         if (!index.isValid()) {
             return;
         }
-        mHighlightModel->logFormat()->removeHighlightAt(index.row());
+        mController->logFormat()->removeHighlightAt(index.row());
     });
     ui->highlightListView->addAction(removeHighlightAction);
     ui->highlightListView->setContextMenuPolicy(Qt::ActionsContextMenu);
 
     // Highlight add button
-    auto addHighlightButton = new QToolButton;
-    addHighlightButton->setIcon(QIcon::fromTheme("list-add"));
+    auto addHighlightButton = createAddButton(ui->highlightListView);
     connect(
         addHighlightButton, &QToolButton::pressed, this, &LogFormatWidget::onAddHighlightClicked);
-
-    auto floater = new WidgetFloater(ui->highlightListView);
-    floater->setAlignment(Qt::AlignRight | Qt::AlignBottom);
-    floater->setChildWidget(addHighlightButton);
 
     // Highlight widget
     connect(mController,
             &MainController::currentHighlightChanged,
             ui->highlightWidget,
             &HighlightWidget::setHighlight);
+}
+
+void LogFormatWidget::setupFilterTab() {
+    // Mode
+    connect(ui->filterModeComboBox,
+            qOverload<int>(&QComboBox::currentIndexChanged),
+            this,
+            [this](int index) {
+                auto mode = static_cast<FilterMode>(index);
+                mController->logFormat()->setFilterMode(mode);
+            });
+
+    // List
+    ui->filterListView->setModel(mFilterModel.get());
+
+    connect(ui->filterListView->selectionModel(),
+            &QItemSelectionModel::currentChanged,
+            this,
+            &LogFormatWidget::onCurrentFilterChanged);
+
+    // List context menu
+    auto removeAction = new QAction(tr("Remove Filter"));
+    connect(removeAction, &QAction::triggered, this, [this] {
+        auto index = ui->filterListView->currentIndex();
+        if (!index.isValid()) {
+            return;
+        }
+        mController->logFormat()->removeFilterAt(index.row());
+    });
+    ui->filterListView->addAction(removeAction);
+    ui->filterListView->setContextMenuPolicy(Qt::ActionsContextMenu);
+
+    // Add button
+    auto addButton = createAddButton(ui->filterListView);
+    connect(addButton, &QToolButton::pressed, this, &LogFormatWidget::onAddFilterClicked);
+
+    // Filter line edit
+    connect(ui->filterLineEdit,
+            &QLineEdit::editingFinished,
+            this,
+            &LogFormatWidget::onFilterEditingFinished);
 }
 
 void LogFormatWidget::setupSearchBar() {
@@ -160,9 +216,20 @@ void LogFormatWidget::onCurrentLogFormatChanged(int row) {
 }
 
 void LogFormatWidget::onCurrentHighlightChanged(const QModelIndex& index) {
-    auto logFormat = mHighlightModel->logFormat();
+    LogFormat* logFormat = mController->logFormat();
+    Q_ASSERT(logFormat);
     auto* highlight = index.isValid() ? logFormat->editableHighlightAt(index.row()) : nullptr;
     mController->setCurrentHighlight(highlight);
+}
+
+void LogFormatWidget::onCurrentFilterChanged(const QModelIndex& index) {
+    LogFormat* logFormat = mController->logFormat();
+    Q_ASSERT(logFormat);
+    auto* filter = index.isValid() ? logFormat->editableFilterAt(index.row()) : nullptr;
+    auto text = filter ? filter->conditionDefinition() : QString();
+
+    ui->filterLineEdit->setEnabled(index.isValid());
+    ui->filterLineEdit->setText(text);
 }
 
 void LogFormatWidget::onParserEditingFinished() {
@@ -191,13 +258,26 @@ void LogFormatWidget::onAddFormatClicked() {
 }
 
 void LogFormatWidget::onAddHighlightClicked() {
-    Highlight* highlight = mHighlightModel->logFormat()->addHighlight();
+    LogFormat* logFormat = mController->logFormat();
+    Q_ASSERT(logFormat);
+    Highlight* highlight = logFormat->addHighlight();
     highlight->setBgColor(Color::createAuto());
 
     auto index = mHighlightModel->index(mHighlightModel->rowCount() - 1, 0);
     ui->highlightListView->setCurrentIndex(index);
 
     ui->highlightWidget->lineEdit()->setFocus();
+}
+
+void LogFormatWidget::onAddFilterClicked() {
+    LogFormat* logFormat = mController->logFormat();
+    Q_ASSERT(logFormat);
+    logFormat->addFilter();
+
+    auto index = mFilterModel->index(mFilterModel->rowCount() - 1, 0);
+    ui->filterListView->setCurrentIndex(index);
+
+    ui->filterLineEdit->setFocus();
 }
 
 void LogFormatWidget::selectLogFormat(const QString& name) {
@@ -226,4 +306,13 @@ void LogFormatWidget::onSearchFinished(const SearchResponse& response) {
     }
     auto pos = ui->searchNextButton->mapToGlobal({ui->searchNextButton->width(), 0});
     QToolTip::showText(pos, text);
+}
+
+void LogFormatWidget::onFilterEditingFinished() {
+    LogFormat* logFormat = mController->logFormat();
+    Q_ASSERT(logFormat);
+    auto index = ui->filterListView->currentIndex();
+    Q_ASSERT(index.isValid());
+    auto* filter = logFormat->editableFilterAt(index.row());
+    filter->setConditionDefinition(ui->filterLineEdit->text());
 }

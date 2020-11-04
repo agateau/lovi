@@ -1,5 +1,5 @@
 /*
- * Copyright 2019 Aurélien Gâteau <mail@agateau.com>
+ * Copyright 2020 Aurélien Gâteau <mail@agateau.com>
  *
  * This file is part of Lovi.
  *
@@ -16,31 +16,32 @@
  * You should have received a copy of the GNU General Public License along with
  * this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-#ifndef HIGHLIGHTMODEL_H
-#define HIGHLIGHTMODEL_H
+#ifndef FILTER_H
+#define FILTER_H
 
-#include <QAbstractItemModel>
+#include "Conditions.h"
 
 #include <memory>
 
 class LogFormat;
 
-class HighlightModel : public QAbstractListModel {
-    Q_OBJECT
+class Filter {
 public:
-    HighlightModel(QObject* parent = nullptr);
+    explicit Filter(LogFormat* logFormat);
+    ~Filter();
 
-    void setLogFormat(LogFormat* logFormat);
+    void setConditionDefinition(const QString& definition);
+    QString conditionDefinition() const;
+    void updateCondition();
 
-    int rowCount(const QModelIndex& parent = {}) const override;
-
-    QVariant data(const QModelIndex& index, int role = Qt::DisplayRole) const override;
+    Condition* condition() const {
+        return mCondition.get();
+    }
 
 private:
-    void onHighlightChanged(int row);
-    void onHighlightAdded();
-    void onHighlightRemoved(int row);
-    LogFormat* mLogFormat = nullptr;
+    LogFormat* const mLogFormat;
+    QString mConditionDefinition;
+    std::unique_ptr<Condition> mCondition;
 };
 
-#endif // HIGHLIGHTMODEL_H
+#endif // FILTER_H

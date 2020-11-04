@@ -1,5 +1,5 @@
 /*
- * Copyright 2019 Aurélien Gâteau <mail@agateau.com>
+ * Copyright 2020 Aurélien Gâteau <mail@agateau.com>
  *
  * This file is part of Lovi.
  *
@@ -16,8 +16,8 @@
  * You should have received a copy of the GNU General Public License along with
  * this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-#ifndef HIGHLIGHTMODEL_H
-#define HIGHLIGHTMODEL_H
+#ifndef FILTERMODEL_H
+#define FILTERMODEL_H
 
 #include <QAbstractItemModel>
 
@@ -25,10 +25,10 @@
 
 class LogFormat;
 
-class HighlightModel : public QAbstractListModel {
+class FilterModel : public QAbstractListModel {
     Q_OBJECT
 public:
-    HighlightModel(QObject* parent = nullptr);
+    FilterModel(QObject* parent = nullptr);
 
     void setLogFormat(LogFormat* logFormat);
 
@@ -37,10 +37,10 @@ public:
     QVariant data(const QModelIndex& index, int role = Qt::DisplayRole) const override;
 
 private:
-    void onHighlightChanged(int row);
-    void onHighlightAdded();
-    void onHighlightRemoved(int row);
+    void onFilterChanged(int row);
+    void onFilterAdded();
+    void onFilterRemoved(int row);
     LogFormat* mLogFormat = nullptr;
 };
 
-#endif // HIGHLIGHTMODEL_H
+#endif // FILTERMODEL_H

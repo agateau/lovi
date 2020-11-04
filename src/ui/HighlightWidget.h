@@ -31,8 +31,6 @@ class HighlightWidget;
 
 class QLineEdit;
 
-class ConditionLineEditChecker;
-
 class HighlightWidget : public QWidget {
     Q_OBJECT
 public:
@@ -47,7 +45,6 @@ public:
 private:
     void setupUi();
     const std::unique_ptr<Ui::HighlightWidget> ui;
-    const std::unique_ptr<ConditionLineEditChecker> mLineEditChecker;
     Highlight* mHighlight = nullptr;
 };
 

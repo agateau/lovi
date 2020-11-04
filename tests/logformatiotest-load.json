@@ -23,5 +23,14 @@
             "scope": "cell",
             "fgColor": "#00ff00"
         }
+    ],
+    "filterMode": "ShowMatchingLines",
+    "filters": [
+        {
+            "condition": "level == D"
+        },
+        {
+            "condition": "message contains noise"
+        }
     ]
 }

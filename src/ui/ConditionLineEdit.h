@@ -1,5 +1,5 @@
 /*
- * Copyright 2019 Aurélien Gâteau <mail@agateau.com>
+ * Copyright 2020 Aurélien Gâteau <mail@agateau.com>
  *
  * This file is part of Lovi.
  *
@@ -16,31 +16,28 @@
  * You should have received a copy of the GNU General Public License along with
  * this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-#ifndef HIGHLIGHTMODEL_H
-#define HIGHLIGHTMODEL_H
+#ifndef CONDITIONLINEEDIT_H
+#define CONDITIONLINEEDIT_H
 
-#include <QAbstractItemModel>
+#include <QLineEdit>
 
 #include <memory>
 
+class ConditionLineEditChecker;
 class LogFormat;
 
-class HighlightModel : public QAbstractListModel {
+/**
+ * A QLineEdit which indicates errors if its content is not a valid LogFormat condition
+ */
+class ConditionLineEdit : public QLineEdit {
     Q_OBJECT
 public:
-    HighlightModel(QObject* parent = nullptr);
-
-    void setLogFormat(LogFormat* logFormat);
-
-    int rowCount(const QModelIndex& parent = {}) const override;
-
-    QVariant data(const QModelIndex& index, int role = Qt::DisplayRole) const override;
+    explicit ConditionLineEdit(QWidget* parent = nullptr);
+    ~ConditionLineEdit();
+    void setLogFormat(const LogFormat* logFormat);
 
 private:
-    void onHighlightChanged(int row);
-    void onHighlightAdded();
-    void onHighlightRemoved(int row);
-    LogFormat* mLogFormat = nullptr;
+    const std::unique_ptr<ConditionLineEditChecker> mLineEditChecker;
 };
 
-#endif // HIGHLIGHTMODEL_H
+#endif // CONDITIONLINEEDIT_H
