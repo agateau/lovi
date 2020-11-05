@@ -11,20 +11,29 @@ jobs:
       fail-fast: false
       matrix:
         os:
-          - ubuntu-18.04
+          # FIXME
+          # - ubuntu-18.04
+          - windows-2019
           # Disabled for now: need to install missing dependencies
           #- macos-10.15
-          #- windows-2019
+    defaults:
+      run:
+        # FIXME: use bash for others
+        shell: msys2 {0}
     steps:
       - uses: actions/checkout@v2
         with:
           submodules: true
+
+      - uses: msys2/setup-msys2@v2
+        if: ${{matrix.os == 'windows-2019' }}
+
       - name: Install dependencies
         run: ci/install-dependencies deps
-        shell: bash
+
       - name: Build
         run: . deps/env.sh && ci/build-app
-        shell: bash
+
       - uses: actions/upload-artifact@v2
         with:
           name: packages

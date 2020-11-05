@@ -12,7 +12,9 @@ main() {
             g++ \
             git \
             libkf5guiaddons-dev \
+            cmake \
             make \
+            ninja \
             openbox \
             python3 \
             python3-pip \
@@ -24,6 +26,4 @@ main() {
     else
         die "Sorry, I don't know how to install the required packages on your distribution."
     fi
-
-    install_cmake
 }

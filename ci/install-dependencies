@@ -4,16 +4,9 @@ set -euo pipefail
 pushd $PWD > /dev/null
 cd $(dirname $0)
 CI_DIR=$PWD
+cd ..
+SRC_DIR=$PWD
 popd > /dev/null
-
-QT_ARCH_WINDOWS=win64_msvc2017_64
-QT_ARCH_MACOS=clang_64
-QT_VERSION=5.12.8
-
-ECM_VERSION=5.69.0
-
-CMAKE_VERSION=3.17.\*
-
 
 add_env_var() {
     echo "export $1=$2" >> $ENV_FILE
