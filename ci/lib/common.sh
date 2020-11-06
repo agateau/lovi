@@ -78,3 +78,10 @@ if is_macos ; then
 else
     NPROC=$(nproc)
 fi
+
+if is_linux ; then
+    # Ubuntu 18.04 does not have Ninja
+    CMAKE_GENERATOR="Unix Makefiles"
+else
+    CMAKE_GENERATOR=Ninja
+fi

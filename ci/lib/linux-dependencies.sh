@@ -14,7 +14,6 @@ main() {
             libkf5guiaddons-dev \
             cmake \
             make \
-            ninja \
             openbox \
             python3 \
             python3-pip \
