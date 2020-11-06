@@ -26,13 +26,26 @@ jobs:
           submodules: true
 
       - uses: msys2/setup-msys2@v2
-        if: ${{matrix.os == 'windows-2019' }}
+        if: ${{ matrix.os == 'windows-2019' }}
 
       - name: Install dependencies
-        run: ci/install-dependencies deps
+        run: ci/build-app install-dependencies
 
       - name: Build
-        run: . deps/env.sh && ci/build-app
+        run: ci/build-app build
+
+      - name: Run tests
+        run: ci/build-app tests
+
+      - name: Install
+        run: ci/build-app install
+
+      - name: Create binary packages
+        run: ci/build-app binary-packages
+
+      - name: Create source package
+        run: ci/build-app source-package
+        if: ${{ matrix.os == 'ubuntu-18.04' }}
 
       - uses: actions/upload-artifact@v2
         with:
