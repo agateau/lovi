@@ -1,52 +1,206 @@
 #!/bin/bash
 set -euo pipefail
 
+PROGNAME=$(basename $0)
+DESCRIPTION="
+Provides all the steps to build the application. This script is called by the
+CI to build the application, but you can run it on your local machine as well.
+"
+
 pushd $PWD > /dev/null
 cd $(dirname $0)/..
 SRC_DIR=$PWD
 popd > /dev/null
 
-. $SRC_DIR/ci/lib/common.sh
-
+CI_DIR=$SRC_DIR/ci
 BUILD_DIR=$SRC_DIR/build
 INSTALL_DIR=$SRC_DIR/inst
 
 BUILD_TYPE=Release
+BUILD_CMD="cmake --build $BUILD_DIR --config $BUILD_TYPE"
 
-BUILD_CMD="cmake --build . --config $BUILD_TYPE"
+echo_title() {
+    echo "========================================="
+    echo $*
+    echo "========================================="
+}
 
-echo_title Configuring
-mkdir $BUILD_DIR
-cd $BUILD_DIR
-cmake "-G$CMAKE_GENERATOR" -DCMAKE_BUILD_TYPE=$BUILD_TYPE -DCMAKE_INSTALL_PREFIX=$INSTALL_DIR $SRC_DIR
+detect_os() {
+    local out
+    out=$(uname)
 
-echo_title Updating translations
-$BUILD_CMD --target lupdate
+    case "$out" in
+    Linux)
+        OS="linux"
+        ;;
+    Darwin)
+        OS="macos"
+        ;;
+    MINGW*)
+        OS="windows"
+        ;;
+    *)
+        echo "Unknown OS. uname printed '$out'"
+        exit 1
+        ;;
+    esac
+}
 
-echo_title Building
-$BUILD_CMD --parallel $NPROC
+is_linux() {
+    [ "$OS" = "linux" ]
+}
 
-echo_title Running tests
-if is_windows ; then
-    echo "Tests do not pass for now on Windows. Skipping them."
-else
-    test_cmd="$BUILD_CMD --target check"
+is_macos() {
+    [ "$OS" = "macos" ]
+}
+
+is_windows() {
+    [ "$OS" = "windows" ]
+}
+
+has_command() {
+    command -v "$1" > /dev/null 2>&1
+}
+
+die() {
+    echo "$*" >&2
+    exit 1
+}
+
+mkabsdir() {
+    mkdir -p "$1"
+    pushd $PWD > /dev/null
+    cd "$1"
+    echo $PWD
+    pop > /dev/null
+}
+
+init_run_as_root() {
+    RUN_AS_ROOT=""
+    if is_windows ; then
+        return
+    fi
+    if [ $(id -u) = "0" ] ; then
+        # Already root
+        return
+    fi
+    if has_command sudo ; then
+        RUN_AS_ROOT=sudo
+    else
+        RUN_AS_ROOT="su -c"
+    fi
+}
+
+init_nproc() {
+    if is_macos ; then
+        NPROC=$(sysctl -n hw.ncpu)
+    else
+        NPROC=$(nproc)
+    fi
+}
+
+install_qpropgen_dependencies() {
+    echo_title "Installing qpropgen dependencies"
+    python -m pip install -r $SRC_DIR/third-party/qpropgen/requirements.txt
+}
+
+step_install-dependencies() {
+    . $CI_DIR/lib/install-$OS-dependencies.sh
+}
+
+step_build() {
+    local cmake_generator=Ninja
+    if is_linux ; then
+        # Ubuntu 18.04 does not have Ninja
+        cmake_generator="Unix Makefiles"
+    fi
+
+    echo_title Configuring
+    mkdir $BUILD_DIR
+    cd $BUILD_DIR
+    cmake "-G$cmake_generator" -DCMAKE_BUILD_TYPE=$BUILD_TYPE -DCMAKE_INSTALL_PREFIX=$INSTALL_DIR $SRC_DIR
+
+    echo_title Updating translations
+    $BUILD_CMD --target lupdate
+
+    echo_title Building
+    $BUILD_CMD --parallel $NPROC
+}
+
+step_tests() {
+    echo_title Running tests
+    if is_windows ; then
+        echo "Tests do not pass for now on Windows. Skipping them."
+        return
+    fi
+    local test_cmd="$BUILD_CMD --target check"
     if is_linux && [ -z "${DISPLAY:-}" ] ; then
-        xvfb-run $SRC_DIR/ci/headless-test-helper $test_cmd
+        xvfb-run $CI_DIR/lib/headless-test-helper $test_cmd
     else
         $test_cmd
     fi
-fi
+}
 
-echo_title Installing
-$BUILD_CMD --target install
+step_install() {
+    echo_title Installing
+    $BUILD_CMD --target install
+}
 
-echo_title "Creating binary packages"
-$BUILD_CMD --target package
+step_binary-packages() {
+    echo_title "Creating binary packages"
+    $BUILD_CMD --target package
+}
 
-if is_linux ; then
-    # No need to build the source package everywhere, arbitrarily decide to
-    # build it on Linux
+step_source-package() {
     echo_title "Creating source package"
     $BUILD_CMD --target package_source
-fi
+}
+
+check_step_exists() {
+    fgrep -q --line-regexp "step_$1() {" $CI_DIR/$PROGNAME
+}
+
+usage() {
+    if [ "$*" != "" ] ; then
+        echo "Error: $*"
+    fi
+
+    cat << EOF
+Usage: $PROGNAME [OPTION ...] [steps...]
+$DESCRIPTION
+
+Options:
+  -h, --help          display this usage message and exit
+
+Steps:
+EOF
+    grep '^step_[-a-z]*() {' $CI_DIR/$PROGNAME | sed -e's/step_/  /' -e 's/() {//'
+
+    exit 1
+}
+
+main() {
+    detect_os
+    init_run_as_root
+    init_nproc
+
+    steps=""
+    while [ $# -gt 0 ] ; do
+        case "$1" in
+        -h|--help)
+            usage
+            ;;
+        *)
+            check_step_exists $1 || usage "Unknown step '$1'"
+            steps="$steps step_$1"
+            ;;
+        esac
+        shift
+    done
+
+    for step in $steps ; do
+        $step
+    done
+}
+
+main $@
