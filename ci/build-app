@@ -13,8 +13,9 @@ SRC_DIR=$PWD
 popd > /dev/null
 
 CI_DIR=$SRC_DIR/ci
-BUILD_DIR=$SRC_DIR/build
-INSTALL_DIR=$SRC_DIR/inst
+WORK_DIR=${WORK_DIR:-$SRC_DIR/_work}
+BUILD_DIR=$WORK_DIR/build
+INSTALL_DIR=$WORK_DIR/install
 
 BUILD_TYPE=Release
 BUILD_CMD="cmake --build $BUILD_DIR --config $BUILD_TYPE"
@@ -197,6 +198,8 @@ main() {
         esac
         shift
     done
+
+    mkdir -p $WORK_DIR
 
     for step in $steps ; do
         $step
