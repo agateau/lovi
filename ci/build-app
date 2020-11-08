@@ -130,11 +130,12 @@ step_build() {
 
 step_tests() {
     echo_title Running tests
+    local test_args=""
     if is_windows ; then
-        echo "Tests do not pass for now on Windows. Skipping them."
-        return
+        echo "Some tests do not pass for now on Windows. Skipping them."
+        test_args="exclude:[skipOnWindows]"
     fi
-    local test_cmd="$BUILD_CMD --target check"
+    local test_cmd="$BUILD_DIR/tests/tests $test_args"
     if is_linux && [ -z "${DISPLAY:-}" ] ; then
         xvfb-run $CI_DIR/lib/headless-test-helper $test_cmd
     else

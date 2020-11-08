@@ -36,7 +36,12 @@ void appendToFile(const QString& path) {
     file.write("hello\n");
 };
 
-TEST_CASE("filewatcher") {
+/* QSystemWatcher is flaky on Windows. Adding some QTest::qWait() helps but it's
+ * a hack. It may be caused by https://bugreports.qt.io/browse/QTBUG-41119.
+ *
+ * For now mark the tests with skipOnWindows as a workaround.
+ */
+TEST_CASE("filewatcher", "[skipOnWindows]") {
     QTemporaryDir tempDir("filewatchertest-XXXXXX");
     FileWatcher watcher;
     QSignalSpy fileCreatedSpy(&watcher, &FileWatcher::fileCreated);

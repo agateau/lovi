@@ -52,7 +52,7 @@ static void checkSignal(QSignalSpy* spy, const QVariantList& args) {
     spy->clear();
 }
 
-TEST_CASE("FileLineProvider") {
+TEST_CASE("FileLineProvider", "[skipOnWindows]") {
     QTemporaryDir tempDir;
     QString path = tempDir.filePath("test.txt");
 
