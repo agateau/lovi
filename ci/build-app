@@ -117,8 +117,7 @@ EOF
 main() {
     init_run_as_root
     init_nproc
-    # Disable for now
-    # init_python_cmd
+    init_python_cmd
 
     steps=""
     while [ $# -gt 0 ] ; do

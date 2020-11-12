@@ -40,25 +40,6 @@ install_cmake() {
     $PYTHON_CMD -m pip install cmake==$CMAKE_VERSION
 }
 
-install_ecm() {
-    echo_title "Installing ECM"
-    git clone --depth 1 https://anongit.kde.org/extra-cmake-modules.git -b v$ECM_VERSION
-    (
-        cd extra-cmake-modules
-        mkdir build
-        cd build
-        cmake \
-            -DCMAKE_INSTALL_PREFIX=$INSTALL_DIR \
-            -DBUILD_HTML_DOCS=OFF \
-            -DBUILD_MAN_DOCS=OFF \
-            -DBUILD_QTHELP_DOCS=OFF \
-            -DBUILD_TESTING=OFF \
-            ..
-        cmake --build .
-        cmake --build . --target install
-    )
-}
-
 install_prebuilt_archive() {
     local url=$1
     local sha1=$2
@@ -86,4 +67,11 @@ install_prebuilt_archive() {
                 ;;
         esac
     )
+}
+
+install_cmake_based_dependencies() {
+    echo_title "Installing cmake-based dependencies"
+    local build_dir=$WORK_DIR/cmake
+    cmake -B $build_dir -S $CI_DIR/lib/cmake -DCMAKE_INSTALL_PREFIX=$INSTALL_DIR
+    cmake --build $build_dir --parallel $NPROC
 }
