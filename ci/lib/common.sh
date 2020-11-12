@@ -83,19 +83,22 @@ init_nproc() {
     fi
 }
 
-# Insert a new directory at the beginning of $PATH in env.sh
+# Insert a new directory at the beginning of $PATH in the current environment
+# and env.sh
 #
 # $1 the directory to insert
 prepend_path() {
+    export PATH="$1:$PATH"
     echo "export PATH=\"$1:\$PATH\"" >> $ENV_FILE
 }
 
-# Define a new environment variable in env.sh
+# Define a new environment variable in the current environment and env.sh
 #
 # $1 name of the variable
 # $2 value of the variable
 add_env_var() {
     local var=$1
     local value=$2
+    export $var="$value"
     echo "export $var=\"$value\"" >> $ENV_FILE
 }
