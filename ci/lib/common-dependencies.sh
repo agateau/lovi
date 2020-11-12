@@ -21,7 +21,7 @@ install_qt() {
     if is_macos ; then
         aqt_args="mac desktop"
     fi
-    $PYTHON_CMD -m pip install aqtinstall==$AQTINSTALL_VERSION
+    $PIP_INSTALL_CMD aqtinstall==$AQTINSTALL_VERSION
     $PYTHON_CMD -m aqt install --outputdir $qt_install_dir $QT_VERSION $aqt_args --archives $AQTINSTALL_ARCHIVES
 
     # Add Qt bin dir to $PATH so that CMake find qmake and tests can find Qt dlls
@@ -36,7 +36,7 @@ install_qt() {
 
 install_cmake() {
     echo_title "Installing CMake"
-    $PYTHON_CMD -m pip install cmake==$CMAKE_VERSION
+    $PIP_INSTALL_CMD cmake==$CMAKE_VERSION
 }
 
 install_prebuilt_archive() {

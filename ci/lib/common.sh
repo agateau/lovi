@@ -52,6 +52,7 @@ init_python_cmd() {
     for interpreter in python3 python ; do
         if $interpreter -m pip --version 2> /dev/null ; then
             export PYTHON_CMD=$interpreter
+            export PIP_INSTALL_CMD="$interpreter -m pip install --user"
             return
         fi
     done
