@@ -41,17 +41,11 @@ step_install-dependencies() {
 }
 
 step_build() {
-    local cmake_generator=Ninja
-    if is_linux ; then
-        # Ubuntu 18.04 does not have Ninja
-        cmake_generator="Unix Makefiles"
-    fi
-
     echo_title Configuring
     . $ENV_FILE
     mkdir $BUILD_DIR
     cd $BUILD_DIR
-    cmake "-G$cmake_generator" -DCMAKE_BUILD_TYPE=$BUILD_TYPE -DCMAKE_INSTALL_PREFIX=$INSTALL_DIR $SRC_DIR
+    cmake -DCMAKE_BUILD_TYPE=$BUILD_TYPE -DCMAKE_INSTALL_PREFIX=$INSTALL_DIR $SRC_DIR
 
     echo_title Updating translations
     $BUILD_CMD --target lupdate
