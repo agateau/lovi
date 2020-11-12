@@ -23,16 +23,15 @@ install_qt() {
     fi
     $PYTHON_CMD -m pip install aqtinstall==$AQTINSTALL_VERSION
     $PYTHON_CMD -m aqt install --outputdir $qt_install_dir $QT_VERSION $aqt_args --archives $AQTINSTALL_ARCHIVES
-    if is_windows ; then
-        # Add Qt bin dir to $PATH so that tests can find Qt dlls
-        prepend_path $(find $qt_install_dir -type d -a -name bin)
-    fi
+
+    # Add Qt bin dir to $PATH so that CMake find qmake and tests can find Qt dlls
+    prepend_path $(find $qt_install_dir -type d -a -name bin)
+
     # Add Qt plugins dir to $QT_PLUGIN_PATH because the official Qt installer
     # patches QtCore dll so that it finds its plugins, but aqt does not.
     # Not being able to find plugins causes tests to not run on macOS and
     # Windows because they can't find the matching platform plugin.
     add_env_var QT_PLUGIN_PATH $(find $qt_install_dir -type d -a -name plugins)
-    add_env_var Qt5_DIR $(find $qt_install_dir -path '*/lib/cmake')
 }
 
 install_cmake() {
