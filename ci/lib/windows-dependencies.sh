@@ -12,8 +12,8 @@ install_icoutils() {
 }
 
 install_dependencies() {
-    install_icoutils
     install_qt
     install_cmake
     install_cmake_based_dependencies
+    install_icoutils
 }
