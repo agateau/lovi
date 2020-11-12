@@ -16,97 +16,28 @@ CI_DIR=$SRC_DIR/ci
 WORK_DIR=${WORK_DIR:-$SRC_DIR/_work}
 BUILD_DIR=$WORK_DIR/build
 INSTALL_DIR=$WORK_DIR/install
+ENV_FILE=$WORK_DIR/env.sh
 
 BUILD_TYPE=Release
 BUILD_CMD="cmake --build $BUILD_DIR --config $BUILD_TYPE"
 
-echo_title() {
-    echo "========================================="
-    echo $*
-    echo "========================================="
-}
+. $CI_DIR/lib/common.sh
+# Call this function here because we need $OS to load the right
+# OS-dependencies.sh file
+detect_os
 
-detect_os() {
-    local out
-    out=$(uname)
+. $CI_DIR/lib/common-dependencies.sh
+. $CI_DIR/lib/$OS-dependencies.sh
 
-    case "$out" in
-    Linux)
-        OS="linux"
-        ;;
-    Darwin)
-        OS="macos"
-        ;;
-    MINGW*)
-        OS="windows"
-        ;;
-    *)
-        echo "Unknown OS. uname printed '$out'"
-        exit 1
-        ;;
-    esac
-}
-
-is_linux() {
-    [ "$OS" = "linux" ]
-}
-
-is_macos() {
-    [ "$OS" = "macos" ]
-}
-
-is_windows() {
-    [ "$OS" = "windows" ]
-}
-
-has_command() {
-    command -v "$1" > /dev/null 2>&1
-}
-
-die() {
-    echo "$*" >&2
-    exit 1
-}
-
-mkabsdir() {
-    mkdir -p "$1"
-    pushd $PWD > /dev/null
-    cd "$1"
-    echo $PWD
-    pop > /dev/null
-}
-
-init_run_as_root() {
-    RUN_AS_ROOT=""
-    if is_windows ; then
-        return
-    fi
-    if [ $(id -u) = "0" ] ; then
-        # Already root
-        return
-    fi
-    if has_command sudo ; then
-        RUN_AS_ROOT=sudo
-    else
-        RUN_AS_ROOT="su -c"
-    fi
-}
-
-init_nproc() {
-    if is_macos ; then
-        NPROC=$(sysctl -n hw.ncpu)
-    else
-        NPROC=$(nproc)
-    fi
-}
-
-install_qpropgen_dependencies() {
-    echo_title "Installing qpropgen dependencies"
-    python -m pip install -r $SRC_DIR/third-party/qpropgen/requirements.txt
-}
-
+#- Build steps ----------------------------------------------------------------
 step_install-dependencies() {
-    . $CI_DIR/lib/install-$OS-dependencies.sh
+    echo_title "Installing dependencies"
+    # The install_dependencies() function can define environment variables to
+    # help the other steps do their work: adding directories to $PATH or
+    # defining the installation directory of libraries so that the build step
+    # can find them.
+    > $ENV_FILE
+    install_dependencies
 }
 
 step_build() {
@@ -117,6 +48,7 @@ step_build() {
     fi
 
     echo_title Configuring
+    . $ENV_FILE
     mkdir $BUILD_DIR
     cd $BUILD_DIR
     cmake "-G$cmake_generator" -DCMAKE_BUILD_TYPE=$BUILD_TYPE -DCMAKE_INSTALL_PREFIX=$INSTALL_DIR $SRC_DIR
@@ -130,6 +62,7 @@ step_build() {
 
 step_tests() {
     echo_title Running tests
+    . $ENV_FILE
     local test_args=""
     if is_windows ; then
         echo "Some tests do not pass for now on Windows. Skipping them."
@@ -158,8 +91,9 @@ step_source-package() {
     $BUILD_CMD --target package_source
 }
 
+#- Main -----------------------------------------------------------------------
 check_step_exists() {
-    fgrep -q --line-regexp "step_$1() {" $CI_DIR/$PROGNAME
+    [ $(type -t "step_$1") = "function" ]
 }
 
 usage() {
@@ -170,21 +104,21 @@ usage() {
     cat << EOF
 Usage: $PROGNAME [OPTION ...] [steps...]
 $DESCRIPTION
-
 Options:
   -h, --help          display this usage message and exit
 
 Steps:
 EOF
-    grep '^step_[-a-z]*() {' $CI_DIR/$PROGNAME | sed -e's/step_/  /' -e 's/() {//'
+    grep '^step_[-a-z]*() {' $CI_DIR/$PROGNAME | sed -e 's/step_/  /' -e 's/() {//'
 
     exit 1
 }
 
 main() {
-    detect_os
     init_run_as_root
     init_nproc
+    # Disable for now
+    # init_python_cmd
 
     steps=""
     while [ $# -gt 0 ] ; do
@@ -201,6 +135,7 @@ main() {
     done
 
     mkdir -p $WORK_DIR
+    mkdir -p $INSTALL_DIR
 
     for step in $steps ; do
         $step
