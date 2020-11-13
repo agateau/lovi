@@ -39,38 +39,11 @@ install_cmake() {
     $PIP_INSTALL_CMD cmake==$CMAKE_VERSION
 }
 
-install_prebuilt_archive() {
-    local url=$1
-    local sha1=$2
-    local download_file=$3
-    local unpack_dir=$4
-
-    echo "Downloading '$url'"
-    curl --location --continue-at - --output "$download_file" "$url"
-
-    echo "Checking integrity"
-    echo "$sha1 $download_file" | sha1sum --check
-
-    echo "Unpacking"
-    (
-        cd "$unpack_dir"
-        case "$download_file" in
-            *.zip)
-                unzip -q "$download_file"
-                ;;
-            *.tar.gz|*.tar.bz2|*.tar.xz)
-                tar xf "$download_file"
-                ;;
-            *)
-                die "Don't know how to unpack $download_file"
-                ;;
-        esac
-    )
-}
-
 install_cmake_based_dependencies() {
     echo_title "Installing cmake-based dependencies"
     local build_dir=$WORK_DIR/cmake
+    mkdir -p "$INSTALL_DIR/bin"
+    prepend_path "$INSTALL_DIR/bin"
     cmake -B $build_dir -S $CI_DIR/lib/cmake -DCMAKE_INSTALL_PREFIX=$INSTALL_DIR
     cmake --build $build_dir --parallel $NPROC
 }
