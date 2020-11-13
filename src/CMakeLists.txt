@@ -53,10 +53,6 @@ set(APPLIB_SRCS
 
 qt5_add_resources(APPLIB_RESOURCES_SRCS ui/lovi.qrc)
 
-qpropgen(QPROPGEN_SRCS
-    core/BaseMainController.yaml
-)
-
 # App library
 add_library(${APPLIB_NAME} STATIC
     ${APPLIB_SRCS}

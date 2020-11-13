@@ -12,6 +12,4 @@ install_dependencies() {
         $mingw_prefix-python-pip \
         $mingw_prefix-icoutils \
         $mingw_prefix-ninja
-
-    install_qpropgen_dependencies
 }

@@ -71,19 +71,6 @@ Lovi uses the Qt framework and a few other dependencies:
 
 - [CMake](https://cmake.org)
 - [KF5GuiAddons](https://download.kde.org)
-- [qpropgen](https://github.com/agateau/qpropgen), bundled as a submodule, so you just need to install its dependencies (see below)
-
-Make sure you have the submodules:
-
-```
-git submodule update --init --recursive
-```
-
-Install qpropgen dependencies:
-
-```
-pip3 install -r third-party/qpropgen/requirements.txt`
-```
 
 Create a build dir:
 
