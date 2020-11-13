@@ -33,7 +33,7 @@
 static const int MAX_RECENT_FILES = 10;
 
 MainController::MainController(Config* config, LogFormatStore* store, QObject* parent)
-        : BaseMainController(parent)
+        : QObject(parent)
         , mConfig(config)
         , mLogFormatStore(store)
         , mEmptyLogFormat(LogFormat::createEmpty())
@@ -46,7 +46,7 @@ MainController::~MainController() {
 }
 
 void MainController::loadLog(const QString& filePath) {
-    setLogPath(filePath);
+    mLogPath = filePath;
 
     LogFormat* format = mLogFormat;
     if (!isStdin()) {
@@ -102,6 +102,34 @@ void MainController::setLogFormat(LogFormat* format) {
 
 LogFormat* MainController::logFormat() const {
     return mLogFormat;
+}
+
+std::optional<int> MainController::currentRow() const {
+    return mCurrentRow;
+}
+
+void MainController::setCurrentRow(const std::optional<int>& value) {
+    if (mCurrentRow == value) {
+        return;
+    }
+    mCurrentRow = value;
+    currentRowChanged(value);
+}
+
+QString MainController::logPath() const {
+    return mLogPath;
+}
+
+Highlight* MainController::currentHighlight() const {
+    return mCurrentHighlight;
+}
+
+void MainController::setCurrentHighlight(Highlight* value) {
+    if (mCurrentHighlight == value) {
+        return;
+    }
+    mCurrentHighlight = value;
+    currentHighlightChanged(value);
 }
 
 void MainController::startSearch(SearchDirection direction) {

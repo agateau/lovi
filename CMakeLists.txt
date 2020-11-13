@@ -24,7 +24,6 @@ find_package(ECM REQUIRED NO_MODULE)
 list(APPEND CMAKE_MODULE_PATH ${ECM_MODULE_PATH})
 
 find_package(KF5GuiAddons CONFIG REQUIRED)
-include(third-party/qpropgen/cmake/qpropgen.cmake)
 
 # Installation directories
 if (UNIX AND NOT APPLE)

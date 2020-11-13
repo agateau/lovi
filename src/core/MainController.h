@@ -19,15 +19,16 @@
 #ifndef MAINCONTROLLER_H
 #define MAINCONTROLLER_H
 
-#include "BaseMainController.h"
-
 #include <QObject>
 
+// stl
 #include <memory>
+#include <optional>
 
 enum class SearchDirection;
 class Condition;
 class Config;
+class Highlight;
 class LineProvider;
 class LogFormat;
 class LogFormatStore;
@@ -38,7 +39,7 @@ class SearchResponse;
 class QAbstractItemModel;
 class FilterProxyModel;
 
-class MainController : public BaseMainController {
+class MainController : public QObject {
     Q_OBJECT
 public:
     explicit MainController(Config* config, LogFormatStore* store, QObject* parent = nullptr);
@@ -56,12 +57,25 @@ public:
 
     bool isStdin() const;
 
-    void setLogFormat(LogFormat* logFormat) override;
-    LogFormat* logFormat() const override;
+    void setLogFormat(LogFormat* logFormat);
+    LogFormat* logFormat() const;
+
+    std::optional<int> currentRow() const;
+    void setCurrentRow(const std::optional<int>& value);
+
+    QString logPath() const;
+
+    Highlight* currentHighlight() const;
+    void setCurrentHighlight(Highlight* value);
 
     void startSearch(SearchDirection direction);
 
     QStringRef lineAt(int row) const;
+
+signals:
+    void logFormatChanged(LogFormat* logFormat);
+    void currentRowChanged(const std::optional<int>& currentRow);
+    void currentHighlightChanged(Highlight* currentHighlight);
 
 private:
     void updateLogFormatForFile();
@@ -81,6 +95,9 @@ private:
     std::unique_ptr<FilterProxyModel> mFilterProxyModel;
 
     LogFormat* mLogFormat = nullptr; // Never null
+    QString mLogPath;
+    std::optional<int> mCurrentRow;
+    Highlight* mCurrentHighlight = nullptr;
 };
 
 #endif // MAINCONTROLLER_H
