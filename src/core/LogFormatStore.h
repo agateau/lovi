@@ -23,7 +23,9 @@
 
 #include <QObject>
 
+// stl
 #include <memory>
+#include <optional>
 
 class LogFormat;
 

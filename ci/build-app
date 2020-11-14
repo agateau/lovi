@@ -41,17 +41,11 @@ step_install-dependencies() {
 }
 
 step_build() {
-    local cmake_generator=Ninja
-    if is_linux ; then
-        # Ubuntu 18.04 does not have Ninja
-        cmake_generator="Unix Makefiles"
-    fi
-
     echo_title Configuring
     . $ENV_FILE
     mkdir $BUILD_DIR
     cd $BUILD_DIR
-    cmake "-G$cmake_generator" -DCMAKE_BUILD_TYPE=$BUILD_TYPE -DCMAKE_INSTALL_PREFIX=$INSTALL_DIR $SRC_DIR
+    cmake -DCMAKE_BUILD_TYPE=$BUILD_TYPE -DCMAKE_INSTALL_PREFIX=$INSTALL_DIR $SRC_DIR
 
     echo_title Updating translations
     $BUILD_CMD --target lupdate
@@ -63,12 +57,7 @@ step_build() {
 step_tests() {
     echo_title Running tests
     . $ENV_FILE
-    local test_args=""
-    if is_windows ; then
-        echo "Some tests do not pass for now on Windows. Skipping them."
-        test_args="exclude:[skipOnWindows]"
-    fi
-    local test_cmd="$BUILD_DIR/tests/tests $test_args"
+    local test_cmd="$BUILD_CMD --target check"
     if is_linux && [ -z "${DISPLAY:-}" ] ; then
         xvfb-run $CI_DIR/lib/headless-test-helper $test_cmd
     else
@@ -117,8 +106,7 @@ EOF
 main() {
     init_run_as_root
     init_nproc
-    # Disable for now
-    # init_python_cmd
+    init_python_cmd
 
     steps=""
     while [ $# -gt 0 ] ; do
