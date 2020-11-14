@@ -128,6 +128,12 @@ endif()
 if (WIN32)
     include(DeployQt)
     windeployqt(${APP_NAME})
+    # install kf5guiaddons.dll so that it is included in the dll
+    get_target_property(kf5guiaddons_dll KF5::GuiAddons LOCATION)
+    install(
+        FILES ${kf5guiaddons_dll}
+        DESTINATION ${BIN_INSTALL_DIR}
+    )
 endif()
 
 if (APPLE)
