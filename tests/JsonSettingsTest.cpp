@@ -26,6 +26,9 @@
 
 #include <catch2/catch.hpp>
 
+// stl
+#include <optional>
+
 using std::optional;
 
 static void writeContent(const QString& path, const QByteArray& content) {
