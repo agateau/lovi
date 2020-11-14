@@ -3,7 +3,7 @@ cmake_minimum_required(VERSION 3.17)
 
 include(ExternalProject)
 
-set(KF5_TAG v5.44.0)
+set(KF5_TAG v5.68.0)
 
 set(ICOUTILS_VERSION 0.32.3)
 set(ICOUTILS_SHA1 c8fb976eaceb63bffc3943e4e632f825b5abb5ac)
