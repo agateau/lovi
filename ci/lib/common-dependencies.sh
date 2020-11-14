@@ -44,6 +44,7 @@ install_cmake_based_dependencies() {
     local build_dir=$WORK_DIR/cmake
     mkdir -p "$INSTALL_DIR/bin"
     prepend_path "$INSTALL_DIR/bin"
-    cmake -B $build_dir -S $CI_DIR/lib/cmake -DCMAKE_INSTALL_PREFIX=$INSTALL_DIR
-    cmake --build $build_dir --parallel $NPROC
+    cmake -B $build_dir -S $CI_DIR/lib/cmake \
+        -DCMAKE_BUILD_TYPE=$BUILD_TYPE -DCMAKE_INSTALL_PREFIX=$INSTALL_DIR
+    cmake --build $build_dir --config $BUILD_TYPE --parallel $NPROC
 }
