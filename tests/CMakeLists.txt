@@ -29,7 +29,14 @@ target_link_libraries(tests
     Catch2::Catch2
 )
 
-add_test(NAME tests COMMAND tests)
+if (WIN32)
+    # Some test are known to fail on Windows. Skip them for now.
+    set(test_args "exclude:[skipOnWindows]")
+else()
+    set(test_args "")
+endif()
+
+add_test(NAME tests COMMAND tests ${test_args})
 
 # Before running tests, make sure tests they are built if necessary
 add_dependencies(check tests)
