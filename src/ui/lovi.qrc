@@ -1,6 +1,14 @@
 <RCC>
     <qresource prefix="/">
-        <file>icons/sc-apps-lovi.svg</file>
+        <file>appicon/sc-apps-lovi.svg</file>
         <file>palette.gpl</file>
+        <file>icons/fill-color.svg</file>
+        <file>icons/document-open.svg</file>
+        <file>icons/format-text-color.svg</file>
+        <file>icons/go-bottom.svg</file>
+        <file>icons/help-contents.svg</file>
+        <file>icons/list-add.svg</file>
+        <file>icons/object-columns.svg</file>
+        <file>icons/paint-none.svg</file>
     </qresource>
 </RCC>
