@@ -97,3 +97,7 @@ Or generate deb and rpm packages to install:
 ```
 make package
 ```
+
+## Icons
+
+This application bundles icons from the KDE Breeze icon theme.

@@ -70,7 +70,7 @@ void HighlightWidget::setupUi() {
     setEnabled(false);
     layout()->setMargin(0);
 
-    setLabelIcon(ui->bgColorLabel, "color-fill");
+    setLabelIcon(ui->bgColorLabel, "fill-color");
     setLabelIcon(ui->fgColorLabel, "format-text-color");
 
     connect(ui->conditionLineEdit, &QLineEdit::editingFinished, this, [this] {
